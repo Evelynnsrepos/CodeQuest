@@ -1,0 +1,1 @@
+-- Start these three when Hyprland starts: waybar, hyprpaper, nm-applet

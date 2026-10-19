@@ -1,0 +1,2 @@
+{"lang": "lua", "name": "Lua for Hyprland", "icon": "🪟", "order": 35, "prelude": "prelude.lua",
+ "blurb": "Write your own hyprland.lua: settings, keybinds, workspaces, autostart, window rules. Uses a practice copy of Hyprland's hl API. Do the Lua basics first."}

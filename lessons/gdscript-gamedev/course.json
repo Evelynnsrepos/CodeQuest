@@ -1,0 +1,2 @@
+{"lang": "gdscript", "name": "GDScript for game dev", "icon": "🕹️", "order": 25,
+ "blurb": "Movement, input, signals, cooldowns, spawning and enemy AI with real Godot nodes. Do the GDScript basics first."}

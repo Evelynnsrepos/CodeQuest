@@ -1,0 +1,9 @@
+CodeQuest on Windows
+====================
+
+1. Make sure you extracted the zip (right-click it > Extract All).
+2. Double-click install.bat in this folder.
+   If Windows says "Windows protected your PC", click More info > Run anyway.
+3. Then open CodeQuest from the Start menu or the desktop icon.
+
+More help is in README.md.
