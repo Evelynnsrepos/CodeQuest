@@ -1,6 +1,6 @@
 # CodeQuest
 
-A self-hosted, game-style coding course in the spirit of Boot.dev. It teaches **Python**, **GDScript** (Godot), **Lua** and **Rust** with hands-on lessons, XP, levels and daily streaks. You run it on your computer and open it in any browser, including your phone or tablet on the same Wi-Fi.
+A self-hosted, game-style coding course in the spirit of Boot.dev. It teaches **Python**, **GDScript** (Godot), **Lua**, **Rust**, **Nix** (with flakes) and **Git** with hands-on lessons, XP, levels and daily streaks. You run it on your computer and open it in any browser, including your phone or tablet on the same Wi-Fi.
 
 ## Install on Windows
 
@@ -31,7 +31,7 @@ It copies CodeQuest to `~/.local/share/codequest`, adds a `codequest` command, a
 | `codequest` | Starts CodeQuest in the background (if it isn't running) and opens it in your browser |
 | `codequest phone` | Shows the address for your phone or tablet, with a QR code if `qrencode` is installed |
 | `codequest stop` | Stops it |
-| `codequest status` | Shows whether it's running, its addresses, and whether Godot and Rust were found |
+| `codequest status` | Shows whether it's running, its addresses, and whether Godot, Rust, Nix and Git were found |
 | `codequest autostart on` | Starts it every time you log in (systemd), so your phone can always connect |
 | `codequest pin 4821` | Asks for a PIN before anyone can run code (`codequest pin off` removes it) |
 | `codequest godot /path/to/godot` | Tells CodeQuest where Godot is |
@@ -61,12 +61,14 @@ Your progress (XP, streak, saved code) is stored on the computer, so it's the sa
 
 Double-click `start.bat` on Windows (it keeps a window open while it runs), or run `python3 server.py --open` from the `codequest` folder on any system. It needs Python 3.9 or newer. Server options: `--pin 4821`, `--port 9000`, `--local-only` (only this computer can connect), `--godot PATH`, `--open`.
 
-## GDScript and Rust
+## GDScript, Rust, Nix and Git
 
-Python and Lua run inside the browser. GDScript and Rust lessons are sent to the host computer, which compiles and runs them, so it needs:
+Python and Lua run inside the browser. GDScript, Rust, Nix and Git lessons are sent to the host computer, which runs them, so it needs:
 
 - **Godot 4** from [godotengine.org](https://godotengine.org/download) (tested with 4.5). Put it on your PATH as `godot`, copy the program into CodeQuest's `tools` folder (on Windows: `%LOCALAPPDATA%\CodeQuest\tools`), or use `codequest godot /path/to/Godot`. On a Mac that path is usually `/Applications/Godot.app/Contents/MacOS/Godot`. On Windows, point it at the `_console.exe` file that comes in the Godot download, because the other one doesn't report output.
 - **Rust** from [rustup.rs](https://rustup.rs).
+- **Nix** for the Nix courses. NixOS has it; elsewhere get it from [nixos.org/download](https://nixos.org/download). Lessons are only evaluated with `nix-instantiate --eval`, never built. There's no Nix for Windows itself, so on Windows these two courses only work inside WSL.
+- **Git** from [git-scm.com](https://git-scm.com) (on NixOS: `pkgs.git`).
 
 The home page tells you if either is missing. Each run has a 10-second limit so an endless loop can't hang the computer.
 
@@ -80,8 +82,15 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 | Lua | Lua | browser |
 | Lua for Hyprland | Lua | browser |
 | Rust | Rust | host computer |
+| Git | Git commands | host computer |
+| Nix | Nix | host computer (Nix) |
+| Nix flakes | Nix | host computer (Nix) |
 
 **Lua for Hyprland** teaches the Lua config that Hyprland uses since version 0.55 (`~/.config/hypr/hyprland.lua`). Lessons run against a practice copy of Hyprland's `hl` API (`lessons/lua-hyprland/prelude.lua`) that records what your code sets and shows a summary, so nothing on your real desktop changes. If `hyprctl version` shows something older than 0.55, your Hyprland still uses `hyprland.conf`, which has a different syntax.
+
+**Nix** and **Nix flakes** evaluate your code with `nix-instantiate`. The flakes course passes your `outputs` a practice nixpkgs (`lessons/nix-flakes/prelude.nix`), so nothing is downloaded or built, and Run shows the outputs your flake produces. The last lessons of both courses are about your own NixOS configuration.
+
+**Git** lessons are a list of commands, one per line, run in a fresh practice repository every time. Only `git` plus `echo`, `cat`, `ls`, `mkdir`, `rm` and `cd` are allowed, and git uses a private practice config, so your real repositories and `~/.gitconfig` are never touched. A lesson can have a hidden `setup.sh` (same commands) that prepares the repository, for example with branches that conflict.
 
 **GDScript for game dev** runs your script as a real node in a headless Godot scene: `_ready()` runs, and the checks call `_process(delta)`, press input actions and listen to your signals.
 
@@ -124,6 +133,8 @@ Checks per language:
 - **Lua** `check.lua`: `assert(condition, "message")` lines. The learner's global variables and functions are available directly, and `output` is what they printed. Ask learners to keep checked functions global (no `local`).
 - **GDScript** `check.gd`: a script with `func check(player) -> String`. `player` is the learner's script object after `run()` was called. Return `""` to pass or a message to fail. The learner's code goes in `func run():`.
 - **Rust** `tests.rs`: normal `#[test]` functions. They are placed in a test module next to the learner's code, so they can call its functions directly.
+- **Nix** `check.nix`: a function `{ result, prelude, expect }: [ (expect condition "message") ... ]`. `result` is the learner's value and `prelude` the course prelude, if any. Checks run in order and the first failing message is shown. Starter, solution and check files end in `.nix`.
+- **Git** `check.py`: Python `assert` statements, run after the learner's commands. `git("log", "-1", "--format=%s")` returns git's output, `read(path)` a file's text, `exists(path)` whether it exists, and `output` the whole transcript. Starter and solution files end in `.sh`; `setup.sh` is optional.
 
 ## Troubleshooting
 
@@ -134,7 +145,7 @@ Checks per language:
 ## What's inside
 
 - `codequest`: the command that starts, stops and opens CodeQuest. `install.sh` installs it.
-- `server.py`: the web server, progress database and GDScript/Rust runners (Python standard library only).
+- `server.py`: the web server, progress database and GDScript, Rust, Nix and Git runners (Python standard library only).
 - `static/`: the web page.
 - `runners/runner.gd`: loads the learner's GDScript inside headless Godot.
 - `vendor/`: Pyodide, wasmoon (Lua), CodeMirror, marked and a QR code library, bundled so the app works without internet. See `vendor/LICENSES.md`.

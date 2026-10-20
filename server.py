@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CodeQuest: a self-hosted, game-style coding course for Python, GDScript, Lua and Rust.
+"""CodeQuest: a self-hosted, game-style coding course for Python, GDScript, Lua, Rust, Nix and Git.
 
 Run it on your computer, then open it from any browser on your network:
 
@@ -7,8 +7,8 @@ Run it on your computer, then open it from any browser on your network:
     python3 server.py --pin 4821   # ask for a PIN before anyone can run code
     python3 server.py --local-only # only this computer can open it
 
-Python and Lua lessons run inside the browser (Pyodide, wasmoon). GDScript and Rust lessons are
-compiled and run on this computer, so Godot 4 and Rust need to be installed here.
+Python and Lua lessons run inside the browser (Pyodide, wasmoon). GDScript, Rust, Nix and Git
+lessons run on this computer, so Godot 4, Rust, Nix and Git need to be installed here.
 Only the Python standard library is required.
 """
 
@@ -18,13 +18,16 @@ import json
 import mimetypes
 import os
 import re
+import shlex
 import shutil
 import socket
 import sqlite3
 import subprocess
 import sys
 import tempfile
+import textwrap
 import threading
+import time
 import webbrowser
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -43,6 +46,9 @@ LANGUAGES = {
     "gdscript": {"name": "GDScript", "ext": "gd", "runs_on": "server"},
     "lua": {"name": "Lua", "ext": "lua", "runs_on": "browser"},
     "rust": {"name": "Rust", "ext": "rs", "runs_on": "server"},
+    "nix": {"name": "Nix", "ext": "nix", "runs_on": "server"},
+    # Git lessons are short scripts of shell-style commands; checks are Python run by this server.
+    "git": {"name": "Git", "ext": "sh", "check_ext": "py", "runs_on": "server"},
 }
 
 RUN_TIMEOUT = 10  # seconds a learner program may run
@@ -112,10 +118,14 @@ def load_courses():
                 "starter": read_optional(folder / f"starter.{ext}") or "",
                 "solution": read_optional(folder / f"solution.{ext}"),
                 "expected_output": read_optional(folder / "expected_output.txt"),
-                "check": read_optional(folder / f"check.{ext}"),
+                "check": read_optional(folder / f"check.{LANGUAGES[lang].get('check_ext', ext)}"),
+                "setup": read_optional(folder / "setup.sh"),
                 "tests": read_optional(folder / "tests.rs"),
             })
         prelude = meta.get("prelude")
+        prelude_code = read_optional(course_dir / prelude) if prelude else None
+        for lesson in lessons:
+            lesson["prelude"] = prelude_code  # server-run languages (Nix) need it next to the lesson
         courses[course_dir.name] = {
             "id": course_dir.name,
             "lang": lang,
@@ -123,7 +133,7 @@ def load_courses():
             "icon": meta.get("icon"),
             "blurb": meta.get("blurb"),
             "order": meta.get("order", 100),
-            "prelude": read_optional(course_dir / prelude) if prelude else None,
+            "prelude": prelude_code,
             "lessons": lessons,
         }
     return dict(sorted(courses.items(), key=lambda kv: (kv[1]["order"], kv[0])))
@@ -274,6 +284,31 @@ def find_godot(explicit=None):
     return None
 
 
+def find_nix():
+    """nix-instantiate evaluates Nix expressions without building anything."""
+    found = shutil.which("nix-instantiate")
+    if found:
+        return found
+    for c in ("/run/current-system/sw/bin/nix-instantiate", "/nix/var/nix/profiles/default/bin/nix-instantiate",
+              str(Path.home() / ".nix-profile" / "bin" / "nix-instantiate")):
+        if Path(c).is_file():
+            return c
+    return None
+
+
+def find_git():
+    found = shutil.which("git")
+    if found:
+        return found
+    if os.name == "nt":
+        for base in (os.environ.get("ProgramFiles", r"C:\Program Files"),
+                     str(Path(os.environ.get("LOCALAPPDATA", "")) / "Programs")):
+            c = Path(base) / "Git" / "cmd" / "git.exe"
+            if c.is_file():
+                return str(c)
+    return None
+
+
 def find_rustc():
     found = shutil.which("rustc")
     if found:
@@ -289,7 +324,7 @@ def clip(text):
     return text
 
 
-# On Windows, stop Godot and Rust from flashing a console window for every run.
+# On Windows, stop Godot, Rust and Git from flashing a console window for every run.
 NO_WINDOW = {"creationflags": 0x08000000} if os.name == "nt" else {}
 
 
@@ -445,6 +480,296 @@ def summarize_rust_tests(out):
     return "\n".join(lines) or out[-2000:]
 
 
+# Nix: the learner's file is evaluated (never built) with nix-instantiate. A lesson's check.nix is a
+# function { result, prelude, expect }: [ checks ], where each check is (expect condition "message").
+# The checks are tried in order and the first failing message is shown. A course prelude.nix
+# can provide practice inputs (a mock nixpkgs) and a `show` function for what Run prints.
+NIX_JUDGE = """
+let
+  result = import ./main.nix;
+  prelude = if builtins.pathExists ./prelude.nix then import ./prelude.nix else { };
+  expect = cond: msg: if cond then null else msg;
+  checks = import ./check.nix { inherit result prelude expect; };
+  go = i:
+    if i >= builtins.length checks then ""
+    else let m = builtins.elemAt checks i; in if m == null then go (i + 1) else m;
+in go 0
+"""
+NIX_SHOW = "(import ./prelude.nix).show (import ./main.nix)\n"
+
+
+def clean_nix_errors(text, tmp):
+    """Keep the last 'error:' and where it happened; drop the trace through CodeQuest's own files."""
+    text = text.replace(str(tmp) + os.sep, "").replace(str(tmp), ".")
+    lines = [l for l in text.strip().splitlines() if "(stack trace truncated" not in l]
+    starts = [i for i, l in enumerate(lines) if l.strip().startswith("error:")]
+    if starts:
+        lines = lines[starts[-1]:]
+    return textwrap.dedent("\n".join(lines)).strip()
+
+
+NIX_TOKEN_RE = re.compile(r'"(?:[^"\\]|\\.)*"|[{}\[\];=]|[^\s{}\[\];="]+')
+
+
+def format_nix_value(text, width=60):
+    """Lay out nix-instantiate's one-line output over several lines when it's long."""
+    tokens = NIX_TOKEN_RE.findall(text)
+    pos = 0
+
+    def parse():
+        nonlocal pos
+        tok = tokens[pos]
+        pos += 1
+        if tok == "{":
+            items = []
+            while tokens[pos] != "}":
+                key = tokens[pos]
+                pos += 2  # key and =
+                items.append((key, parse()))
+                pos += 1  # ;
+            pos += 1
+            return ("set", items)
+        if tok == "[":
+            items = []
+            while tokens[pos] != "]":
+                items.append(parse())
+            pos += 1
+            return ("list", items)
+        return ("atom", tok)
+
+    def inline(node):
+        kind, value = node
+        if kind == "atom":
+            return value
+        if kind == "set":
+            return "{ " + "".join(f"{k} = {inline(v)}; " for k, v in value) + "}" if value else "{ }"
+        return "[ " + "".join(inline(v) + " " for v in value) + "]" if value else "[ ]"
+
+    def block(node, level, column):
+        flat = inline(node)
+        kind, value = node
+        if kind == "atom" or column + len(flat) <= width:
+            return flat
+        pad = "  " * (level + 1)
+        if kind == "set":
+            body = "".join(f"{pad}{k} = {block(v, level + 1, len(pad) + len(k) + 3)};\n" for k, v in value)
+            return "{\n" + body + "  " * level + "}"
+        body = "".join(f"{pad}{block(v, level + 1, len(pad))}\n" for v in value)
+        return "[\n" + body + "  " * level + "]"
+
+    try:
+        tree = parse()
+        if pos != len(tokens):
+            return text
+        return block(tree, 0, 0)
+    except (IndexError, ValueError):
+        return text
+
+
+def run_nix(lesson, code, mode, nix):
+    if not nix:
+        return {"ok": False, "output": "", "error":
+                "Nix isn't installed on the computer running CodeQuest. Install it from nixos.org/download "
+                "(it comes with NixOS), then restart CodeQuest."}
+    with tempfile.TemporaryDirectory(prefix="codequest-nix-") as tmp:
+        tmp = Path(tmp)
+        (tmp / "main.nix").write_text(code, encoding="utf-8")
+        if lesson["prelude"]:
+            (tmp / "prelude.nix").write_text(lesson["prelude"], encoding="utf-8")
+            (tmp / "show.nix").write_text(NIX_SHOW, encoding="utf-8")
+        target = "show.nix" if lesson["prelude"] else "main.nix"
+        rc, out, err, timed_out = run_process([nix, "--eval", "--strict", target], tmp, RUN_TIMEOUT)
+        if timed_out:
+            return {"ok": False, "output": "", "error":
+                    f"Evaluating took more than {RUN_TIMEOUT} seconds and was stopped. Does something call itself forever?"}
+        if rc != 0:
+            return {"ok": False, "output": "", "error": clip(clean_nix_errors(err, tmp) or "Nix couldn't evaluate your code.")}
+        result = {"ok": True, "output": clip(format_nix_value(out.strip()))}
+        if err.strip():
+            result["warnings"] = clip(clean_nix_errors(err, tmp))
+        if mode != "submit":
+            return result
+
+        check_message = None
+        if lesson["check"]:
+            (tmp / "check.nix").write_text(lesson["check"], encoding="utf-8")
+            (tmp / "judge.nix").write_text(NIX_JUDGE, encoding="utf-8")
+            rc, out, err, timed_out = run_process([nix, "--eval", "--strict", "--json", "judge.nix"], tmp, RUN_TIMEOUT)
+            if timed_out:
+                check_message = {"passed": False, "message": "The checks took too long. Does something call itself forever?"}
+            elif rc != 0:
+                check_message = {"passed": False, "message": "The checks hit an error while using your code:\n\n"
+                                 + clip(clean_nix_errors(err, tmp))}
+            else:
+                message = json.loads(out)
+                check_message = {"passed": message == "", "message": message}
+        result.update(judge(lesson, result["output"], check_message=check_message, has_check=bool(lesson["check"])))
+        return result
+
+
+# Git: lessons are short scripts, one command per line, run in a fresh practice folder. Only git and a
+# few file commands are understood (no real shell), so this works the same on Windows. git's settings
+# point at a private config file in the practice folder, so the learner's real git setup is untouched.
+GIT_FILE_COMMANDS = ("echo", "cat", "ls", "mkdir", "rm", "cd", "pwd")
+GIT_SANDBOX_CONFIG = """[user]
+\tname = CodeQuest Learner
+\temail = learner@codequest.local
+[init]
+\tdefaultBranch = main
+[advice]
+\tdetachedHead = false
+[core]
+\tautocrlf = false
+"""
+
+
+class GitSandbox:
+    def __init__(self, git, root):
+        self.git_bin = git
+        self.root = root.resolve()
+        self.cwd = self.root / "project"
+        self.cwd.mkdir()
+        home = self.root / "home"
+        home.mkdir()
+        (home / ".gitconfig").write_text(GIT_SANDBOX_CONFIG, encoding="utf-8")
+        self.env = dict(os.environ, HOME=str(home), USERPROFILE=str(home), GIT_CONFIG_GLOBAL=str(home / ".gitconfig"),
+                        GIT_CONFIG_NOSYSTEM="1", GIT_TERMINAL_PROMPT="0", GIT_EDITOR="true", GIT_MERGE_AUTOEDIT="no",
+                        GIT_PAGER="cat", PAGER="cat", LC_ALL="C", LANG="C", GIT_CEILING_DIRECTORIES=str(self.root))
+
+    def path(self, name):
+        target = (self.cwd / name).resolve()
+        if target != self.root and self.root not in target.parents:
+            raise ValueError(f"{name}: only files inside the practice folder can be used")
+        return target
+
+    def git(self, *args, timeout=RUN_TIMEOUT):
+        proc = subprocess.run([self.git_bin, *args], cwd=self.cwd, env=self.env, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=timeout, **NO_WINDOW)
+        return proc.returncode, proc.stdout, proc.stderr
+
+    def run_line(self, line, timeout):
+        """Run one command; return (output, failed)."""
+        try:
+            words = shlex.split(line, comments=True)
+        except ValueError as exc:
+            return f"Couldn't read this line: {exc}", True
+        if not words:
+            return "", False
+        cmd, args = words[0], words[1:]
+        if cmd == "git":
+            rc, out, err = self.git(*args, timeout=timeout)
+            return out + err, rc != 0
+        if cmd not in GIT_FILE_COMMANDS:
+            return (f"{cmd}: CodeQuest only runs git and these file commands here: "
+                    + ", ".join(GIT_FILE_COMMANDS)), True
+        try:
+            if cmd == "echo":
+                redirect = next((i for i, w in enumerate(args) if w in (">", ">>")), None)
+                if redirect is None:
+                    return " ".join(args) + "\n", False
+                if redirect != len(args) - 2:
+                    return "echo: put the file name right after > or >>", True
+                text = " ".join(args[:redirect]) + "\n"
+                with open(self.path(args[-1]), "a" if args[redirect] == ">>" else "w", encoding="utf-8", newline="\n") as f:
+                    f.write(text)
+                return "", False
+            if cmd == "cat":
+                return "".join(self.path(a).read_text(encoding="utf-8") for a in args), False
+            if cmd == "ls":
+                folder = self.path(args[0]) if args else self.cwd
+                return "".join(p.name + ("/" if p.is_dir() else "") + "\n"
+                               for p in sorted(folder.iterdir()) if p.name != ".git"), False
+            if cmd == "mkdir":
+                for a in args:
+                    if a != "-p":
+                        self.path(a).mkdir(parents=True, exist_ok=True)
+                return "", False
+            if cmd == "rm":
+                for a in args:
+                    if not a.startswith("-"):
+                        target = self.path(a)
+                        shutil.rmtree(target) if target.is_dir() else target.unlink()
+                return "", False
+            if cmd == "cd":
+                target = self.path(args[0]) if args else self.root / "project"
+                if not target.is_dir():
+                    return f"cd: {args[0]}: no such folder", True
+                self.cwd = target
+                return "", False
+            if cmd == "pwd":
+                return "/" + self.cwd.relative_to(self.root).as_posix() + "\n", False
+        except (OSError, ValueError, IndexError) as exc:
+            return f"{cmd}: {exc.strerror if isinstance(exc, OSError) and exc.strerror else exc}", True
+        return "", False
+
+    def run_script(self, script, deadline, echo=True):
+        """Run every line like a terminal would; return (transcript, error)."""
+        transcript = []
+        for raw in script.splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            left = deadline - time.monotonic()
+            if left <= 0:
+                raise subprocess.TimeoutExpired(line, RUN_TIMEOUT)
+            out, failed = self.run_line(line, left)
+            if failed and not line.startswith("git "):
+                # A git command that fails is normal (a merge conflict, say), but anything else stops the run.
+                transcript.append(f"$ {line}\n")
+                return "".join(transcript), out.strip()
+            if echo:
+                transcript.append(f"$ {line}\n{out}")
+        return "".join(transcript), ""
+
+
+def run_git(lesson, code, mode, git):
+    if not git:
+        return {"ok": False, "output": "", "error":
+                "Git isn't installed on the computer running CodeQuest. Install it from git-scm.com "
+                "(on NixOS add pkgs.git to your packages), then restart CodeQuest."}
+    with tempfile.TemporaryDirectory(prefix="codequest-git-") as tmp:
+        box = GitSandbox(git, Path(tmp))
+        deadline = time.monotonic() + RUN_TIMEOUT
+        try:
+            if lesson["setup"]:
+                _, setup_error = box.run_script(lesson["setup"], deadline, echo=False)
+                if setup_error:
+                    return {"ok": False, "output": "", "error": "This lesson's setup failed: " + setup_error}
+                box.cwd = box.root / "project"
+            transcript, error = box.run_script(code, deadline)
+        except subprocess.TimeoutExpired:
+            return {"ok": False, "output": "", "error":
+                    f"Your commands ran for more than {RUN_TIMEOUT} seconds and were stopped. Is one waiting for input?"}
+        result = {"ok": not error, "output": clip(transcript.rstrip())}
+        if error:
+            result["error"] = error
+        if mode != "submit":
+            return result
+
+        check_message = None
+        if lesson["check"]:
+            box.cwd = box.root / "project"
+
+            def run_git_check(*args):
+                return box.git(*args)[1].strip()  # stdout only, so failures read as ""
+
+            def read(name):
+                return box.path(name).read_text(encoding="utf-8")
+
+            scope = {"git": run_git_check, "read": read, "exists": lambda name: box.path(name).exists(),
+                     "output": transcript}
+            try:
+                exec(compile(lesson["check"], "check.py", "exec"), scope)
+                check_message = {"passed": True, "message": ""}
+            except AssertionError as exc:
+                check_message = {"passed": False, "message": str(exc) or "Not quite yet."}
+            except Exception as exc:  # a broken check, or the repo is in a state the check didn't expect
+                check_message = {"passed": False, "message": f"The check couldn't read your repository ({exc})."}
+        result.update(judge(lesson, transcript, check_message=check_message, has_check=bool(lesson["check"]),
+                            runtime_error=error))
+        return result
+
+
 def judge(lesson, program_output, check_message, has_check, runtime_error=""):
     """Combine expected-output and check results into a pass/fail with a message."""
     if runtime_error:
@@ -467,6 +792,8 @@ class Handler(BaseHTTPRequestHandler):
     pin = None
     godot = None
     rustc = None
+    nix = None
+    git = None
     port = 8000
 
     def log_message(self, fmt, *args):
@@ -528,6 +855,8 @@ class Handler(BaseHTTPRequestHandler):
                 "urls": lan_urls(self.port),
                 "godot": bool(self.godot),
                 "rust": bool(self.rustc),
+                "nix": bool(self.nix),
+                "git": bool(self.git),
             })
         if not path.startswith("/api/"):
             return self.send_error(HTTPStatus.NOT_FOUND)
@@ -567,6 +896,10 @@ class Handler(BaseHTTPRequestHandler):
                 result = run_gdscript(lesson, code, mode, self.godot)
             elif lang == "rust":
                 result = run_rust(lesson, code, mode, self.rustc)
+            elif lang == "nix":
+                result = run_nix(lesson, code, mode, self.nix)
+            elif lang == "git":
+                result = run_git(lesson, code, mode, self.git)
             else:
                 return self.send_json({"error": "This language runs in the browser"}, HTTPStatus.BAD_REQUEST)
             if mode == "submit":
@@ -583,13 +916,16 @@ class Handler(BaseHTTPRequestHandler):
 
         self.send_error(HTTPStatus.NOT_FOUND)
 
+    def host_tool(self, lang):
+        return {"gdscript": self.godot, "rust": self.rustc, "nix": self.nix, "git": self.git}.get(lang)
+
     def courses_payload(self):
         progress = progress_map()
         courses = []
         for course in load_courses().values():
             lang = course["lang"]
             info = LANGUAGES[lang]
-            available = info["runs_on"] == "browser" or bool(self.godot if lang == "gdscript" else self.rustc)
+            available = info["runs_on"] == "browser" or bool(self.host_tool(lang))
             courses.append({
                 "id": course["id"],
                 "lang": lang,
@@ -672,6 +1008,8 @@ def main():
     Handler.pin = args.pin
     Handler.godot = find_godot(args.godot)
     Handler.rustc = find_rustc()
+    Handler.nix = find_nix()
+    Handler.git = find_git()
     Handler.port = args.port
 
     if not (VENDOR_DIR / "pyodide" / "pyodide.js").exists():
@@ -700,6 +1038,8 @@ def main():
     print(f"  Lua:      runs in the browser")
     print(f"  GDScript: {'Godot found at ' + Handler.godot if Handler.godot else 'Godot not found (use --godot PATH)'}")
     print(f"  Rust:     {'rustc found at ' + Handler.rustc if Handler.rustc else 'rustc not found (install from rustup.rs)'}")
+    print(f"  Nix:      {'found at ' + Handler.nix if Handler.nix else 'not found (install from nixos.org/download)'}")
+    print(f"  Git:      {'found at ' + Handler.git if Handler.git else 'not found (install from git-scm.com)'}")
     print("\n  Press Ctrl+C to stop.\n")
     try:
         server.serve_forever()

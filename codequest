@@ -4,7 +4,7 @@
     codequest              start in the background (if needed) and open it in your browser
     codequest phone        show the address (and a QR code) for your phone or tablet
     codequest stop         stop it
-    codequest status       is it running? which address? are Godot and Rust found?
+    codequest status       is it running? which address? are Godot, Rust, Nix and Git found?
     codequest logs         show the server log
     codequest pin 4821     require a PIN (codequest pin off to remove it)
     codequest port 9000    use another port
@@ -204,7 +204,9 @@ def cmd_status(config):
     print(f"CodeQuest is running ({how}).")
     print_addresses(config, data)
     print(f"  GDScript lessons: {'ready' if data.get('godot') else 'Godot not found (codequest godot /path/to/godot)'}")
-    print(f"  Rust lessons:     {'ready' if data.get('rust') else 'Rust not found (install from rustup.rs)'}\n")
+    print(f"  Rust lessons:     {'ready' if data.get('rust') else 'Rust not found (install from rustup.rs)'}")
+    print(f"  Nix lessons:      {'ready' if data.get('nix') else 'Nix not found (install from nixos.org/download)'}")
+    print(f"  Git lessons:      {'ready' if data.get('git') else 'Git not found (install from git-scm.com)'}\n")
 
 
 def restart_if_running(config, old_config):

@@ -1,0 +1,2 @@
+{"lang": "nix", "name": "Nix flakes", "icon": "🧊", "order": 65, "prelude": "prelude.nix",
+ "blurb": "Write flake.nix files: packages, dev shells, several systems and your NixOS config. Uses a practice nixpkgs, so nothing is downloaded or built. Do the Nix basics first."}

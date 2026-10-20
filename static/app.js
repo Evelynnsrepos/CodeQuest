@@ -10,6 +10,56 @@ const LANG_INFO = {
   gdscript: { icon: "🎮", blurb: "The language of the Godot game engine.", unit: "\t" },
   lua: { icon: "🌙", blurb: "Small scripting language used in Roblox, LÖVE and Defold. Runs in your browser.", unit: "    " },
   rust: { icon: "🦀", blurb: "Fast, safe systems programming.", unit: "    " },
+  nix: { icon: "❄️", blurb: "The language NixOS, nixpkgs and flakes are written in.", unit: "  " },
+  git: { icon: "🌿", blurb: "Track changes, branch, merge and share your code.", unit: "  " },
+};
+const HOST_TOOL = { gdscript: "Godot", rust: "Rust", nix: "Nix", git: "Git" };
+
+// Small highlighters for Nix and for the shell-style Git lesson scripts.
+const nixLang = {
+  name: "nix",
+  token(stream, state) {
+    // state.quote is the closing quote of the string we're in: " or ''
+    if (state.quote) {
+      if (stream.match("${")) { if (stream.skipTo("}")) stream.next(); else stream.skipToEnd(); return "meta"; }
+      while (!stream.eol()) {
+        if (stream.match(state.quote)) { state.quote = null; break; }
+        if (stream.match("${", false)) break;
+        if (stream.next() === "\\" && state.quote === '"') stream.next();
+      }
+      return "string";
+    }
+    if (stream.eatSpace()) return null;
+    if (stream.match("#")) { stream.skipToEnd(); return "comment"; }
+    if (stream.match('"')) { state.quote = '"'; return "string"; }
+    if (stream.match("''")) { state.quote = "''"; return "string"; }
+    if (stream.match(/^\d+(\.\d+)?/)) return "number";
+    if (stream.match(/^(let|in|rec|with|inherit|if|then|else|assert|or)\b/)) return "keyword";
+    if (stream.match(/^(true|false|null)\b/)) return "atom";
+    if (stream.match(/^(builtins|import|map|throw|toString|pkgs|lib)\b/)) return "builtin";
+    if (stream.match(/^[A-Za-z_][\w'-]*/)) return "variable";
+    if (stream.match(/^(\.\/|\.\.\/|<)[\w./-]*>?/)) return "string";
+    stream.next();
+    return null;
+  },
+  startState: () => ({ quote: null }),
+  languageData: { commentTokens: { line: "#" } },
+};
+const shellLang = {
+  name: "shell",
+  token(stream) {
+    if (stream.eatSpace()) return null;
+    if (stream.match("#")) { stream.skipToEnd(); return "comment"; }
+    if (stream.match(/^"([^"\\]|\\.)*"?/) || stream.match(/^'[^']*'?/)) return "string";
+    if (stream.sol() || stream.string.slice(0, stream.start).trim() === "") {
+      if (stream.match(/^\S+/)) return "keyword";
+    }
+    if (stream.match(/^--?[\w-]+/)) return "attribute";
+    if (stream.match(/^>>?/)) return "operator";
+    stream.match(/^\S+/) || stream.next();
+    return null;
+  },
+  languageData: { commentTokens: { line: "#" } },
 };
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -121,7 +171,7 @@ function courseCard(c) {
   const next = c.lessons.find((l) => !l.completed) || c.lessons[0];
   const meta = LANG_INFO[c.lang];
   const icon = c.icon || meta.icon, blurb = c.blurb || meta.blurb;
-  const missing = c.lang === "gdscript" ? "Godot" : "Rust";
+  const missing = HOST_TOOL[c.lang];
   return `
     <article class="course ${c.available ? "" : "unavailable"}">
       <header>
@@ -242,7 +292,8 @@ async function showLesson(course, slug) {
 
 function createEditor(doc, lang, onChange) {
   // GDScript reads well with Python highlighting.
-  const language = lang === "rust" ? rust() : lang === "lua" ? StreamLanguage.define(lua) : python();
+  const language = lang === "rust" ? rust() : lang === "lua" ? StreamLanguage.define(lua)
+    : lang === "nix" ? StreamLanguage.define(nixLang) : lang === "git" ? StreamLanguage.define(shellLang) : python();
   editor = new EditorView({
     parent: document.getElementById("editor"),
     state: EditorState.create({
@@ -384,7 +435,7 @@ function escapeHtml(s) {
 }
 
 function langName(lang) {
-  return { python: "Python", gdscript: "GDScript", lua: "Lua", rust: "Rust" }[lang] || lang;
+  return { python: "Python", gdscript: "GDScript", lua: "Lua", rust: "Rust", nix: "Nix", git: "Git" }[lang] || lang;
 }
 
 route().catch((err) => {

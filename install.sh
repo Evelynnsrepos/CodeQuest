@@ -40,7 +40,7 @@ if [ "$(uname)" = "Linux" ]; then
 [Desktop Entry]
 Type=Application
 Name=CodeQuest
-Comment=Learn Python, GDScript, Lua and Rust
+Comment=Learn Python, GDScript, Lua, Rust, Nix and Git
 Exec=$DEST/codequest open
 Icon=$DEST/static/icon-512.png
 Terminal=false
@@ -69,3 +69,7 @@ command -v godot >/dev/null 2>&1 || command -v godot4 >/dev/null 2>&1 || \
     echo "Godot wasn't found, so GDScript lessons won't run yet. Install Godot 4, then: codequest godot /path/to/godot"
 command -v rustc >/dev/null 2>&1 || [ -x "$HOME/.cargo/bin/rustc" ] || \
     echo "Rust wasn't found, so Rust lessons won't run yet. Install it from https://rustup.rs"
+command -v nix-instantiate >/dev/null 2>&1 || \
+    echo "Nix wasn't found, so Nix lessons won't run. Install it from https://nixos.org/download"
+command -v git >/dev/null 2>&1 || \
+    echo "Git wasn't found, so Git lessons won't run. Install it with your package manager."
