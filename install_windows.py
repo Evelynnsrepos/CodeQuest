@@ -131,7 +131,7 @@ def install():
 
     tools = DEST / "tools"
     tools.mkdir(exist_ok=True)
-    print("Optional, for the GDScript and Rust lessons (Python and Lua work right away):")
+    print("Optional, for the GDScript, Rust and Git lessons (Python and Lua work right away):")
     print("  Godot: download Godot 4 from https://godotengine.org/download, unzip it and copy the")
     print(f"         Godot_..._console.exe file into {tools}")
     if shutil.which("rustc") or (Path.home() / ".cargo" / "bin" / "rustc.exe").exists():
@@ -139,6 +139,9 @@ def install():
     else:
         print("  Rust:  install it from https://rustup.rs (it also asks to install the Visual Studio")
         print("         C++ build tools, which Rust needs on Windows).")
+    git_found = shutil.which("git") or (Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Git" / "cmd" / "git.exe").exists()
+    print("  Git:   found." if git_found else "  Git:   install it from https://git-scm.com/download/win")
+    print("  (The Nix courses need Nix, which only runs on Linux and Mac, or in WSL.)")
     print("  Then restart CodeQuest: Start menu > CodeQuest > Stop CodeQuest, then open it again.\n")
 
     if ask("Open CodeQuest now?"):
@@ -169,6 +172,11 @@ def uninstall():
 def main():
     if os.name != "nt":
         print("This installer is for Windows. On Linux or Mac, run ./install.sh instead.")
+        sys.exit(1)
+    if "WindowsApps" in sys.executable:
+        print("This is the Microsoft Store version of Python, which can't create CodeQuest's shortcuts.")
+        print("Install Python from https://www.python.org/downloads/ and run install.bat again.")
+        input("\nPress Enter to close.")
         sys.exit(1)
     try:
         uninstall() if "--uninstall" in sys.argv else install()
