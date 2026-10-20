@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""CodeQuest: a self-hosted, game-style coding course for Python, GDScript, Lua, Rust, Nix and Git.
+"""CodeQuest: a self-hosted, game-style coding course for Python, GDScript, Lua, TypeScript,
+Rust, Nix and Git.
 
 Run it on your computer, then open it from any browser on your network:
 
@@ -7,8 +8,9 @@ Run it on your computer, then open it from any browser on your network:
     python3 server.py --pin 4821   # ask for a PIN before anyone can run code
     python3 server.py --local-only # only this computer can open it
 
-Python and Lua lessons run inside the browser (Pyodide, wasmoon). GDScript, Rust, Nix and Git
-lessons run on this computer, so Godot 4, Rust, Nix and Git need to be installed here.
+Python, Lua and TypeScript lessons run inside the browser (Pyodide, wasmoon, the TypeScript
+compiler). GDScript, Rust, Nix and Git lessons run on this computer, so Godot 4, Rust, Nix and
+Git need to be installed here.
 Only the Python standard library is required.
 """
 
@@ -45,6 +47,8 @@ LANGUAGES = {
     "python": {"name": "Python", "ext": "py", "runs_on": "browser"},
     "gdscript": {"name": "GDScript", "ext": "gd", "runs_on": "server"},
     "lua": {"name": "Lua", "ext": "lua", "runs_on": "browser"},
+    # TypeScript is type-checked and run in the browser; checks are plain JavaScript.
+    "typescript": {"name": "TypeScript", "ext": "ts", "check_ext": "js", "runs_on": "browser"},
     "rust": {"name": "Rust", "ext": "rs", "runs_on": "server"},
     "nix": {"name": "Nix", "ext": "nix", "runs_on": "server"},
     # Git lessons are short scripts of shell-style commands; checks are Python run by this server.
