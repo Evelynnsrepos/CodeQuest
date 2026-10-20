@@ -1,28 +1,39 @@
 # CodeQuest
 
-A self-hosted, game-style coding course in the spirit of Boot.dev. It teaches **Python**, **GDScript** (Godot), **Lua**, **Rust**, **Nix** (with flakes) and **Git** with hands-on lessons, XP, levels and daily streaks. You run it on your computer and open it in any browser, including your phone or tablet on the same Wi-Fi.
+A self-hosted, game-style coding course in the spirit of Boot.dev. It teaches **Python**, **GDScript** (Godot), **Lua**, **TypeScript**, **Rust**, **Nix** (with flakes) and **Git** with hands-on lessons, XP, levels and daily streaks. You run it on your computer and open it in any browser, including your phone or tablet on the same Wi-Fi.
 
 ## Install on Windows
 
-1. Right-click `codequest.zip` and choose **Extract All**. (Don't run it from inside the zip.)
-2. Open the extracted `codequest` folder and double-click **install.bat**. If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**.
+1. Get the code with Git (from [git-scm.com](https://git-scm.com)): `git clone https://github.com/Evelynnsrepos/CodeQuest.git`
+2. Open the `CodeQuest` folder and double-click **install.bat**. If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**.
 3. If Python isn't installed, it offers to install it. Say yes, then double-click `install.bat` again.
 4. Answer the two questions (start automatically at login, open now).
 
-Afterwards, open **CodeQuest** from the Start menu or the desktop icon. It runs quietly in the background, with no window to keep open. To stop it, use **Start menu > CodeQuest > Stop CodeQuest**. To remove it, use **Uninstall CodeQuest** in the same place. Running `install.bat` again updates CodeQuest and keeps your progress.
+Afterwards, open **CodeQuest** from the Start menu or the desktop icon. It runs quietly in the background, with no window to keep open. To stop it, use **Start menu > CodeQuest > Stop CodeQuest**. To remove it, use **Uninstall CodeQuest** in the same place. Running `install.bat` again updates CodeQuest and keeps your progress (see [Update](#update)).
 
 For your phone or tablet: when Windows asks whether Python may use the network, tick **Private networks** and click **Allow**. Your Wi-Fi also has to be set to Private (Settings > Network & internet > Wi-Fi > your network). Then click **Open on phone** on the CodeQuest home page.
 
 ## Install (Linux and Mac)
 
-Unzip CodeQuest anywhere, then run the installer once:
+Clone CodeQuest anywhere, then run the installer once:
 
 ```
-cd codequest
+git clone https://github.com/Evelynnsrepos/CodeQuest.git
+cd CodeQuest
 ./install.sh
 ```
 
 It copies CodeQuest to `~/.local/share/codequest`, adds a `codequest` command, and on Linux adds **CodeQuest** to your app launcher (wofi, rofi, hyprlauncher, ...). Running it again updates CodeQuest and keeps your progress. `./install.sh --uninstall` removes the command and launcher entry.
+
+## Update
+
+Pull the latest version in your clone, then run the installer again. Your progress is kept.
+
+```
+git pull
+./install.sh        # Linux and Mac
+install.bat         # Windows (or double-click it)
+```
 
 ## Use it (Linux and Mac)
 
@@ -59,11 +70,11 @@ Your progress (XP, streak, saved code) is stored on the computer, so it's the sa
 
 ## Without installing
 
-Double-click `start.bat` on Windows (it keeps a window open while it runs), or run `python3 server.py --open` from the `codequest` folder on any system. It needs Python 3.9 or newer. Server options: `--pin 4821`, `--port 9000`, `--local-only` (only this computer can connect), `--godot PATH`, `--open`.
+Double-click `start.bat` on Windows (it keeps a window open while it runs), or run `python3 server.py --open` from the `CodeQuest` folder on any system. It needs Python 3.9 or newer. Server options: `--pin 4821`, `--port 9000`, `--local-only` (only this computer can connect), `--godot PATH`, `--open`.
 
 ## GDScript, Rust, Nix and Git
 
-Python and Lua run inside the browser. GDScript, Rust, Nix and Git lessons are sent to the host computer, which runs them, so it needs:
+Python, Lua and TypeScript run inside the browser. GDScript, Rust, Nix and Git lessons are sent to the host computer, which runs them, so it needs:
 
 - **Godot 4** from [godotengine.org](https://godotengine.org/download) (tested with 4.5). Put it on your PATH as `godot`, copy the program into CodeQuest's `tools` folder (on Windows: `%LOCALAPPDATA%\CodeQuest\tools`), or use `codequest godot /path/to/Godot`. On a Mac that path is usually `/Applications/Godot.app/Contents/MacOS/Godot`. On Windows, point it at the `_console.exe` file that comes in the Godot download, because the other one doesn't report output.
 - **Rust** from [rustup.rs](https://rustup.rs).
@@ -81,6 +92,7 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 | GDScript for game dev | GDScript | host computer (Godot) |
 | Lua | Lua | browser |
 | Lua for Hyprland | Lua | browser |
+| TypeScript | TypeScript | browser |
 | Rust | Rust | host computer |
 | Git | Git commands | host computer |
 | Nix | Nix | host computer (Nix) |
@@ -91,6 +103,8 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 **Nix** and **Nix flakes** evaluate your code with `nix-instantiate`. The flakes course passes your `outputs` a practice nixpkgs (`lessons/nix-flakes/prelude.nix`), so nothing is downloaded or built, and Run shows the outputs your flake produces. The last lessons of both courses are about your own NixOS configuration.
 
 **Git** lessons are a list of commands, one per line, run in a fresh practice repository every time. Only `git` plus `echo`, `cat`, `ls`, `mkdir`, `rm` and `cd` are allowed, and git uses a private practice config, so your real repositories and `~/.gitconfig` are never touched. A lesson can have a hidden `setup.sh` (same commands) that prepares the repository, for example with branches that conflict.
+
+**TypeScript** lessons are checked by the real TypeScript compiler (5.9, `strict` mode) running in your browser, then the compiled JavaScript runs there too. A type error stops the run and shows the compiler's message, just like `tsc` would. Lessons have plain JavaScript plus `console`, but no browser page APIs such as `document`.
 
 **GDScript for game dev** runs your script as a real node in a headless Godot scene: `_ready()` runs, and the checks call `_process(delta)`, press input actions and listen to your signals.
 
@@ -131,6 +145,7 @@ Checks per language:
 
 - **Python** `check.py`: plain `assert` statements. `ns` is a dict of the learner's variables and functions, and `output` is what they printed. The assert message is shown to the learner.
 - **Lua** `check.lua`: `assert(condition, "message")` lines. The learner's global variables and functions are available directly, and `output` is what they printed. Ask learners to keep checked functions global (no `local`).
+- **TypeScript** `check.js`: plain JavaScript with `assert(condition, "message")` lines. It runs in the same scope as the learner's code, so their top-level functions, classes, `const` and `let` are available directly. `output` is what they printed and `code` is their source text, for checking things that only exist in types (for example `/interface\s+Hero/.test(code)`). Starter and solution files end in `.ts`.
 - **GDScript** `check.gd`: a script with `func check(player) -> String`. `player` is the learner's script object after `run()` was called. Return `""` to pass or a message to fail. The learner's code goes in `func run():`.
 - **Rust** `tests.rs`: normal `#[test]` functions. They are placed in a test module next to the learner's code, so they can call its functions directly.
 - **Nix** `check.nix`: a function `{ result, prelude, expect }: [ (expect condition "message") ... ]`. `result` is the learner's value and `prelude` the course prelude, if any. Checks run in order and the first failing message is shown. Starter, solution and check files end in `.nix`.
@@ -139,7 +154,7 @@ Checks per language:
 ## Troubleshooting
 
 - **Phone can't connect:** make sure both devices are on the same Wi-Fi (not a guest network), and allow Python through your computer's firewall when asked. On Windows choose "Private networks".
-- **Python lesson is slow the first time:** the browser downloads Python once (about 13 MB), then caches it. Lua is much smaller (under 1 MB).
+- **Python lesson is slow the first time:** the browser downloads Python once (about 13 MB), then caches it. Lua is much smaller (under 1 MB), and TypeScript is about 4 MB.
 - **Start over:** run `codequest stop`, then delete `~/.local/share/codequest/data/progress.db` (or `data/progress.db` in the folder you run it from).
 
 ## What's inside
@@ -148,4 +163,4 @@ Checks per language:
 - `server.py`: the web server, progress database and GDScript, Rust, Nix and Git runners (Python standard library only).
 - `static/`: the web page.
 - `runners/runner.gd`: loads the learner's GDScript inside headless Godot.
-- `vendor/`: Pyodide, wasmoon (Lua), CodeMirror, marked and a QR code library, bundled so the app works without internet. See `vendor/LICENSES.md`.
+- `vendor/`: Pyodide, wasmoon (Lua), the TypeScript compiler, CodeMirror, marked and a QR code library, bundled so the app works without internet. See `vendor/LICENSES.md`.

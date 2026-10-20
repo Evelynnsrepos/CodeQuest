@@ -1,9 +1,12 @@
 CodeQuest on Windows
 ====================
 
-1. Make sure you extracted the zip (right-click it > Extract All).
+1. Get this folder with git: git clone https://github.com/Evelynnsrepos/CodeQuest.git
 2. Double-click install.bat in this folder.
    If Windows says "Windows protected your PC", click More info > Run anyway.
 3. Then open CodeQuest from the Start menu or the desktop icon.
+
+To update later: run "git pull" in this folder, then double-click install.bat again.
+Your progress is kept.
 
 More help is in README.md.

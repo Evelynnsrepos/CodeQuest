@@ -1,6 +1,6 @@
 import {
   EditorView, basicSetup, EditorState, keymap, indentWithTab, indentUnit, python, rust, oneDark,
-  StreamLanguage, lua,
+  StreamLanguage, lua, javascript,
 } from "/vendor/codemirror.js";
 import { marked } from "/vendor/marked.js";
 
@@ -9,6 +9,7 @@ const LANG_INFO = {
   python: { icon: "🐍", blurb: "Runs right in your browser.", unit: "    " },
   gdscript: { icon: "🎮", blurb: "The language of the Godot game engine.", unit: "\t" },
   lua: { icon: "🌙", blurb: "Small scripting language used in Roblox, LÖVE and Defold. Runs in your browser.", unit: "    " },
+  typescript: { icon: "🔷", blurb: "JavaScript with types. Runs in your browser.", unit: "  " },
   rust: { icon: "🦀", blurb: "Fast, safe systems programming.", unit: "    " },
   nix: { icon: "❄️", blurb: "The language NixOS, nixpkgs and flakes are written in.", unit: "  " },
   git: { icon: "🌿", blurb: "Track changes, branch, merge and share your code.", unit: "  " },
@@ -293,6 +294,7 @@ async function showLesson(course, slug) {
 function createEditor(doc, lang, onChange) {
   // GDScript reads well with Python highlighting.
   const language = lang === "rust" ? rust() : lang === "lua" ? StreamLanguage.define(lua)
+    : lang === "typescript" ? javascript({ typescript: true })
     : lang === "nix" ? StreamLanguage.define(nixLang) : lang === "git" ? StreamLanguage.define(shellLang) : python();
   editor = new EditorView({
     parent: document.getElementById("editor"),
@@ -383,7 +385,7 @@ function celebrate(xp, newLevel) {
   setTimeout(() => el.remove(), 1800);
 }
 
-// ------------------------------------- in-browser runners (Python, Lua) ---
+// ------------------------- in-browser runners (Python, Lua, TypeScript) ---
 
 const makeWorkerRunner = (url, name) => ({
   worker: null,
@@ -426,6 +428,7 @@ const makeWorkerRunner = (url, name) => ({
 const browserRunners = {
   python: makeWorkerRunner("/static/py-worker.js", "Python"),
   lua: makeWorkerRunner("/static/lua-worker.js", "Lua"),
+  typescript: makeWorkerRunner("/static/ts-worker.js", "TypeScript"),
 };
 
 // ---------------------------------------------------------------- utils ---
@@ -435,7 +438,7 @@ function escapeHtml(s) {
 }
 
 function langName(lang) {
-  return { python: "Python", gdscript: "GDScript", lua: "Lua", rust: "Rust", nix: "Nix", git: "Git" }[lang] || lang;
+  return { python: "Python", gdscript: "GDScript", lua: "Lua", typescript: "TypeScript", rust: "Rust", nix: "Nix", git: "Git" }[lang] || lang;
 }
 
 route().catch((err) => {
