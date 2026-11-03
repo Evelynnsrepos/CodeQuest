@@ -98,10 +98,11 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 | Nix | Nix | host computer (Nix) |
 | Nix flakes | Nix | host computer (Nix) |
 | LLMs 1: How an LLM works | Python | browser |
+| LLMs 2: Running models locally | Python | browser |
 
 **Lua for Hyprland** teaches the Lua config that Hyprland uses since version 0.55 (`~/.config/hypr/hyprland.lua`). Lessons run against a practice copy of Hyprland's `hl` API (`lessons/lua-hyprland/prelude.lua`) that records what your code sets and shows a summary, so nothing on your real desktop changes. If `hyprctl version` shows something older than 0.55, your Hyprland still uses `hyprland.conf`, which has a different syntax.
 
-**LLMs 1: How an LLM works** is the first module of a local-AI course: tokens and BPE, weights, softmax, perplexity, the generation loop, temperature and top-p, chat templates, embeddings, attention and the context window. Each idea is built in a few lines of plain Python, and each lesson ends with review questions from earlier lessons. It needs only the Python basics.
+**LLMs 1: How an LLM works** is the first module of a local-AI course: tokens and BPE, weights, softmax, perplexity, the generation loop, temperature and top-p, chat templates, embeddings, attention and the context window. Each idea is built in a few lines of plain Python, and each lesson ends with review questions from earlier lessons. It needs only the Python basics. **LLMs 2** continues with safetensors and GGUF files, quantization, VRAM, KV cache and speed math, Mixture of Experts, AMD ROCm vs Vulkan, and LM Studio's OpenAI-compatible server.
 
 **Nix** and **Nix flakes** evaluate your code with `nix-instantiate`. The flakes course passes your `outputs` a practice nixpkgs (`lessons/nix-flakes/prelude.nix`), so nothing is downloaded or built, and Run shows the outputs your flake produces. The last lessons of both courses are about your own NixOS configuration.
 
