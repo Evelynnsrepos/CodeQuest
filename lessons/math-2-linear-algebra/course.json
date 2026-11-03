@@ -1,0 +1,2 @@
+{"lang": "python", "name": "Math 2: Linear algebra", "icon": "📏", "order": 61,
+ "blurb": "Vectors and matrices from zero: adding and scaling, the dot product, length and cosine similarity, matrix shapes and multiplication, transpose, neural-network layers, attention as matrices, inverses and eigenvectors."}
