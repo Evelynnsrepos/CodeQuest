@@ -1,0 +1,2 @@
+{"lang": "python", "name": "LLMs 5: How training works", "icon": "🏋️", "order": 74,
+ "blurb": "Build it yourself, Karpathy-style: an autograd engine, a neural network, optimizers, a character-level language model and a causal attention head, then compare backprop with Hinton's Forward-Forward. Do LLMs 4 first."}
