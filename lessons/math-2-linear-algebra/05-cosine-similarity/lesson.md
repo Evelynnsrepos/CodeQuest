@@ -4,73 +4,70 @@ xp: 45
 ---
 # Same direction, whatever the length
 
-> **Warm-up:** "cat" and "kitten" should be similar; "cat" and "tax return" not. If both are vectors, how could you measure "pointing the same way" without caring how long they are?
+> **Warm-up:** "cat" and "kitten" should count as similar, even if one vector is much longer. How could you compare only the **direction**?
 
-**In one sentence:** cosine similarity is the dot product of the two normalized vectors, a number from −1 (opposite) to 1 (same direction).
+**In one sentence:** cosine similarity is the dot product divided by both lengths, giving a number from −1 (opposite) to 1 (same direction).
 
-## 🔣 New symbols
+## 🪜 Plain words
 
-| Symbol | Say it | Means | In Python |
+The dot product mixes two things: how much the arrows point the same way **and** how long they are. To keep only the direction, divide the length back out. What's left is a score:
+
+- 1 → exactly the same direction
+- 0 → at a right angle, unrelated
+- −1 → exactly opposite
+
+That score is called the **cosine** of the angle between them.
+
+## 🪜 With numbers
+
+(1, 0) and (1, 1): dot = 1. Lengths 1 and about 1.414. 1 divided by (1 times 1.414) ≈ **0.707**: fairly similar (the angle is 45°).
+
+(2, 0) and (5, 0): dot 10, lengths 2 and 5, 10 / 10 = **1**: same direction, even though one is longer.
+
+## 🔣 The signs
+
+| Sign | Say it | Means | In Python |
 |---|---|---|---|
-| `θ` | "theta" | here: the **angle** between two vectors | |
-| `cos θ` | "cosine theta" | from 1 (0°) through 0 (90°) to −1 (180°) | `math.cos(theta)` (radians!) |
-| `cos(a, b)` | "the cosine similarity of a and b" | `(a · b) / (‖a‖ · ‖b‖)` | |
-| `arccos` or `cos⁻¹` | "arc cosine" | the angle whose cosine is a value | `math.acos(x)` |
-| `°` / rad | degrees / radians | 180° = π radians | `math.degrees(r)` |
+| `θ` | "theta" | here: the **angle** between two arrows | |
+| `cos θ` | "cosine theta" | 1 at 0°, 0 at 90°, −1 at 180° | `math.cos` (radians!) |
+| `cos⁻¹` / `arccos` | "arc cosine" | the angle for a cosine value (the ⁻¹ means "reverse function", not 1/cos) | `math.acos` |
+| `‖a‖` | "the length of a" | | |
 
-`cos⁻¹` means the **inverse function**, not `1/cos`. Confusing, but standard.
+## 🔬 Take the formula apart
 
-## The idea
+<div class="formula"><span class="k1">cos θ</span> = <span class="k2">a · b</span> / ( <span class="k3">‖a‖</span> · <span class="k4">‖b‖</span> )</div>
 
-There's a geometric formula for the dot product:
+| Piece | Say it | Means | (1, 0) and (1, 1) |
+|---|---|---|---|
+| <span class="k1">cos θ</span> | "cosine theta" | the similarity score | 0.707 |
+| <span class="k2">a · b</span> | "a dot b" | how much they agree, including length | 1 |
+| `/` ( … ) | "divided by" | divide by the whole bottom | |
+| <span class="k3">‖a‖</span> | "length of a" | | 1 |
+| <span class="k4">‖b‖</span> | "length of b" | | 1.414 |
 
-```
-a · b = ‖a‖ · ‖b‖ · cos θ
-```
+## 🔀 What if it were different?
 
-Solve it for `cos θ`:
-
-```
-cos θ = (a · b) / (‖a‖ · ‖b‖)
-```
-
-Dividing by both lengths removes the effect of size, leaving only the direction. Read the result as:
-
-| cos θ | angle | meaning |
-|---|---|---|
-| 1 | 0° | same direction |
-| ~0.7 | 45° | related |
-| 0 | 90° | unrelated |
-| −1 | 180° | opposite |
+<div class="wrong"><b>a · b alone</b>: compare query (1, 0) with "short match" (1, 0.1) and "long but off" (10, 10): dot products 1 and 10. The long one wins although it points 45° away.</div>
+<div class="wrong"><b>a · b / ‖a‖</b> (only one length): the long vector still wins (10 vs 1). Both lengths must go.</div>
+<div class="right"><b>a · b / (‖a‖ ‖b‖)</b>: 0.995 vs 0.707 → the short, well-aligned one wins ✓</div>
 
 ## 🗣️ Say it out loud
 
-`cos(a, b) = a·b / (‖a‖‖b‖)` → "a dot b, divided by the length of a times the length of b".
-
-## 🧮 Worked example
-
-`a = (1, 0)`, `b = (1, 1)`:
-
-1. `a · b = 1`
-2. `‖a‖ = 1`, `‖b‖ = √2 ≈ 1.414`
-3. `cos θ = 1 / 1.414 ≈ 0.707`
-4. `θ = arccos(0.707) = 45°`
+"cos theta equals a dot b, divided by the length of a times the length of b."
 
 ## 🤖 Where AI uses it
 
-Semantic search and RAG (LLMs 3), CLIP's zero-shot classification, deduplication by embedding, comparing what layers of a model represent.
+Semantic search and RAG, CLIP, deduplication, comparing embeddings.
 
 ## 🎯 Your quest
 
-`dot` and `norm` are given.
-
 1. `cosine(a, b)`
-2. `angle_degrees(a, b)`: the angle in degrees (clamp the cosine into `[−1, 1]` before `math.acos`, because rounding can give 1.0000000002).
-3. `most_similar(query, items)`: `items` is a dict name → vector; return the name with the highest cosine similarity.
+2. `angle_degrees(a, b)`: clamp the cosine into [−1, 1] before `math.acos`, then `math.degrees`.
+3. `most_similar(query, items)`: `items` is name → vector; the name with the highest cosine.
 
 **Remember:** cosine similarity only cares about direction.
 
 ## Review
 
 <details><summary>‖(6, 8)‖ = ?</summary>10.</details>
-<details><summary>What does gradient clipping do?</summary>If the gradient is longer than a maximum, scales it down to that length.</details>
+<details><summary>What does gradient clipping do?</summary>Shrinks the gradient to a maximum length if it's too long.</details>

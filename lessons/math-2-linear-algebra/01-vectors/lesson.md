@@ -4,52 +4,68 @@ xp: 30
 ---
 # A vector is a list with a direction
 
-> **Warm-up:** describe a flat with three numbers. Which numbers would you choose? Congratulations: that's a vector.
+> **Warm-up:** describe a flat with three numbers. Which three would you pick?
 
-**In one sentence:** a vector is an ordered list of numbers, and you can picture it as an arrow from the origin to a point.
+**In one sentence:** a vector is an ordered list of numbers, and you can picture it as an arrow.
 
-## 🔣 New symbols
+## 🪜 Plain words
 
-| Symbol | Say it | Means | In Python |
+A flat could be "size, rooms, floor". Writing those three numbers in a fixed order gives a **vector**. The order matters: if you swap size and rooms, it describes a different flat.
+
+You can also picture a vector as an **arrow**: "3 steps right, 2 steps up" is the vector (3, 2). With 3 numbers it's an arrow in 3D space. With 4096 numbers you can't picture it, but the math works exactly the same.
+
+## 🪜 With numbers
+
+- A flat: (65, 3, 2) → 65 m², 3 rooms, 2nd floor.
+- An arrow: (3, 2) → 3 right, 2 up.
+- How many numbers? That's the **dimension**: (65, 3, 2) has dimension 3.
+
+## 🔣 The signs
+
+| Sign | Say it | Means | In Python |
 |---|---|---|---|
-| `v` (bold **v** or `v⃗`) | "vector v" | a list of numbers; bold or an arrow marks "this is a vector, not one number" | `v = [3, 1, 2]` |
-| `vᵢ` | "v sub i" | entry number i (counting from **1**) | `v[i - 1]` |
-| `v ∈ ℝⁿ` | "v is in R n" | v has n real numbers: its **dimension** is n | `len(v) == n` |
-| `(3, 1, 2)` or a column | "the vector three, one, two" | written out | `[3, 1, 2]` |
-| `0` (bold) | "the zero vector" | all zeros | `[0] * n` |
+| **v** (bold) or `v⃗` | "vector v" | a list of numbers (bold = "this is a list, not one number") | `v = [65, 3, 2]` |
+| `vᵢ` | "v i" / "v sub i" | entry number i, **counting from 1** | `v[i - 1]` |
+| `ℝ` | "the reals" | all ordinary numbers | `float` |
+| `ℝⁿ` | "R n" | all lists of n numbers | |
+| `∈` | "is in" | belongs to | |
+| scalar | | a single number (not a list) | `3.5` |
 
-## The idea
+## 🔬 Take the formula apart
 
-Two ways to see the same thing:
+<div class="formula"><span class="k1">v</span> <span class="k2">∈</span> <span class="k3">ℝ</span><sup><span class="k4">3</span></sup>, &nbsp; <span class="k1">v</span><sub><span class="k5">2</span></sub> = 3</div>
 
-- **A list of features:** a flat = `(size, rooms, floor) = (65, 3, 2)`. Order matters: `(3, 65, 2)` would mean something else.
-- **An arrow:** `(3, 2)` is an arrow 3 steps right and 2 steps up. In 3D you need 3 numbers; in 4096D you can't picture it, but all the math works the same.
+| Piece | Say it | Means | Flat (65, 3, 2) |
+|---|---|---|---|
+| <span class="k1">v</span> | "v" | the vector's name | the flat |
+| <span class="k2">∈</span> | "is in" | belongs to | |
+| <span class="k3">ℝ</span> | "the reals" | made of ordinary numbers | |
+| <sup><span class="k4">3</span></sup> | "to the three" (here: "of length 3") | how many numbers. Here the small 3 is **not** a power, it means "lists of 3" | 3 numbers |
+| <span class="k1">v</span><sub><span class="k5">2</span></sub> | "v two" | entry number 2 (math counts from 1) | rooms = 3 = `v[1]` in Python |
 
-**Dimension** = how many numbers. A single number is called a **scalar** (it "scales" vectors, next lesson).
+## 🔀 What if it were different?
 
-Papers often write vectors as **columns** (stacked vertically). It's the same list; the direction only matters for matrix shapes (lesson 6).
+<div class="wrong"><b>v₂ read as v[2]</b> (Python counting): you'd get the floor (2) instead of the rooms (3). Off-by-one is the most common bug when turning papers into code.</div>
+<div class="wrong"><b>(3, 65, 2)</b> (order changed): a 3 m² flat with 65 rooms. Same numbers, different meaning.</div>
+<div class="right"><b>v = (65, 3, 2), v₂ = 3</b> ✓</div>
 
 ## 🗣️ Say it out loud
 
-`x ∈ ℝ⁴⁰⁹⁶` → "x is a vector of 4096 real numbers" → one token's hidden state in Llama 3 8B.
-
-## 🧮 Worked example
-
-`v = (4, −1, 7)`: dimension 3; `v₁ = 4` (Python `v[0]`), `v₃ = 7` (Python `v[2]`).
+`x ∈ ℝ⁴⁰⁹⁶` → "x is in R four thousand ninety-six" → "x is a list of 4096 numbers": one token's vector in Llama 3 8B.
 
 ## 🤖 Where AI uses it
 
-Everything is a vector: a token's embedding, a layer's output, a row of weights, the gradient, an image patch, a whole batch's loss values.
+Everything is a vector: a token's embedding, a layer's output, the gradient, an image patch.
 
 ## 🎯 Your quest
 
 1. `dim(v)`: its dimension.
-2. `entry(v, i)`: `vᵢ` with **math counting** (i = 1 is the first entry).
-3. `flat_vector(flat)`: `flat` is a dict with keys `"size"`, `"rooms"` and `"floor"`; return the vector `(size, rooms, floor)` in that order.
+2. `entry(v, i)`: `vᵢ` with **math counting** (i = 1 is the first).
+3. `flat_vector(flat)`: `flat` is a dict with keys `"size"`, `"rooms"`, `"floor"`; return `[size, rooms, floor]`.
 
 **Remember:** math counts from 1, Python from 0: `vᵢ` is `v[i - 1]`.
 
 ## Review
 
-<details><summary>Say softmax(z)ᵢ = e^(zᵢ) / Σⱼ e^(zⱼ) out loud.</summary>Item i of softmax is e to the z i, divided by the sum over all j of e to the z j.</details>
-<details><summary>What does θ usually stand for?</summary>All the model's parameters.</details>
+<details><summary>Say softmax(z)ᵢ out loud.</summary>Item i of softmax of z.</details>
+<details><summary>What does θ usually mean?</summary>All the model's weights.</details>

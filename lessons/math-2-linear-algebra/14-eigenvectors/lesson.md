@@ -4,49 +4,69 @@ xp: 50
 ---
 # The special arrows
 
-> **Warm-up:** apply `[[2, 0], [0, 1]]` to the arrows (1, 0), (0, 1) and (1, 1). Which ones keep pointing the same way?
+> **Warm-up:** the matrix `[[2, 0], [0, 1]]` stretches things sideways. Which arrows keep pointing in exactly the same direction after it?
 
-**In one sentence:** an eigenvector of A is a direction that A only stretches (by its eigenvalue λ) without turning.
+**In one sentence:** an eigenvector is an arrow that a matrix only makes longer or shorter, never turns, and its eigenvalue says by how much.
 
-## 🔣 New symbols
+## 🪜 Plain words
 
-| Symbol | Say it | Means |
+Stretch a rubber sheet sideways. Most arrows drawn on it **tilt** toward the sideways direction. But an arrow pointing exactly sideways just gets longer, and one pointing exactly up doesn't change at all. Those special directions are the **eigenvectors** ("eigen" is German for "own": the matrix's own directions).
+
+**Power iteration**: start with any arrow and apply the matrix again and again (shrinking it back to length 1 each time). The strongest stretch direction wins and the arrow swings toward it.
+
+## 🪜 With numbers
+
+`[[2, 0], [0, 1]]`:
+
+- (1, 0) → (2, 0): same direction, 2× longer. Eigenvector, stretch **2**.
+- (0, 1) → (0, 1): unchanged. Eigenvector, stretch **1**.
+- (1, 1) → (2, 1): tilted. Not an eigenvector.
+
+## 🔣 The signs
+
+| Sign | Say it | Means |
 |---|---|---|
-| `Av = λv` | "A v equals lambda v" | v is an **eigenvector**, λ its **eigenvalue** |
-| `λ` | "lambda" | the stretch factor (negative = flipped, 0 = squashed) |
-| power iteration | | repeat `v ← Av / ‖Av‖`; v turns toward the biggest eigenvector |
-| Rayleigh quotient `vᵀAv / vᵀv` | | estimates λ from a (unit) eigenvector |
+| `v` | "v" | the special arrow (eigenvector) |
+| `λ` | "lambda" | the stretch factor (eigenvalue) |
+| `Av = λv` | "A v equals lambda v" | A does nothing but stretch v by λ |
 
-## The idea
+## 🔬 Take the formula apart
 
-Most arrows get rotated by a matrix. A few special ones only get longer or shorter. For `[[2, 0], [0, 1]]`: `(1, 0)` → `(2, 0)`, stretched by 2 (λ = 2); `(0, 1)` → `(0, 1)` (λ = 1); `(1, 1)` → `(2, 1)`: turned, so not an eigenvector.
+<div class="formula"><span class="k1">A</span><span class="k2">v</span> = <span class="k3">λ</span><span class="k2">v</span></div>
 
-**Power iteration:** start with any vector and keep applying A, normalizing each time. The direction with the biggest |λ| grows fastest and takes over. Then `λ ≈ v · Av` (with ‖v‖ = 1).
+| Piece | Say it | Means | A = [[2, 1], [1, 2]], v = (1, 1) |
+|---|---|---|---|
+| <span class="k1">A</span><span class="k2">v</span> | "A v" | the matrix applied to the arrow (matrix × vector) | (3, 3) |
+| = | "equals" | is the same as | |
+| <span class="k3">λ</span> | "lambda" | a plain number | 3 |
+| <span class="k3">λ</span><span class="k2">v</span> | "lambda v" | the same arrow, just scaled | 3·(1, 1) = (3, 3) ✓ |
 
-Why AI cares:
+On the left a **matrix** acts on v; on the right just a **number** does. That only works for these special arrows.
 
-- **PCA** (AI beyond LLMs): the eigenvectors of the data's covariance matrix are the directions of largest variance.
-- **Exploding/vanishing gradients:** if a recurrent weight matrix has |λ| > 1, repeated multiplication explodes; < 1, it vanishes (RNNs!).
-- Google's original **PageRank** is the top eigenvector of the link matrix, found by power iteration.
+## 🔀 What if it were different?
+
+<div class="wrong"><b>v = (1, 0)</b> for [[2, 1], [1, 2]]: Av = (2, 1), which is not a multiple of (1, 0). It turned → not an eigenvector.</div>
+<div class="wrong"><b>v = (0, 0)</b>: A·0 = λ·0 for every λ. The zero arrow has no direction, so it never counts.</div>
+<div class="right">(1, 1) with λ = 3, and (1, −1) with λ = 1 ✓</div>
 
 ## 🗣️ Say it out loud
 
-`Av = λv` → "A times v equals lambda times v" → "A only stretches v by lambda."
+"A v equals lambda v" → "A only stretches v, by lambda."
 
-## 🧮 Worked example
+## 🤖 Where AI uses it
 
-`A = [[2, 1], [1, 2]]`, `v = (1, 1)`: `Av = (3, 3) = 3·(1, 1)`. So (1, 1) is an eigenvector with λ = 3. And `(1, −1)` → `(1, −1)`: λ = 1.
+**PCA** (directions of largest spread in data), **exploding/vanishing gradients** (repeatedly multiplying by a matrix with |λ| > 1 explodes, < 1 vanishes; that's the RNN problem), Google's original PageRank.
 
 ## 🎯 Your quest
 
-`matvec`, `dot` and `norm` are given.
+`matvec`, `dot`, `norm` are given.
 
-1. `is_eigenvector(A, v)`: `True` if `Av` is a multiple of `v` (v not zero). Check that `Av − (λ)v` is ~0 using `λ = (v·Av)/(v·v)`, within `1e-9` per entry.
-2. `power_iteration(A, steps)`: start from `[1.0, 1.0, …]` (length of A), repeat `v ← Av/‖Av‖` `steps` times, return `(λ, v)` with `λ = v·Av`.
+1. `is_eigenvector(A, v)`: compute `λ = (v·Av)/(v·v)`, then check every entry of `Av − λv` is within `1e-9` of 0.
+2. `power_iteration(A, steps)`: start from all 1s, repeat `v ← Av / ‖Av‖`, return `(λ, v)` with `λ = v·Av`.
 
-**Remember:** eigenvectors keep their direction; λ says by how much they stretch.
+**Remember:** eigenvectors keep their direction; λ is the stretch.
 
 ## Review
 
-<details><summary>det([[a, b], [c, d]]) = ?</summary>ad − bc.</details>
-<details><summary>What does det = 0 mean?</summary>The matrix squashes space (loses a dimension), so it has no inverse.</details>
+<details><summary>det([[a, b], [c, d]])?</summary>ad − bc.</details>
+<details><summary>What does det = 0 mean?</summary>The matrix squashes space flat: no inverse.</details>
