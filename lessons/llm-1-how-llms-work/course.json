@@ -1,0 +1,2 @@
+{"lang": "python", "name": "LLMs 1: How an LLM works", "icon": "🧠", "order": 70,
+ "blurb": "Tokens, weights, next-token prediction, sampling, chat templates, embeddings and attention. You build each piece in small Python steps. Do the Python basics first."}

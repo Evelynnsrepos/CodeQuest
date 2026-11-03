@@ -215,3 +215,8 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
   .stats .xp { display: none; }
   .hero h1 { font-size: 1.5rem; }
 }
+
+/* ---- review questions in lessons (<details> in lesson.md) */
+.lesson-body details { margin: 8px 0; padding: 8px 12px; border-radius: 8px; background: rgba(127, 127, 127, 0.08); }
+.lesson-body summary { cursor: pointer; font-weight: 600; }
+.lesson-body details[open] summary { margin-bottom: 6px; }
