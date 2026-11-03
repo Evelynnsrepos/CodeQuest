@@ -1,0 +1,2 @@
+{"lang": "python", "name": "LLMs 4: Python and math for AI", "icon": "📐", "order": 73,
+ "blurb": "The gate to training: Python classes, vectors and matrices, derivatives and the chain rule, gradients, probability, information theory and statistics, all in code. Ends with a script that talks to LM Studio."}
