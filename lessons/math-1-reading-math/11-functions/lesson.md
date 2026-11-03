@@ -4,53 +4,66 @@ xp: 35
 ---
 # A machine with an input slot
 
-> **Warm-up:** you already write Python functions. What do you think `f(g(x))` means?
+> **Warm-up:** you already write Python functions. What do you think `f(g(x))` might mean?
 
-**In one sentence:** a math function is a rule that turns each input into exactly one output, just like a Python function with no side effects.
+**In one sentence:** a math function is a rule that turns each input into exactly one output, just like a Python function.
 
-## 🔣 New symbols
+## 🪜 Plain words
 
-| Symbol | Say it | Means | In Python |
+Picture a machine: you drop a number in the top, it does something, and a number comes out of the bottom. Same input, always same output. You can also connect machines: the output of the first one falls straight into the second.
+
+## 🪜 With numbers
+
+- The "double" machine: put in 5, get 10.
+- The "add 3" machine: put in 2, get 5.
+- Connect them, "add 3" first, then "double": 2 → 5 → 10.
+- The other order, "double" first, then "add 3": 2 → 4 → 7. **Different!** Order matters.
+
+## 🔣 The signs
+
+| Sign | Say it | Means | In Python |
 |---|---|---|---|
-| `f(x)` | "f of x" | the output of function f for input x | `f(x)` |
-| `f(x) = x² + 1` | "f of x equals x squared plus one" | defines f | `def f(x): return x**2 + 1` |
-| `f(g(x))` | "f of g of x" | **composition**: do g first, then f on the result | `f(g(x))` |
-| `(f ∘ g)(x)` | "f after g of x" | the same composition, as one new function | `lambda x: f(g(x))` |
-| `f: ℝ → ℝ` | "f maps reals to reals" | f takes a real number and gives a real number | type hints `float -> float` |
-| `y = f(x)` | "y equals f of x" | y is the name for the output | `y = f(x)` |
+| `f` | "f" | the name of a function (a machine) | `def f(x):` |
+| `f(x)` | "f of x" | what comes out when x goes in. **Not** "f times x"! | `f(x)` |
+| `f(x) = x² + 1` | "f of x equals x squared plus one" | defines the machine | `def f(x): return x**2 + 1` |
+| `f(g(x))` | "f of g of x" | put x into g, then the result into f | `f(g(x))` |
+| `f ∘ g` | "f after g" | the combined machine | `lambda x: f(g(x))` |
+| `f: ℝ → ℝ` | "f goes from reals to reals" | takes a number, gives a number | |
 
-## The idea
+## 🔬 Take the formula apart
 
-- `f(x)` is **not** "f times x". The brackets after a function name mean "feed in".
-- Function names are usually single letters: `f`, `g`, `h`, `σ` (sigma, the sigmoid).
-- **Composition** reads **inside-out**: in `f(g(x))`, the innermost thing (`g(x)`) happens first. Like nested Python calls.
-- The arrow `ℝ → ℝ` describes input and output types. `ℝ` is the set of all real numbers (Math 1, lesson 12); `ℝⁿ` is a list of n real numbers. So `f: ℝⁿ → ℝ` takes a vector and returns one number (like a loss).
+<div class="formula"><span class="k1">f</span>(<span class="k2">g</span>(<span class="k3">x</span>))</div>
+
+| Piece | Say it | Means | With f = square, g = add 3, x = 2 |
+|---|---|---|---|
+| <span class="k3">x</span> | "x" | the input | 2 |
+| <span class="k2">g</span>( … ) | "g of" | the **inner** machine: runs **first** | g(2) = 5 |
+| <span class="k1">f</span>( … ) | "f of" | the **outer** machine: runs **second**, on g's output | f(5) = 25 |
+
+Read nested brackets from the **inside out**, like nested Python calls.
+
+## 🔀 What if the formula were different?
+
+<div class="wrong"><b>g(f(x))</b> (order swapped): square first, then add 3: 2 → 4 → 7. Not 25.</div>
+<div class="wrong"><b>f · g · x</b> (reading the brackets as "times"): makes no sense: f and g are machines, not numbers.</div>
+<div class="right"><b>f(g(x))</b>: 2 → 5 → 25 ✓</div>
 
 ## 🗣️ Say it out loud
 
-`y = σ(w·x + b)` → "y equals sigma of w times x plus b" → "compute w times x plus b, then put that through sigma."
-
-## 🧮 Worked example
-
-`f(x) = x²`, `g(x) = x + 3`, find `f(g(2))`:
-
-1. Inside first: `g(2) = 2 + 3 = 5`
-2. Then outside: `f(5) = 25`
-
-The other order is different: `g(f(2)) = g(4) = 7`. Order matters!
+`y = σ(w·x + b)` → "y equals sigma of w times x plus b" → "compute w times x plus b, then put that into the machine σ."
 
 ## 🤖 Where AI uses it
 
-A neural network **is** a composition: `output = layer₃(layer₂(layer₁(x)))`. The chain rule (Math 3) is how you take the derivative of such a composition, which is all of backpropagation.
+A neural network **is** machines connected in a row: `output = layer₃(layer₂(layer₁(x)))`. The chain rule (Math 3) is how training finds out how each machine affects the final output.
 
 ## 🎯 Your quest
 
 1. `compose(f, g)`: return a **new function** that computes `f(g(x))`.
-2. `pipeline(fs, x)`: apply the functions in the list `fs` to `x` in order (first `fs[0]`, then `fs[1]`, …) and return the result.
+2. `pipeline(fs, x)`: apply the functions in the list `fs` to `x` in order (`fs[0]` first) and return the result.
 
-**Remember:** read nested functions from the inside out.
+**Remember:** brackets after a function name mean "put this in", and nested ones run from the inside out.
 
 ## Review
 
-<details><summary>Write 3e-4 as a decimal.</summary>0.0003.</details>
-<details><summary>How big is a 7B model at 0.5 bytes per weight?</summary>3.5 GB.</details>
+<details><summary>Slope from (0, 1) to (2, 5)?</summary>(5 − 1) / (2 − 0) = 2.</details>
+<details><summary>What does b mean in y = mx + b?</summary>The starting value: where the line crosses the y-axis.</details>
