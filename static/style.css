@@ -225,3 +225,24 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
 .lesson-body th, .lesson-body td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; overflow-wrap: normal; word-break: normal; min-width: 5.5em; }
 .lesson-body th { background: var(--surface-2); white-space: nowrap; }
 .lesson-body td code { white-space: nowrap; }
+/* colour-coded formulas in math lessons: each piece of a formula has a colour, and the
+   breakdown table uses the same colour for that piece. Colours also get an underline so
+   they don't rely on colour alone. */
+.lesson-body .formula { font-family: var(--mono); font-size: 1.35em; text-align: center; padding: 14px 10px; margin: 12px 0; border-radius: 10px; background: var(--surface-2); overflow-x: auto; white-space: nowrap; }
+.lesson-body .k1, .lesson-body .k2, .lesson-body .k3, .lesson-body .k4, .lesson-body .k5, .lesson-body .k6 { font-weight: 700; border-bottom: 2px solid currentColor; padding: 0 1px; }
+.lesson-body .k1 { color: #c2337a; }
+.lesson-body .k2 { color: #1f6fc2; }
+.lesson-body .k3 { color: #b45f06; }
+.lesson-body .k4 { color: #13804a; }
+.lesson-body .k5 { color: #7343d6; }
+.lesson-body .k6 { color: #a33a26; }
+.lesson-body .wrong { background: var(--bad-bg); border-left: 4px solid var(--bad); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
+.lesson-body .right { background: var(--good-bg); border-left: 4px solid var(--good); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
+@media (prefers-color-scheme: dark) {
+  .lesson-body .k1 { color: #ff7ab8; }
+  .lesson-body .k2 { color: #6fb3ff; }
+  .lesson-body .k3 { color: #ffb15c; }
+  .lesson-body .k4 { color: #5fdc98; }
+  .lesson-body .k5 { color: #b79bff; }
+  .lesson-body .k6 { color: #ff8f78; }
+}
