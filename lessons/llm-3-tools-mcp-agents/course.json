@@ -1,0 +1,2 @@
+{"lang": "python", "name": "LLMs 3: Tools, MCP and agents", "icon": "🔌", "order": 72,
+ "blurb": "Tool calling, the agent loop, MCP clients and servers, stdio vs HTTP, LM Studio's mcp.json, MCP security and a first RAG pipeline. Do LLMs 2 first."}
