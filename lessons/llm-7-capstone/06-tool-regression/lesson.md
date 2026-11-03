@@ -8,7 +8,7 @@ xp: 50
 
 It can get worse. This is **catastrophic forgetting** (LLMs 6): training only on one kind of output pulls the model away from others. LoRA forgets less than full fine-tuning, but "less" isn't "none". So the last step before you ship is a **regression test**: the same tool tasks, base vs tuned.
 
-**On your machine:** load your GGUF in LM Studio, attach the MCP server you built in LLMs 3 (lesson 8) through `mcp.json`, and run 10–20 prompts that should trigger a tool and a few that shouldn't. Record each reply's tool call (or none). Do the same with the base model.
+**On your machine:** load your GGUF in LM Studio, attach the MCP server you built in LLMs 3 (lesson 9) through `mcp.json`, and run 10–20 prompts that should trigger a tool and a few that shouldn't. Record each reply's tool call (or none). Do the same with the base model.
 
 A reply counts as **correct** when:
 

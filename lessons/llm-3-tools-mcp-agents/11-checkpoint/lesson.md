@@ -6,7 +6,7 @@ xp: 60
 
 The Module 3 checkpoint, from your plan: *from a blank mcp.json, add a filesystem MCP server yourself, restrict it to one folder, and get the model to summarize a file in it.*
 
-Do it **without scrolling back** to lesson 6. If you get stuck, that's the signal to reread it, then close it and try again.
+Do it **without scrolling back** to lesson 7. If you get stuck, that's the signal to reread it, then close it and try again.
 
 ## Your quest
 
