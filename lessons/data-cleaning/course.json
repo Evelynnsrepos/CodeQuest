@@ -1,0 +1,8 @@
+{
+ "lang": "python",
+ "name": "Data cleaning with Python",
+ "icon": "🧹",
+ "order": 12,
+ "blurb": "Turn messy real-world data into something you can trust: CSV and JSON, missing values, German and US numbers, dates, duplicates, outliers, validation, personal data and joins. Plain Python, useful for spreadsheets, apps and AI training data alike.",
+ "topic": "Data"
+}

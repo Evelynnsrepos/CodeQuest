@@ -1,0 +1,2 @@
+confident: 1.25
+unsure: 4.0

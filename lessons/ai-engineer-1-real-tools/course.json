@@ -1,0 +1,10 @@
+{
+ "lang": "pyhost",
+ "name": "AI engineer 1: Real tools",
+ "icon": "🧪",
+ "order": 80,
+ "blurb": "The libraries real AI work uses, run with Python on your computer: NumPy, pandas, PyTorch up to training a tiny GPT, and scikit-learn. Lesson 1 sets up the packages.",
+ "track": "AI",
+ "level": "Level 3 · Advanced and pro",
+ "topic": "PyTorch and friends"
+}

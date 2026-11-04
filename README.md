@@ -97,8 +97,44 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 | Git | Git commands | host computer |
 | Nix | Nix | host computer (Nix) |
 | Nix flakes | Nix | host computer (Nix) |
+| LLMs 1: How an LLM works | Python | browser |
+| LLMs 2: Running models locally | Python | browser |
+| LLMs 3: Tools, MCP and agents | Python | browser |
+| LLMs 4: Python and math for AI | Python | browser |
+| LLMs 5: How training works | Python | browser |
+| LLMs 6: Fine-tuning and its alternatives | Python | browser |
+| LLMs 7: Capstone, your own model | Python | browser |
+| LLMs 8: Build a GPT, scale it, make it reason | Python | browser |
+| LLMs 9: Working with AI tools | Python | browser |
+| AI beyond LLMs | Python | browser |
+| Math 1: Reading math | Python | browser |
+| Math 2: Linear algebra | Python | browser |
+| Math 3: Calculus | Python | browser |
+| Math 4: Probability and statistics | Python | browser |
+| Math 5: Information theory and optimization | Python | browser |
+| Math 6: Data geometry and testing | Python | browser |
+| AI crash course | Python | browser |
+| Data cleaning with Python | Python | browser |
+| AI engineer 1: Real tools | Python (numpy, pandas, PyTorch) | host computer |
+| AI engineer 2: Real RAG and evals | Python | host computer |
+| AI engineer 3: Shipping AI apps | Python (FastAPI) | host computer |
 
 **Lua for Hyprland** teaches the Lua config that Hyprland uses since version 0.55 (`~/.config/hypr/hyprland.lua`). Lessons run against a practice copy of Hyprland's `hl` API (`lessons/lua-hyprland/prelude.lua`) that records what your code sets and shows a summary, so nothing on your real desktop changes. If `hyprctl version` shows something older than 0.55, your Hyprland still uses `hyprland.conf`, which has a different syntax.
+
+**LLMs 1: How an LLM works** is the first module of a local-AI course: tokens and BPE, weights, softmax, perplexity, the generation loop, temperature and top-p, chat templates, embeddings, attention and the context window. Each idea is built in a few lines of plain Python, and each lesson ends with review questions from earlier lessons. It needs only the Python basics. **LLMs 2** continues with safetensors and GGUF files, quantization, VRAM, KV cache and speed math, Mixture of Experts, AMD ROCm vs Vulkan, and LM Studio's OpenAI-compatible server. **LLMs 3** covers tool calling, the agent loop, MCP (JSON-RPC, stdio vs HTTP, writing a server), LM Studio's `mcp.json`, MCP security and a first RAG pipeline. **LLMs 4** is the math gate: classes, vectors, matrices, FLOPs, derivatives, gradients, the chain rule (including the softmax + cross-entropy gradient), probability, information theory and statistics for evaluations, ending with a script that calls LM Studio. **LLMs 5** builds training from scratch in the style of Karpathy's *Zero to Hero*: an autograd engine (micrograd), a neural network, batches and epochs, overfitting, AdamW and LR schedules, makemore-style character models, a causal attention head, training memory, and Hinton's Forward-Forward algorithm as a comparison. **LLMs 6** covers the training options: RAG vs fine-tuning, JSONL datasets and loss masking, LoRA and QLoRA math, hyperparameters, the Hugging Face stack, DPO, merging and GGUF conversion, and training on AMD or a rented GPU. **LLMs 7** is the capstone: plan a fine-tune, clean and split a dataset, budget tokens, read training logs, run a blind A/B evaluation with confidence intervals, check tool calling did not regress, and publish a model card, ending with a quiz on the reason behind every step. **LLMs 8** goes to university depth: every part of a GPT (multi-head attention, LayerNorm and RMSNorm, the MLP and residuals, RoPE, a full forward pass), parameter counts, the training recipe, Chinchilla scaling laws, pretraining data, multi-GPU training with ZeRO, and RLHF, PPO, GRPO and test-time compute. **AI beyond LLMs** covers the rest of the field: linear and logistic regression, decision trees, k-means, honest evaluation, RNNs, CNNs, vision transformers and CLIP, diffusion, speech and Whisper, multimodal LLMs and Q-learning. **LLMs 9** turns Evelynn's guide *AI on your computer* into practice: the four layers, context budgets and prompt caching, how Claude Code remembers (CLAUDE.md, auto memory), settings layers and permission rules, hooks, skills, prompt engineering, validated JSON output, prompt injection, headless automation with cron, and the math of speculative decoding, MoE routers and Mamba.
+
+The **Math for AI** track (Math 1–6) assumes no math at all. Every lesson explains one idea in plain words and real numbers first, introduces each sign with how to say it and its Python equivalent, then takes the full formula apart with colour-coded pieces and shows what goes wrong if the formula were different. Math 1 covers arithmetic up to Σ, logs and e; Math 2 linear algebra up to attention and LoRA; Math 3 calculus up to backprop by hand; Math 4 probability and statistics up to Bayes, maximum likelihood and p-values; Math 5 entropy, cross-entropy, KL, log-sum-exp, Adam, floating point, quantization, contrastive loss and distillation; Math 6 covariance, PCA, SVD, Jacobians and t-tests. Math 1–5 each have a mixed practice set, and key lessons have drawings.
+
+On the home page the AI and Math courses are grouped into **levels**. New to AI? Start with the **AI crash course** (11 short lessons, the whole picture in one evening), then Level 1 (LLMs 1–3), Level 2 (LLMs 4–7, AI beyond LLMs) and Level 3 (LLMs 8–9, AI engineer 1–3). **Data cleaning with Python** is its own course because it is useful far beyond training data.
+
+The **AI engineer** courses use real packages (numpy, pandas, PyTorch, scikit-learn, FastAPI, pytest), so they run on your computer, not in the browser. Set them up once:
+
+```
+python3 -m venv ~/.codequest/ai-venv
+~/.codequest/ai-venv/bin/pip install torch -r requirements-ai.txt
+```
+
+On Windows use `%USERPROFILE%\.codequest\ai-venv\Scripts\pip`. CodeQuest finds that venv by itself (or set `CODEQUEST_AI_PYTHON` to another Python). Lessons that talk to a model use Ollama or LM Studio when running and a built-in fake otherwise.
 
 **Nix** and **Nix flakes** evaluate your code with `nix-instantiate`. The flakes course passes your `outputs` a practice nixpkgs (`lessons/nix-flakes/prelude.nix`), so nothing is downloaded or built, and Run shows the outputs your flake produces. The last lessons of both courses are about your own NixOS configuration.
 

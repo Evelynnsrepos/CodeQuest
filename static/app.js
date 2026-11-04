@@ -13,6 +13,7 @@ const LANG_INFO = {
   rust: { icon: "🦀", blurb: "Fast, safe systems programming.", unit: "    " },
   nix: { icon: "❄️", blurb: "The language NixOS, nixpkgs and flakes are written in.", unit: "  " },
   git: { icon: "🌿", blurb: "Track changes, branch, merge and share your code.", unit: "  " },
+  pyhost: { icon: "🧪", blurb: "Python with real AI libraries, run on your computer.", unit: "    " },
 };
 const HOST_TOOL = { gdscript: "Godot", rust: "Rust", nix: "Nix", git: "Git" };
 
@@ -161,10 +162,26 @@ async function showHome() {
       </div>
       ${onLan ? `<button class="btn" id="phone-btn">📱 Open on phone</button>` : ""}
     </section>
-    <section class="courses">
-      ${courses.map(courseCard).join("")}
-    </section>`;
+    ${groupCourses(courses).map(([track, levels]) => `
+      <section class="track">
+        <h2 class="track-title">${escapeHtml(track)}</h2>
+        ${levels.map(([level, list]) => `
+          ${level ? `<h3 class="level-title">${escapeHtml(level)}</h3>` : ""}
+          <div class="courses">${list.map(courseCard).join("")}</div>`).join("")}
+      </section>`).join("")}`;
   if (onLan) document.getElementById("phone-btn").onclick = () => showPhoneDialog(info.urls);
+}
+
+// Courses arrive sorted by order; keep that order for tracks and levels (by their first course).
+function groupCourses(courses) {
+  const tracks = new Map();
+  for (const c of courses) {
+    if (!tracks.has(c.track)) tracks.set(c.track, new Map());
+    const levels = tracks.get(c.track);
+    if (!levels.has(c.level)) levels.set(c.level, []);
+    levels.get(c.level).push(c);
+  }
+  return [...tracks].map(([track, levels]) => [track, [...levels]]);
 }
 
 function courseCard(c) {
@@ -179,6 +196,7 @@ function courseCard(c) {
         <span class="icon" aria-hidden="true">${icon}</span>
         <div>
           <h2>${escapeHtml(c.name)}</h2>
+          ${c.topic ? `<span class="chip">${escapeHtml(c.topic)}</span>` : ""}
           <p>${escapeHtml(blurb)}</p>
         </div>
       </header>
@@ -438,7 +456,7 @@ function escapeHtml(s) {
 }
 
 function langName(lang) {
-  return { python: "Python", gdscript: "GDScript", lua: "Lua", typescript: "TypeScript", rust: "Rust", nix: "Nix", git: "Git" }[lang] || lang;
+  return { python: "Python", gdscript: "GDScript", lua: "Lua", typescript: "TypeScript", rust: "Rust", nix: "Nix", git: "Git", pyhost: "Python" }[lang] || lang;
 }
 
 route().catch((err) => {

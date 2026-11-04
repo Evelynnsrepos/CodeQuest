@@ -88,6 +88,10 @@ main { max-width: 1280px; margin: 0 auto; padding: 16px; }
 .hero h1 { margin: 0; font-size: 1.8rem; letter-spacing: -0.02em; }
 .hero p { margin: 4px 0 0; color: var(--muted); }
 
+.track { margin: 0 0 28px; }
+.track-title { margin: 0 0 8px; font-size: 1.45rem; letter-spacing: -0.01em; }
+.level-title { margin: 18px 0 10px; font-size: 1rem; color: var(--muted); font-weight: 600; text-transform: none; }
+.course .chip { display: inline-block; margin: 4px 0 2px; padding: 1px 8px; border-radius: 999px; font-size: 0.78rem; background: var(--surface-2); color: var(--muted); }
 .courses { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
 .course {
   display: flex; flex-direction: column; gap: 10px;
@@ -214,4 +218,37 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
 @media (max-width: 420px) {
   .stats .xp { display: none; }
   .hero h1 { font-size: 1.5rem; }
+}
+
+/* ---- review questions in lessons (<details> in lesson.md) */
+.lesson-body details { margin: 8px 0; padding: 8px 12px; border-radius: 8px; background: rgba(127, 127, 127, 0.08); }
+.lesson-body summary { cursor: pointer; font-weight: 600; }
+.lesson-body details[open] summary { margin-bottom: 6px; }
+/* tables in lessons (symbol cheat sheets): readable, scroll sideways instead of squashing */
+.lesson-body table { display: block; overflow-x: auto; border-collapse: collapse; font-size: 0.92em; margin: 12px 0; }
+.lesson-body th, .lesson-body td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; overflow-wrap: normal; word-break: normal; min-width: 5.5em; }
+.lesson-body th { background: var(--surface-2); white-space: nowrap; }
+.lesson-body td code { white-space: nowrap; }
+/* colour-coded formulas in math lessons: each piece of a formula has a colour, and the
+   breakdown table uses the same colour for that piece. Colours also get an underline so
+   they don't rely on colour alone. */
+.lesson-body .formula { font-family: var(--mono); font-size: 1.35em; text-align: center; padding: 14px 10px; margin: 12px 0; border-radius: 10px; background: var(--surface-2); overflow-x: auto; white-space: nowrap; }
+.lesson-body .k1, .lesson-body .k2, .lesson-body .k3, .lesson-body .k4, .lesson-body .k5, .lesson-body .k6 { font-weight: 700; border-bottom: 2px solid currentColor; padding: 0 1px; }
+.lesson-body .k1 { color: #c2337a; }
+.lesson-body .k2 { color: #1f6fc2; }
+.lesson-body .k3 { color: #b45f06; }
+.lesson-body .k4 { color: #13804a; }
+.lesson-body .k5 { color: #7343d6; }
+.lesson-body .k6 { color: #a33a26; }
+.lesson-body .wrong { background: var(--bad-bg); border-left: 4px solid var(--bad); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
+.lesson-body .right { background: var(--good-bg); border-left: 4px solid var(--good); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
+.lesson-body .alt { background: var(--surface-2); border-left: 4px solid var(--accent); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
+.lesson-body .alt::before { content: "🔁 Also valid: "; font-weight: 600; }
+@media (prefers-color-scheme: dark) {
+  .lesson-body .k1 { color: #ff7ab8; }
+  .lesson-body .k2 { color: #6fb3ff; }
+  .lesson-body .k3 { color: #ffb15c; }
+  .lesson-body .k4 { color: #5fdc98; }
+  .lesson-body .k5 { color: #b79bff; }
+  .lesson-body .k6 { color: #ff8f78; }
 }

@@ -1,0 +1,10 @@
+{
+ "lang": "python",
+ "name": "AI crash course",
+ "icon": "⚡",
+ "order": 69,
+ "blurb": "The whole AI map in 11 short lessons, about 15 minutes each: tokens, next-token prediction, temperature, embeddings, attention, training, prompt vs RAG vs fine-tuning, running models locally, agents and evals. Each lesson says which full course goes deeper.",
+ "track": "AI",
+ "level": "Start here",
+ "topic": "Overview"
+}
