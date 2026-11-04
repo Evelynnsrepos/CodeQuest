@@ -1,0 +1,2 @@
+{"lang": "python", "name": "LLMs 9: Working with AI tools", "icon": "🛠️", "order": 79,
+ "blurb": "From Evelynn's AI guide: the four layers, context budgets, how Claude Code remembers (CLAUDE.md, auto memory), settings and permission rules, hooks, skills, prompt engineering, JSON output, prompt injection, automation, plus the math of speculative decoding, MoE routers and Mamba."}
