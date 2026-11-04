@@ -93,7 +93,8 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 | Lua | Lua | browser |
 | Lua for Hyprland | Lua | browser |
 | TypeScript | TypeScript | browser |
-| AI automation | Python | browser |
+| AI automation 1: Scripts | Python | browser |
+| AI automation 2: n8n with local AI | Python (then n8n on your computer) | browser |
 | Rust | Rust | host computer |
 | Git | Git commands | host computer |
 | Nix | Nix | host computer (Nix) |
