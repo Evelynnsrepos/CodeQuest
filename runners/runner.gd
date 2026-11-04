@@ -32,6 +32,7 @@ func _run() -> void:
 	if obj.has_method("run"):
 		obj.run()
 	_learner = obj
+	_dim = 3 if obj is Node3D else 2
 	var moves: bool = learner.source_code.contains("func _physics_process") or learner.source_code.contains("func _process")
 	if args.size() == 1 and moves and (obj is Node2D or obj is Node3D):
 		await _playground(obj)
@@ -58,6 +59,7 @@ func _run() -> void:
 const MAX_SAMPLES := 180   # every 2nd physics frame, so about 6 seconds
 const MAX_NODES := 40
 var _learner
+var _dim := 2
 var _recording := false
 var _frames: Array = []
 var _tick := 0
@@ -127,7 +129,7 @@ func _size_3d(node: Node) -> Vector3:
 func _print_replay() -> void:
 	if _frames.size() < 2 or _frames.all(func(f): return f == _frames[0]):
 		return  # nothing moved, nothing to watch
-	print("__CQ_REPLAY__ ", JSON.stringify({"dim": 3 if _learner is Node3D else 2, "frames": _frames}))
+	print("__CQ_REPLAY__ ", JSON.stringify({"dim": _dim, "frames": _frames}))
 
 
 # ---- Run in a test scene: a floor, scripted key presses and a short log ----
@@ -143,6 +145,9 @@ func _playground(obj) -> void:
 	print("time    position        velocity")
 	_recording = true
 	for f in 150:
+		if not is_instance_valid(obj):
+			print("%.2f s  your node removed itself (queue_free)" % (f / 60.0))
+			break
 		for k in SCRIPT_KEYS:
 			if f == k[0]:
 				Input.action_press(k[2])
@@ -152,8 +157,11 @@ func _playground(obj) -> void:
 			_log_line(obj, f)
 		await physics_frame
 	_recording = false
-	_log_line(obj, 150)
-	print("Open the Replay below to watch it. Change a number and press Run again to compare.")
+	for k in SCRIPT_KEYS:
+		Input.action_release(k[2])
+	if is_instance_valid(obj):
+		_log_line(obj, 150)
+	print("If anything moved, watch it in the Replay. Change a number and press Run again to compare.")
 
 
 func _log_line(obj, f: int) -> void:
