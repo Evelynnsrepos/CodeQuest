@@ -477,6 +477,12 @@ def run_gdscript(lesson, code, mode, godot):
         return {"ok": False, "output": "", "error": clean_godot_errors(err, out) or "Your script has an error."}
     runtime_errors = clean_godot_errors(err, out)
     result = {"ok": not runtime_errors, "output": clip(program_output)}
+    replay = re.search(r"^__CQ_REPLAY__ (.*)$", out, re.M)
+    if replay:
+        try:
+            result["replay"] = json.loads(replay.group(1))
+        except ValueError:
+            pass  # a cut-off replay just means nothing to watch
     if runtime_errors:
         result["error"] = runtime_errors
     if mode == "submit":
