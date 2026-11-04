@@ -20,6 +20,8 @@ Run it in parallel with boot.dev. The courses that matter for AI, in order (name
 | 6 | Learn Statistics for Programmers | probability and evaluation (lessons 9–11 here) |
 | 7 | Learn Retrieval Augmented Generation | RAG done properly |
 
+**New to math?** Do the Math for AI track first (Math 1: Reading math → Math 5: Information theory and optimization). It starts from arithmetic, explains every sign, and builds the same formulas this module uses step by step. This module then works as the fast applied bridge into training.
+
 For math intuition, watch alongside: 3Blue1Brown's *Essence of Linear Algebra* (chapters 1–4 and 9) and *Essence of Calculus* (chapters 1–4), plus Khan Academy for practice problems. This module goes further than "intuition level" on purpose: you'll implement the gradient of softmax + cross-entropy yourself, which is the exact formula every LLM is trained with.
 
 ## Your quest
