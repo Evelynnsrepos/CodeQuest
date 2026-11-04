@@ -1,8 +1,12 @@
 ---
 title: Running with acceleration
 xp: 25
+hint: var direction := Input.get_axis("ui_left", "ui_right")
+hint: velocity.x = move_toward(velocity.x, direction * max_speed, acceleration * delta), and the same towards 0 with friction when direction is 0.
 ---
 # Speeding up and slowing down
+
+> **Warm-up:** Why does a character that starts and stops instantly feel stiff?
 
 The simplest movement sets the speed straight away: `velocity.x = direction * speed`. It works, but feels stiff, like a robot. Most platformers **accelerate** to full speed and **slow down** (friction) when you let go. It's a tiny delay, but it makes movement feel smooth.
 
@@ -32,3 +36,8 @@ The gravity code is already there. Add horizontal movement:
 1. Read the direction with `Input.get_axis("ui_left", "ui_right")`.
 2. If the direction isn't `0`, move `velocity.x` towards `direction * max_speed` by `acceleration * delta`.
 3. Otherwise, move `velocity.x` towards `0` by `friction * delta`.
+
+## Review
+
+<details><summary>What does Input.get_axis("ui_left", "ui_right") give?</summary>-1 for left, 1 for right, 0 for neither (or both).</details>
+<details><summary>Why use friction bigger than acceleration?</summary>Stopping a bit faster than starting feels responsive.</details>

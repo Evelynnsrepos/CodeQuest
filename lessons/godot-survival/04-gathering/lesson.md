@@ -1,8 +1,12 @@
 ---
 title: Gathering resources
 xp: 25
+hint: var amount := mini(tool_power.get(tool, 1), hits_left)
+hint: hits_left -= amount, dropped.emit("wood", amount), and when hits_left is 0 emit depleted and queue_free().
 ---
 # Chop chop
+
+> **Warm-up:** Why does a stone axe take more hits to chop a tree than an iron axe?
 
 Trees, rocks and bushes are **resource nodes**: hit them a few times and they drop items, then disappear (and maybe grow back later).
 
@@ -24,3 +28,8 @@ The tree starts with `hits_left := 6`. Write `hit(tool: String)`:
 2. Lower `hits_left` by the tool's power (unknown tools count as `1`), not below `0`.
 3. Emit `dropped("wood", amount)` with the same amount as the power used. Use `mini` so the drop is at most what was left: an iron axe (4) hitting a tree with 2 hits left drops 2.
 4. When `hits_left` reaches `0`, emit `depleted` and `queue_free()` the tree.
+
+## Review
+
+<details><summary>What does tool_power.get(tool, 1) do for an unknown tool?</summary>Returns 1, the default.</details>
+<details><summary>Why use mini for the drop?</summary>So you never get more wood than the tree had left.</details>

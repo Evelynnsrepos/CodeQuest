@@ -1,8 +1,12 @@
 ---
 title: A 3D enemy that hunts you
 xp: 30
+hint: var flat := target - global_position, then flat.y = 0.
+hint: If flat.length() > attack_range move with flat.normalized() * speed and look_at(Vector3(target.x, global_position.y, target.z)); else stop and attack(). Always move_and_slide().
 ---
 # Footsteps behind you
+
+> **Warm-up:** What does a 3D zombie need to know to walk towards you?
 
 Time to combine the 3D tools: `ground_direction` from lesson 1, `look_at` from lesson 4 and `move_and_slide`.
 
@@ -24,3 +28,8 @@ Write `hunt(target: Vector3)`. `_physics_process` already calls it every frame w
 2. If farther than `attack_range`: set `velocity.x` and `velocity.z` from the direction times `speed`, and face the target.
 3. Otherwise: stop (`velocity.x` and `velocity.z` to 0) and call `attack()`.
 4. Always finish with `move_and_slide()`.
+
+## Review
+
+<details><summary>Why look at the target at your own height?</summary>So the enemy turns but doesn't tilt up or down.</details>
+<details><summary>What does the enemy do inside attack range?</summary>Stops moving and attacks.</details>

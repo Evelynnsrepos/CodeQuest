@@ -1,10 +1,14 @@
 ---
 title: A creature with a mind
 xp: 30
+hint: Check fleeing first: if health < max_health * 0.3, state = State.FLEE and return.
+hint: Then match state and only change it as the table says for that state.
 ---
 # Wolves
 
-Remember `enum` and `match` from Godot 1? Here's where they shine. A wolf in a survival game might:
+> **Warm-up:** What should a wolf do when it's badly hurt?
+
+Remember `enum` and `match` from Basics 1? Here's where they shine. A wolf in a survival game might:
 
 | state | does | switches when |
 | --- | --- | --- |
@@ -23,3 +27,8 @@ Health below 30% means `health < max_health * 0.3`. With `max_health = 50` that'
 ## Your quest
 
 Write `think(distance: float) -> void`, which picks the next `state` given the distance to the player, using the table. The check walks the wolf through a whole hunt.
+
+## Review
+
+<details><summary>Why check low health before the match?</summary>Fleeing beats every other state, whatever the wolf was doing.</details>
+<details><summary>Why does the wolf only stop chasing at 1.5 x sight range?</summary>So it doesn't flip between chase and wander at the edge of its sight.</details>

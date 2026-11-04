@@ -1,2 +1,10 @@
-{"lang": "gdscript", "name": "Godot 2: Game dev foundations", "icon": "🕹️", "order": 25,
- "blurb": "Level 2. Movement, input, signals, timers, vectors, scenes, collisions and a HUD with real Godot nodes. Do Godot 1 first."}
+{
+ "lang": "gdscript",
+ "name": "Basics 2: Game dev foundations",
+ "icon": "🕹️",
+ "order": 25,
+ "blurb": "Movement, input, signals, timers, vectors, scenes, collisions and a HUD with real Godot nodes. Ends with your first scene you can play in Godot. Do Basics 1 first.",
+ "track": "Godot",
+ "level": "Basics",
+ "topic": "Nodes"
+}

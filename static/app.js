@@ -374,6 +374,12 @@ async function execute(lesson, mode) {
   out.innerHTML = `<p class="muted">${lesson.lang === "rust" ? "Compiling…" : runner && !runner.isReady ? `Starting ${langName(lesson.lang)} (first time only)…` : "Running…"}</p>`;
 
   let result;
+  const started = Date.now();
+  const ticker = lesson.lang === "gdscript" && setInterval(() => {
+    const secs = Math.round((Date.now() - started) / 1000);
+    out.innerHTML = `<p class="muted">${mode === "submit" ? "Godot is playing your code against the check" : "Godot is running your code"}… ${secs} s
+      <span class="busy"><span style="width:${Math.min(100, secs * 12)}%"></span></span></p>`;
+  }, 500);
   try {
     if (runner) {
       result = await runner.run({ code, check: lesson.check, expected: lesson.expected_output, prelude: lesson.prelude, mode });
@@ -387,6 +393,7 @@ async function execute(lesson, mode) {
     result = { output: "", error: String(err.message || err) };
   } finally {
     buttons.forEach((b) => (b.disabled = false));
+    if (ticker) clearInterval(ticker);
   }
   renderResult(out, result, mode, lesson);
 }
@@ -420,6 +427,80 @@ function renderResult(out, r, mode, lesson) {
     }
   }
   out.innerHTML = html;
+  if (r.replay) showReplay(out, r.replay, mode);
+}
+
+// Replay: the Godot runner records where every body was while your code ran, drawn here as boxes.
+function showReplay(out, replay, mode) {
+  const frames = replay.frames, is3d = replay.dim === 3;
+  if (!frames?.length || !frames.some((f) => f.some((e) => e[1] !== 1))) return;
+  const box = document.createElement("div");
+  box.className = "replay";
+  box.innerHTML = `<div class="replay-head"><strong>🎬 Replay</strong>
+      <span class="muted">${mode === "submit" ? "what happened during the check" : "your node in the test scene"}</span></div>
+    <canvas></canvas>
+    <div class="replay-controls"><button class="btn small" data-play>⏸ Pause</button>
+      <input type="range" min="0" max="${frames.length - 1}" value="0" aria-label="Replay time">
+      <span class="muted time">0.0 s</span></div>
+    <p class="replay-key muted"><span class="k you"></span>you <span class="k solid"></span>floor and walls <span class="k area"></span>areas <span class="k other"></span>other bodies</p>`;
+  const verdict = out.querySelector(".verdict");
+  if (verdict) verdict.after(box); else out.prepend(box);
+  const canvas = box.querySelector("canvas"), ctx = canvas.getContext("2d");
+  const slider = box.querySelector("input"), timeLabel = box.querySelector(".time"), playBtn = box.querySelector("[data-play]");
+
+  // 3D: look from the side (x, y) when things move up and down more than forwards, else from above (x, z).
+  const spread = (i) => { const v = frames.flatMap((f) => f.filter((e) => e[1] === 0).map((e) => e[i])); return v.length ? Math.max(...v) - Math.min(...v) : 0; };
+  const topDown = is3d && spread(4) > spread(3);
+  const view = (e) => is3d
+    ? (topDown ? { x: e[2], y: e[4], w: e[5], h: e[7] } : { x: e[2], y: -e[3], w: e[5], h: e[6] })
+    : { x: e[2], y: e[3], w: e[4], h: e[5] };
+
+  // Frame the moving things (not the huge floor), with some room around them.
+  const moving = frames.flatMap((f) => f.filter((e) => e[1] !== 1).map(view));
+  const xs = moving.flatMap((v) => [v.x - v.w / 2, v.x + v.w / 2]), ys = moving.flatMap((v) => [v.y - v.h / 2, v.y + v.h / 2]);
+  const minSpan = is3d ? 6 : 160;
+  let [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const padX = Math.max((minSpan - (x1 - x0)) / 2, (x1 - x0) * 0.15), padY = Math.max((minSpan / 2 - (y1 - y0)) / 2, (y1 - y0) * 0.25);
+  x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
+
+  const css = getComputedStyle(document.documentElement);
+  const color = (n) => css.getPropertyValue(n).trim();
+  const fills = [color("--accent"), color("--muted"), color("--gold"), color("--bad")];
+  let at = 0, playing = true, last = 0;
+
+  function draw() {
+    const w = canvas.clientWidth, h = canvas.clientHeight, dpr = window.devicePixelRatio || 1;
+    if (canvas.width !== Math.round(w * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
+    const scale = Math.min(w / (x1 - x0), h / (y1 - y0));
+    const ox = (w - (x1 - x0) * scale) / 2, oy = (h - (y1 - y0) * scale) / 2;
+    const sx = (x) => ox + (x - x0) * scale, sy = (y) => oy + (y - y0) * scale;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    // the path you took so far
+    ctx.strokeStyle = fills[0]; ctx.globalAlpha = 0.35; ctx.lineWidth = 2; ctx.beginPath();
+    frames.slice(0, at + 1).forEach((f, i) => { const me = f.find((e) => e[1] === 0); if (me) { const v = view(me); ctx[i ? "lineTo" : "moveTo"](sx(v.x), sy(v.y)); } });
+    ctx.stroke(); ctx.globalAlpha = 1;
+    for (const e of [...frames[at]].sort((a, b) => (a[1] === 0) - (b[1] === 0))) {
+      const v = view(e), px = sx(v.x - v.w / 2), py = sy(v.y - v.h / 2), pw = Math.max(v.w * scale, 3), ph = Math.max(v.h * scale, 3);
+      if (e[1] === 2) { ctx.setLineDash([4, 3]); ctx.strokeStyle = fills[2]; ctx.lineWidth = 2; ctx.strokeRect(px, py, pw, ph); ctx.setLineDash([]); }
+      else { ctx.fillStyle = fills[e[1]]; ctx.globalAlpha = e[1] === 1 ? 0.5 : 1; ctx.fillRect(px, py, pw, ph); ctx.globalAlpha = 1; }
+    }
+    slider.value = at;
+    timeLabel.textContent = `${(at / 30).toFixed(1)} s`;
+  }
+  function tick(t) {
+    if (!box.isConnected) return;
+    if (playing && t - last > 1000 / 30) {
+      last = t;
+      at = at < frames.length - 1 ? at + 1 : 0;
+      draw();
+    }
+    requestAnimationFrame(tick);
+  }
+  playBtn.onclick = () => { playing = !playing; playBtn.textContent = playing ? "⏸ Pause" : "▶ Play"; };
+  slider.oninput = () => { playing = false; playBtn.textContent = "▶ Play"; at = Number(slider.value); draw(); };
+  draw();
+  requestAnimationFrame(tick);
 }
 
 function celebrate(xp, newLevel) {

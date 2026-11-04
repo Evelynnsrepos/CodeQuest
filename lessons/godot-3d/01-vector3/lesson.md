@@ -1,8 +1,12 @@
 ---
 title: The third dimension
 xp: 25
+hint: Make the arrow b - a, then set its y to 0.
+hint: Distance is flat.length(); direction is flat.normalized().
 ---
 # x, y and z
+
+> **Warm-up:** In 3D, which way is up, and what is the third number for?
 
 In 3D, positions are `Vector3`: three numbers instead of two. Godot's 3D axes are:
 
@@ -44,3 +48,8 @@ Example: a = (0, 0, 0), b = (3, 10, 4). The straight distance is √(9 + 100 + 1
 
 1. `ground_distance(a: Vector3, b: Vector3) -> float`: the distance from a to b, ignoring height.
 2. `ground_direction(a: Vector3, b: Vector3) -> Vector3`: the length-1 direction from a to b along the ground (y = 0).
+
+## Review
+
+<details><summary>Which axis is up in Godot 3D?</summary>y.</details>
+<details><summary>How do you ignore height in a distance?</summary>Set the arrow's y to 0 before taking its length.</details>

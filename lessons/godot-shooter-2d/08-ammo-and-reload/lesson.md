@@ -1,8 +1,12 @@
 ---
 title: Ammo and reloading
 xp: 20
+hint: fire: if magazine == 0 return false; otherwise magazine -= 1 and return true.
+hint: reload: var moved := mini(magazine_size - magazine, reserve), then add moved to magazine and take it from reserve.
 ---
 # Click. Empty.
+
+> **Warm-up:** You have 3 bullets left in a 12-bullet magazine and 5 spare. How many do you have after reloading?
 
 Most shooters have two ammo counts:
 
@@ -25,3 +29,8 @@ Two examples with `magazine_size = 12`:
 
 1. `fire() -> bool`: if `magazine` is `0`, return `false`. Otherwise use up one bullet and return `true`.
 2. `reload()`: move bullets from `reserve` into `magazine` with the formula above.
+
+## Review
+
+<details><summary>Why use mini in reload?</summary>You can't move more bullets than the gap in the magazine or more than you have in reserve.</details>
+<details><summary>What should fire() return when empty?</summary>false, so the game can play a click instead of shooting.</details>

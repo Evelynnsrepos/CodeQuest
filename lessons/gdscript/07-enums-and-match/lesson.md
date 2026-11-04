@@ -1,8 +1,12 @@
 ---
 title: Enums and match
 xp: 20
+hint: Check the smallest distance first: if distance <= 30 attack, elif distance <= 200 chase, else idle.
+hint: In describe(), each match branch looks like State.ATTACK: and then return "attack" on the next line.
 ---
 # What is the enemy doing?
+
+> **Warm-up:** Name three things an enemy in a game might be doing.
 
 An enemy is usually in one **state** at a time: idle, chasing, attacking. You could store that as a String, but a typo like `"chasng"` would never be caught. An **enum** gives each state a name that Godot checks for you:
 
@@ -37,3 +41,8 @@ Write `next_state(distance: float) -> void` for an enemy with `var state := Stat
 - farther: `State.IDLE`
 
 Then write `describe() -> String` with `match`: it returns `"idle"`, `"chase"` or `"attack"` for the current state.
+
+## Review
+
+<details><summary>Why use an enum instead of strings like "chase"?</summary>Godot checks the names for you, so a typo is an error instead of a silent bug.</details>
+<details><summary>What does _ mean in a match?</summary>Anything else: the branch used when no other value matched.</details>

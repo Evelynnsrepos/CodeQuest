@@ -1,2 +1,9 @@
-{"name": "Godot 1: GDScript basics", "icon": "🎮", "order": 20,
- "blurb": "Level 1 of the Godot path. The language of the Godot game engine: variables, functions, loops, decisions, dictionaries and state machines."}
+{
+ "name": "Basics 1: GDScript",
+ "icon": "🎮",
+ "order": 20,
+ "blurb": "Start here. The language of the Godot game engine: variables, functions, loops, decisions, dictionaries and state machines. Tiny lessons, about 5 minutes each.",
+ "track": "Godot",
+ "level": "Basics",
+ "topic": "Language"
+}

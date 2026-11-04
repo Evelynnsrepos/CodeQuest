@@ -1,8 +1,12 @@
 ---
 title: Invincibility frames
 xp: 20
+hint: take_damage: if invincible_time > 0 return; otherwise lower health and set invincible_time = invincible_duration.
+hint: In _process: count invincible_time down with maxf(..., 0.0). While it's above 0, visible = int(invincible_time * 10) % 2 == 0; else visible = true.
 ---
 # Blink blink
+
+> **Warm-up:** Why do characters blink for a moment after getting hit?
 
 If five enemies touch you at once, losing all your health in one frame feels unfair. Most games give the player a short **invincibility** window after each hit (often called **i-frames**), and make the sprite blink so you can see it.
 
@@ -29,3 +33,8 @@ When the invincibility ends, make sure the player is visible again!
 
 1. `take_damage(amount: int)`: if `invincible_time > 0`, ignore the hit. Otherwise lower `health` and set `invincible_time` to `invincible_duration`.
 2. `_process(delta)`: count `invincible_time` down (not below 0). While it's above 0, blink with the trick above. Otherwise set `visible = true`.
+
+## Review
+
+<details><summary>What are invincibility frames for?</summary>So one touch can't hit you many frames in a row.</details>
+<details><summary>How does the blink trick work?</summary>int(time x 10) changes every 0.1 s; % 2 turns that into on, off, on, off.</details>

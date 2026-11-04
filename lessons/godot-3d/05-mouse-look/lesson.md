@@ -1,8 +1,12 @@
 ---
 title: First-person mouse look
 xp: 30
+hint: rotate_y(-event.relative.x * sensitivity) turns the body.
+hint: head.rotation.x = clampf(head.rotation.x - event.relative.y * sensitivity, deg_to_rad(-89), deg_to_rad(89))
 ---
 # Look around
+
+> **Warm-up:** Why can't you look so far up in a first-person game that you flip upside down?
 
 A first-person shooter turns with the mouse. The scene usually looks like this:
 
@@ -47,3 +51,8 @@ The `Head` node is created for you. In `_unhandled_input(event)`, for `InputEven
 
 1. Turn the body left/right with `rotate_y`.
 2. Tilt the head up/down by setting `head.rotation.x`, clamped to ±89°.
+
+## Review
+
+<details><summary>Why turn the body for left/right but only the head for up/down?</summary>Walking should follow where you face, but not tilt into the floor when you look down.</details>
+<details><summary>Why clamp the head at 89 degrees?</summary>Past 90 the view flips over.</details>
