@@ -19,7 +19,7 @@ Compare settings on the **same** golden set: keyword only, embeddings only, hybr
 2. `mrr(results, golden)`.
 3. `bm25_results(notes, golden)`: rank the note ids for every golden question with the `BM25` class (given, from lesson 04); return the `results` dict.
 
-The check makes sure your numbers match and that BM25 gets recall@3 ≥ 0.6 on this set. Notice which questions it misses: they use **different words** than the note ("keyboard shortcut" vs "keybindings"). That's what embeddings and hybrid search fix.
+The check makes sure your numbers match and that BM25 gets recall@3 ≥ 0.6 on this set. Print the questions where the right note is **not first**: they use different words than the note ("keyboard shortcut" vs "keybindings", "refresh rate" vs "144"). With 12 notes BM25 still finds them in the top 3; with 5,000 real notes those are the questions it loses. That's what embeddings and hybrid search fix.
 
 **Remember:** a golden set first, then change one thing at a time.
 
