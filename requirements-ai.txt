@@ -1,0 +1,9 @@
+# Packages for the "AI engineer" courses. They run with Python on your own computer.
+# Install PyTorch first (see AI engineer 1, lesson 01), then: pip install -r requirements-ai.txt
+numpy
+pandas
+scikit-learn
+fastapi
+httpx
+pydantic
+pytest

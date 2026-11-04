@@ -53,9 +53,12 @@ LANGUAGES = {
     "nix": {"name": "Nix", "ext": "nix", "runs_on": "server"},
     # Git lessons are short scripts of shell-style commands; checks are Python run by this server.
     "git": {"name": "Git", "ext": "sh", "check_ext": "py", "runs_on": "server"},
+    # AI engineer lessons need real packages (numpy, torch, fastapi...), so they run with Python on this computer.
+    "pyhost": {"name": "Python (your computer)", "ext": "py", "runs_on": "server"},
 }
 
 RUN_TIMEOUT = 10  # seconds a learner program may run
+PYHOST_TIMEOUT = 180  # importing torch and training a tiny model takes longer
 COMPILE_TIMEOUT = 60  # seconds rustc may take
 MAX_OUTPUT = 20_000  # characters of output sent back to the page
 MAX_CODE = 100_000  # characters of code accepted from the page
@@ -311,6 +314,16 @@ def find_git():
             if c.is_file():
                 return str(c)
     return None
+
+
+def find_ai_python():
+    """The Python used for "pyhost" lessons: $CODEQUEST_AI_PYTHON, else ~/.codequest/ai-venv, else this Python."""
+    env = os.environ.get("CODEQUEST_AI_PYTHON")
+    if env and Path(env).is_file():
+        return env
+    venv = Path.home() / ".codequest" / "ai-venv"
+    c = venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    return str(c) if c.is_file() else sys.executable
 
 
 def find_rustc():
@@ -774,6 +787,33 @@ def run_git(lesson, code, mode, git):
         return result
 
 
+PYHOST_MARK = "\x1eCODEQUEST-CHECK "
+
+
+def run_pyhost(lesson, code, mode, python):
+    with tempfile.TemporaryDirectory(prefix="codequest-py-") as tmp:
+        tmp = Path(tmp)
+        (tmp / "main.py").write_text(code, encoding="utf-8")
+        cmd = [python, "-X", "utf8", str(RUNNERS_DIR / "pyhost_runner.py"), "main.py"]
+        if mode == "submit" and lesson["check"]:
+            (tmp / "check.py").write_text(lesson["check"], encoding="utf-8")
+            cmd.append("check.py")
+        rc, out, err, timed_out = run_process(cmd, tmp, PYHOST_TIMEOUT)
+        if timed_out:
+            return {"ok": False, "output": clip(out), "error":
+                    f"Your program ran for more than {PYHOST_TIMEOUT} seconds and was stopped. Is a loop running forever?"}
+        out, _, verdict = out.partition("\n" + PYHOST_MARK)
+        result = {"ok": rc == 0, "output": clip(out.rstrip())}
+        if rc != 0:
+            result["error"] = clip(err.strip() or "Your program stopped with an error.")
+        if mode != "submit":
+            return result
+        check_message = json.loads(verdict) if verdict.strip() else None
+        result.update(judge(lesson, result["output"], check_message=check_message, has_check=bool(lesson["check"]),
+                            runtime_error=result.get("error", "")))
+        return result
+
+
 def judge(lesson, program_output, check_message, has_check, runtime_error=""):
     """Combine expected-output and check results into a pass/fail with a message."""
     if runtime_error:
@@ -798,6 +838,7 @@ class Handler(BaseHTTPRequestHandler):
     rustc = None
     nix = None
     git = None
+    pyhost = None
     port = 8000
 
     def log_message(self, fmt, *args):
@@ -904,6 +945,8 @@ class Handler(BaseHTTPRequestHandler):
                 result = run_nix(lesson, code, mode, self.nix)
             elif lang == "git":
                 result = run_git(lesson, code, mode, self.git)
+            elif lang == "pyhost":
+                result = run_pyhost(lesson, code, mode, find_ai_python())  # looked up each run, so a new venv works without a restart
             else:
                 return self.send_json({"error": "This language runs in the browser"}, HTTPStatus.BAD_REQUEST)
             if mode == "submit":
@@ -921,7 +964,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def host_tool(self, lang):
-        return {"gdscript": self.godot, "rust": self.rustc, "nix": self.nix, "git": self.git}.get(lang)
+        return {"gdscript": self.godot, "rust": self.rustc, "nix": self.nix, "git": self.git,
+                "pyhost": self.pyhost}.get(lang)
 
     def courses_payload(self):
         progress = progress_map()
@@ -1014,6 +1058,7 @@ def main():
     Handler.rustc = find_rustc()
     Handler.nix = find_nix()
     Handler.git = find_git()
+    Handler.pyhost = find_ai_python()
     Handler.port = args.port
 
     if not (VENDOR_DIR / "pyodide" / "pyodide.js").exists():

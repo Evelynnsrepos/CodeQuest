@@ -13,6 +13,7 @@ const LANG_INFO = {
   rust: { icon: "🦀", blurb: "Fast, safe systems programming.", unit: "    " },
   nix: { icon: "❄️", blurb: "The language NixOS, nixpkgs and flakes are written in.", unit: "  " },
   git: { icon: "🌿", blurb: "Track changes, branch, merge and share your code.", unit: "  " },
+  pyhost: { icon: "🧪", blurb: "Python with real AI libraries, run on your computer.", unit: "    " },
 };
 const HOST_TOOL = { gdscript: "Godot", rust: "Rust", nix: "Nix", git: "Git" };
 
@@ -438,7 +439,7 @@ function escapeHtml(s) {
 }
 
 function langName(lang) {
-  return { python: "Python", gdscript: "GDScript", lua: "Lua", typescript: "TypeScript", rust: "Rust", nix: "Nix", git: "Git" }[lang] || lang;
+  return { python: "Python", gdscript: "GDScript", lua: "Lua", typescript: "TypeScript", rust: "Rust", nix: "Nix", git: "Git", pyhost: "Python" }[lang] || lang;
 }
 
 route().catch((err) => {
