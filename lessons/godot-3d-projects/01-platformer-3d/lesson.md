@@ -4,7 +4,7 @@ xp: 40
 ---
 # Build it: a 3D platformer
 
-Uses **Godot 6** lessons 1–4: a body that walks and jumps, moving relative to an orbiting camera.
+Uses **Into 3D** lessons 1–4: a body that walks and jumps, moving relative to an orbiting camera.
 
 ## 1. Block out the level
 

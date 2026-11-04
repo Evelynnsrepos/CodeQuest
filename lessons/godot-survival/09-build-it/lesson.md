@@ -4,7 +4,7 @@ xp: 40
 ---
 # Build it: a top-down survival game
 
-All of **Godot 5** comes together here, with movement from Godot 2.
+Everything from this course comes together here, with movement from Basics 2.
 
 ## 1. Scenes
 

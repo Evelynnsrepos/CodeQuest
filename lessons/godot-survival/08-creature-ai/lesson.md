@@ -4,7 +4,7 @@ xp: 30
 ---
 # Wolves
 
-Remember `enum` and `match` from Godot 1? Here's where they shine. A wolf in a survival game might:
+Remember `enum` and `match` from Basics 1? Here's where they shine. A wolf in a survival game might:
 
 | state | does | switches when |
 | --- | --- | --- |

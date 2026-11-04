@@ -4,7 +4,7 @@ xp: 40
 ---
 # Build it: a 2D platformer
 
-You have every piece from **Godot 3**. This guide puts them together in the real Godot editor. Work through it with Godot open next to CodeQuest.
+You have every piece from the lessons before this one. This guide puts them together in the real Godot editor. Work through it with Godot open next to CodeQuest.
 
 ## 1. Set up the project
 
@@ -33,7 +33,7 @@ Level1 (Node2D)
 ├── TileMapLayer                ← paint the ground
 ├── Player (instance)           ← drag player.tscn in
 ├── Enemies (Node2D)            ← patrol enemies from lesson 6
-├── Coins (Node2D)              ← Area2D coins from Godot 2
+├── Coins (Node2D)              ← Area2D coins from Basics 2
 ├── Checkpoint (Area2D)         ← calls player.set_checkpoint()
 └── Goal (Area2D)               ← the flag at the end
 ```

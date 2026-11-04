@@ -4,7 +4,7 @@ xp: 25
 ---
 # Pew pew
 
-Time to put the pieces together: the **cooldown** from Godot 2, **instancing** a scene, and the **angle** maths.
+Time to put the pieces together: the **cooldown** from Basics 2, **instancing** a scene, and the **angle** maths.
 
 A bullet should appear at the **tip of the gun** (the "muzzle"), not in the middle of the player. The muzzle is `muzzle_distance` pixels in front of the player, in the direction it's facing:
 

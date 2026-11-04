@@ -4,7 +4,7 @@ xp: 40
 ---
 # Build it: a first-person shooter
 
-Uses **Godot 6** lessons 2, 3, 5, 6 and 8, plus the ammo and waves from Godot 4.
+Uses **Into 3D** lessons 2, 3, 5, 6 and 8, plus the ammo and waves from 2D Shooter.
 
 ## 1. The player
 
@@ -13,7 +13,7 @@ Player (CharacterBody3D)        ← walk with lesson 3's basis movement (strafe 
 ├── CollisionShape3D            ← CapsuleShape3D
 └── Head (Node3D)               ← lesson 5's mouse look; place it at eye height (y ≈ 1.6)
     └── Camera3D
-        └── Gun (Node3D)        ← lesson 6's hitscan + Godot 4's ammo
+        └── Gun (Node3D)        ← lesson 6's hitscan + 2D Shooter's ammo
             └── GunModel
 ```
 

@@ -22,7 +22,7 @@ for ingredient in recipes["axe"]:
 
 Crafting has to be **all or nothing**. Check that *every* ingredient is there **before** taking anything out. Otherwise a player with 3 wood and 0 stone would lose their wood and get no axe!
 
-The inventory here is a plain `{"item": count}` Dictionary (like Godot 1). The slot version from the last lesson works the same way, just with more bookkeeping.
+The inventory here is a plain `{"item": count}` Dictionary (like Basics 1). The slot version from the last lesson works the same way, just with more bookkeeping.
 
 ## Your quest
 

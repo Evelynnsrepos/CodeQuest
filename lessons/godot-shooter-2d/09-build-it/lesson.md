@@ -4,7 +4,7 @@ xp: 40
 ---
 # Build it: a top-down shooter
 
-All the pieces come from **Godot 4**. A wave-survival arena shooter is a great first shooter: one screen, endless replay.
+All the pieces come from this course. A wave-survival arena shooter is a great first shooter: one screen, endless replay.
 
 ## 1. Set up
 
@@ -23,7 +23,7 @@ Bullet (Area2D)                 ← lessons 2 and 4
 ├── Sprite2D
 └── CollisionShape2D
 
-Enemy (CharacterBody2D)         ← chase from Godot 2, take_damage + died signal
+Enemy (CharacterBody2D)         ← chase from Basics 2, take_damage + died signal
 ├── Sprite2D
 └── CollisionShape2D
 
@@ -31,7 +31,7 @@ Arena (Node2D)                  ← the main scene
 ├── TileMapLayer (floor and walls)
 ├── Player
 ├── WaveManager (Node)          ← lessons 5 and 6
-└── HUD (CanvasLayer)           ← the HUD lesson from Godot 2
+└── HUD (CanvasLayer)           ← the HUD lesson from Basics 2
 ```
 
 With a `Marker2D` you can use `$Muzzle.global_position` instead of computing the muzzle point.
@@ -57,4 +57,4 @@ It would keep shrinking towards 0, so we put a floor under it with `maxf(..., mi
 Write:
 
 1. `spawn_interval(wave: int) -> float` with the formula and the `min_interval` floor.
-2. `game_over(score: int) -> bool`: if `score` beats `high_score`, store it and return `true` (show "New high score!"), otherwise return `false`. Saving it to a file is the save lesson from Godot 5.
+2. `game_over(score: int) -> bool`: if `score` beats `high_score`, store it and return `true` (show "New high score!"), otherwise return `false`. Saving it to a file comes in the Survival systems course (the save lesson).

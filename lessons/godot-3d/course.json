@@ -1,2 +1,10 @@
-{"lang": "gdscript", "name": "Godot 6: Into 3D", "icon": "🧊", "order": 25.4,
- "blurb": "Level 6. Everything you need to make 3D games: Vector3, CharacterBody3D, the basis, camera-relative movement, first-person mouse look, hitscan shooting, interacting and 3D enemies. Do Godot 5 first."}
+{
+ "lang": "gdscript",
+ "name": "Into 3D",
+ "icon": "🧊",
+ "order": 25.4,
+ "blurb": "Everything you need to make 3D games: Vector3, CharacterBody3D, the basis, camera-relative movement, first-person mouse look, hitscan shooting, interacting and 3D enemies. Do the 2D courses first.",
+ "track": "Godot",
+ "level": "3D",
+ "topic": "3D basics"
+}

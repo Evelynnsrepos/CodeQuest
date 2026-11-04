@@ -4,20 +4,20 @@ xp: 40
 ---
 # Build it: a 3D survival game
 
-The big one. Godot 5's systems don't care whether the world is 2D or 3D, so they carry over almost unchanged. Movement and looking come from Godot 6.
+The big one. Survival systems's systems don't care whether the world is 2D or 3D, so they carry over almost unchanged. Movement and looking come from Into 3D.
 
 ## 1. Pieces
 
 | Part | From |
 | --- | --- |
-| first-person body and camera | Godot 6, lessons 3 and 5 |
-| "Press E to chop" | Godot 6, lesson 7 |
-| trees and rocks | Godot 5, lesson 4 (make them `StaticBody3D` with `interact()` calling `hit()`) |
-| hunger, thirst, inventory, crafting | Godot 5, lessons 1–3 |
-| sun and night | Godot 5, lesson 5: brightness → `DirectionalLight3D.light_energy`, and rotate the light: `rotation.x = -time_of_day / 24 × TAU` |
-| wolves | Godot 5, lesson 8 for the decision, Godot 6 lesson 8 to move |
-| building | Godot 5, lesson 6 with a 3D grid: `Vector3i` and `(position / cell_size).floor()` |
-| saving | Godot 5, lesson 7 (save `x`, `y` and `z` now) |
+| first-person body and camera | Into 3D, lessons 3 and 5 |
+| "Press E to chop" | Into 3D, lesson 7 |
+| trees and rocks | Survival systems, lesson 4 (make them `StaticBody3D` with `interact()` calling `hit()`) |
+| hunger, thirst, inventory, crafting | Survival systems, lessons 1–3 |
+| sun and night | Survival systems, lesson 5: brightness → `DirectionalLight3D.light_energy`, and rotate the light: `rotation.x = -time_of_day / 24 × TAU` |
+| wolves | Survival systems, lesson 8 for the decision, Into 3D lesson 8 to move |
+| building | Survival systems, lesson 6 with a 3D grid: `Vector3i` and `(position / cell_size).floor()` |
+| saving | Survival systems, lesson 7 (save `x`, `y` and `z` now) |
 
 ## 2. Terrain
 

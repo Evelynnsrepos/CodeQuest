@@ -10,7 +10,7 @@ Two hidden tricks make a platformer feel **fair**. Players almost never notice t
 
 **Jump buffering**: if the player presses jump a few frames *before* landing, remember it and jump the moment they touch the ground.
 
-Both are small countdown timers, like your cooldown from Godot 2:
+Both are small countdown timers, like your cooldown from Basics 2:
 
 ```gdscript
 # coyote: full while on the floor, counts down in the air
