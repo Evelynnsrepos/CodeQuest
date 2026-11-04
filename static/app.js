@@ -3,6 +3,7 @@ import {
   StreamLanguage, lua, javascript,
 } from "/vendor/codemirror.js";
 import { marked } from "/vendor/marked.js";
+import { setUpInteractive } from "/static/widgets.js";
 
 const app = document.getElementById("app");
 const LANG_INFO = {
@@ -323,6 +324,7 @@ async function showLesson(course, slug) {
       solBtn.hidden = false;
     }
   };
+  setUpInteractive(app.querySelector(".lesson-body"));
   setUpParts(app.querySelector(".lesson-body"), lesson);
   setUpReview(app.querySelector(".lesson-body"), lesson);
   setUpChecklists(app.querySelector(".lesson-body"), lesson);
