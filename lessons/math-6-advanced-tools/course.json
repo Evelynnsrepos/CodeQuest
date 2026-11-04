@@ -1,0 +1,10 @@
+{
+ "lang": "python",
+ "name": "Math 6: Data geometry and testing",
+ "icon": "📐",
+ "order": 64.5,
+ "blurb": "The last math tools AI papers assume: covariance and correlation, projections, PCA, the SVD behind LoRA and compression, Jacobians, and t-tests for comparing models. Same style as Math 1–5: every sign explained, every formula taken apart. Do Math 2 and 4 first.",
+ "track": "Math for AI",
+ "level": "Level 3 · Advanced",
+ "topic": "Data geometry and testing"
+}
