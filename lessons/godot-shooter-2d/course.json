@@ -1,0 +1,2 @@
+{"lang": "gdscript", "name": "Godot 4: 2D shooter", "icon": "🔫", "order": 25.2,
+ "blurb": "Level 4. A top-down shooter: aiming with angles, bullets, hits, spawning around the player, waves, invincibility frames and ammo. Every bit of math explained. Do Godot 3 first."}

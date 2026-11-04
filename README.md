@@ -88,8 +88,13 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 | Course | Language | Runs in |
 | --- | --- | --- |
 | Python | Python | browser |
-| GDScript | GDScript | host computer (Godot) |
-| GDScript for game dev | GDScript | host computer (Godot) |
+| Godot 1: GDScript basics | GDScript | host computer (Godot) |
+| Godot 2: Game dev foundations | GDScript | host computer (Godot) |
+| Godot 3: 2D platformer | GDScript | host computer (Godot) |
+| Godot 4: 2D shooter | GDScript | host computer (Godot) |
+| Godot 5: Survival systems | GDScript | host computer (Godot) |
+| Godot 6: Into 3D | GDScript | host computer (Godot) |
+| Godot 7: Build the six games | GDScript | host computer (Godot) |
 | Lua | Lua | browser |
 | Lua for Hyprland | Lua | browser |
 | TypeScript | TypeScript | browser |
@@ -106,7 +111,9 @@ The home page tells you if either is missing. Each run has a 10-second limit so 
 
 **TypeScript** lessons are checked by the real TypeScript compiler (5.9, `strict` mode) running in your browser, then the compiled JavaScript runs there too. A type error stops the run and shows the compiler's message, just like `tsc` would. Lessons have plain JavaScript plus `console`, but no browser page APIs such as `document`.
 
-**GDScript for game dev** runs your script as a real node in a headless Godot scene: `_ready()` runs, and the checks call `_process(delta)`, press input actions and listen to your signals.
+The **Godot** path is seven levels that end with a platformer, a shooter and a survival game in both 2D and 3D. Level 1 is the language, level 2 the engine basics (vectors, scenes, timers, areas, a HUD), then a 2D platformer (gravity, jump height from a formula, coyote time, patrolling enemies), a 2D shooter (angles, bullets, waves, i-frames, ammo), survival systems (stats, stacked inventory, crafting, day and night, grid building, saving, creature AI), 3D (the basis, camera-relative movement, mouse look, hitscan, interacting) and finally six build guides for the real Godot editor, each with the last piece of code the game needs. Every bit of math is explained step by step with numbers.
+
+From level 2 on, your script runs as a real node in a headless Godot scene with physics turned on: `_ready()` runs, and the checks call your functions, press input actions, listen to your signals and drop your `CharacterBody2D`/`3D` onto real floors, walls and raycasts.
 
 ## Write your own lessons
 
@@ -146,7 +153,7 @@ Checks per language:
 - **Python** `check.py`: plain `assert` statements. `ns` is a dict of the learner's variables and functions, and `output` is what they printed. The assert message is shown to the learner.
 - **Lua** `check.lua`: `assert(condition, "message")` lines. The learner's global variables and functions are available directly, and `output` is what they printed. Ask learners to keep checked functions global (no `local`).
 - **TypeScript** `check.js`: plain JavaScript with `assert(condition, "message")` lines. It runs in the same scope as the learner's code, so their top-level functions, classes, `const` and `let` are available directly. `output` is what they printed and `code` is their source text, for checking things that only exist in types (for example `/interface\s+Hero/.test(code)`). Starter and solution files end in `.ts`.
-- **GDScript** `check.gd`: a script with `func check(player) -> String`. `player` is the learner's script object after `run()` was called. Return `""` to pass or a message to fail. The learner's code goes in `func run():`.
+- **GDScript** `check.gd`: a script with `func check(player) -> String` (it may `await`, e.g. `await player.get_tree().physics_frame` to let physics run). `player` is the learner's script object after `run()` was called. Return `""` to pass or a message to fail. The learner's code goes in `func run():`.
 - **Rust** `tests.rs`: normal `#[test]` functions. They are placed in a test module next to the learner's code, so they can call its functions directly.
 - **Nix** `check.nix`: a function `{ result, prelude, expect }: [ (expect condition "message") ... ]`. `result` is the learner's value and `prelude` the course prelude, if any. Checks run in order and the first failing message is shown. Starter, solution and check files end in `.nix`.
 - **Git** `check.py`: Python `assert` statements, run after the learner's commands. `git("log", "-1", "--format=%s")` returns git's output, `read(path)` a file's text, `exists(path)` whether it exists, and `output` the whole transcript. Starter and solution files end in `.sh`; `setup.sh` is optional.

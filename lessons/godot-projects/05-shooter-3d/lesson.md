@@ -1,0 +1,53 @@
+---
+title: Project: 3D first-person shooter
+xp: 40
+---
+# Build it: a first-person shooter
+
+Uses **Godot 6** lessons 2, 3, 5, 6 and 8, plus the ammo and waves from Godot 4.
+
+## 1. The player
+
+```
+Player (CharacterBody3D)        ← walk with lesson 3's basis movement (strafe with input.x)
+├── CollisionShape3D            ← CapsuleShape3D
+└── Head (Node3D)               ← lesson 5's mouse look; place it at eye height (y ≈ 1.6)
+    └── Camera3D
+        └── Gun (Node3D)        ← lesson 6's hitscan + Godot 4's ammo
+            └── GunModel
+```
+
+In `_ready()`: `Input.mouse_mode = Input.MOUSE_MODE_CAPTURED`. Free it again with Esc, or you can't close the window!
+
+## 2. Enemies
+
+```
+Enemy (CharacterBody3D)         ← lesson 8's hunt(), health and take_damage()
+├── CollisionShape3D
+├── MeshInstance3D
+└── NavigationAgent3D           ← walks around walls
+```
+
+Put the level geometry under a `NavigationRegion3D` and click **Bake NavigationMesh**. In `hunt()`, aim at `$NavigationAgent3D.get_next_path_position()` instead of the player directly.
+
+## 3. Feel
+
+Shooters live on feedback: a muzzle flash (a `GPUParticles3D` with **One Shot**), a sound (`AudioStreamPlayer3D`), a small camera kick (rotate the head up a little and ease it back with `lerpf`), and a hit marker on the HUD when `shoot()` returns something with `take_damage`.
+
+## 4. Weapon switching (your quest)
+
+The player carries a list of weapons. The mouse wheel steps through them, and number keys pick one directly.
+
+Stepping past the last weapon should **wrap** to the first, and stepping back from the first to the last. `posmod(a, b)` is the whole-number version of `fposmod` from the day-night lesson:
+
+```
+posmod(3, 3)  = 0      (past the end → back to the start)
+posmod(-1, 3) = 2      (before the start → the last one)
+posmod(1, 3)  = 1
+```
+
+Write:
+
+1. `cycle(step: int)`: move `current` by `step` (1 for wheel down, -1 for wheel up) and wrap it.
+2. `select(index: int)`: pick that weapon, but ignore an `index` that doesn't exist (a player pressing 7 with 3 weapons).
+3. `current_damage() -> int`: the current weapon's `damage`.

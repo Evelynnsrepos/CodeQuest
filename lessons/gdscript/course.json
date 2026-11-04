@@ -1,1 +1,2 @@
-{"order": 20, "blurb": "The language of the Godot game engine. The basics."}
+{"name": "Godot 1: GDScript basics", "icon": "🎮", "order": 20,
+ "blurb": "Level 1 of the Godot path. The language of the Godot game engine: variables, functions, loops, decisions, dictionaries and state machines."}
