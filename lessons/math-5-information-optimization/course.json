@@ -1,2 +1,1 @@
-{"lang": "python", "name": "Math 5: Information theory and optimization", "icon": "🧭", "order": 64,
- "blurb": "The math of the loss and the optimizer: surprise, entropy, cross-entropy, KL divergence, perplexity, log-sum-exp, the softmax gradient, convexity, momentum, Adam and regularization."}
+{"lang": "python", "name": "Math 5: Information theory and optimization", "icon": "🧭", "order": 64, "blurb": "The math of the loss and the optimizer: surprise, entropy, cross-entropy, KL, perplexity, log-sum-exp, the p − y gradient, curvature, momentum, Adam, weight decay, FP16/BF16, quantization, contrastive loss and distillation."}
