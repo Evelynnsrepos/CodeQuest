@@ -4,6 +4,9 @@ extends SceneTree
 
 
 func _initialize() -> void:
+	# --script mode leaves physics off; lessons need areas, rigid bodies and raycasts to work.
+	PhysicsServer2D.set_active(true)
+	PhysicsServer3D.set_active(true)
 	_run()
 
 
@@ -33,7 +36,7 @@ func _run() -> void:
 		var checker = _compile(args[1])
 		var result := {"passed": false, "message": "The lesson's check script has an error."}
 		if checker != null:
-			var message = checker.new().check(obj)
+			var message = await checker.new().check(obj)
 			if message == null:
 				message = "The check stopped with an error. Look at the messages above."
 			result = {"passed": message == "", "message": message}
