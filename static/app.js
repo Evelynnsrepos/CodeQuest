@@ -3,6 +3,7 @@ import {
   StreamLanguage, lua, javascript,
 } from "/vendor/codemirror.js";
 import { marked } from "/vendor/marked.js";
+import { setUpInteractive } from "/static/widgets.js";
 
 const app = document.getElementById("app");
 const LANG_INFO = {
@@ -142,6 +143,7 @@ window.addEventListener("popstate", route);
 function route() {
   const m = location.pathname.match(/^\/learn\/([\w-]+)\/([\w-]+)/);
   if (m) return showLesson(m[1], m[2]);
+  if (location.pathname === "/review") return showReviews();
   return showHome();
 }
 
@@ -149,7 +151,7 @@ function route() {
 
 async function showHome() {
   document.title = "CodeQuest";
-  const { courses, profile } = await api("/api/courses");
+  const { courses, profile, reviews_due: due } = await api("/api/courses");
   showProfile(profile);
   const info = await fetch("/api/info").then((r) => r.json());
   const onLan = info.urls.length > 0 && ["localhost", "127.0.0.1"].includes(location.hostname);
@@ -162,6 +164,8 @@ async function showHome() {
       </div>
       ${onLan ? `<button class="btn" id="phone-btn">📱 Open on phone</button>` : ""}
     </section>
+    ${due.length ? `<a class="review-card" href="/review" data-link>🧠 <strong>${due.length} review ${due.length === 1 ? "question" : "questions"} due</strong>
+      <span class="muted">A 2-minute warm-up that makes old lessons stick.</span></a>` : ""}
     ${groupCourses(courses).map(([track, levels]) => `
       <section class="track">
         <h2 class="track-title">${escapeHtml(track)}</h2>
@@ -211,6 +215,7 @@ function courseCard(c) {
             <a href="/learn/${c.id}/${l.slug}" data-link>
               <span class="mark">${l.completed ? "✓" : ""}</span>
               <span class="title">${escapeHtml(l.title)}</span>
+              <span class="mins">~${l.minutes} min</span>
               <span class="reward">${l.xp} XP</span>
             </a>
           </li>`).join("")}
@@ -246,7 +251,7 @@ async function showLesson(course, slug) {
   app.innerHTML = `
     <div class="lesson-head">
       <a href="/" data-link class="back">← Quests</a>
-      <span class="muted">${escapeHtml(lesson.course_name)} · Lesson ${lesson.index} of ${lesson.total}</span>
+      <span class="muted">${escapeHtml(lesson.course_name)} · Lesson ${lesson.index} of ${lesson.total} · ~${lesson.minutes} min</span>
       <span class="reward-pill ${lesson.completed ? "done" : ""}">${lesson.completed ? "✓ Cleared" : `+${lesson.xp} XP`}</span>
     </div>
     <div class="tabs" role="tablist">
@@ -265,9 +270,11 @@ async function showLesson(course, slug) {
           <button class="btn" id="run">▶ Run</button>
           <button class="btn primary" id="submit">Submit</button>
           <span class="spacer"></span>
-          ${lesson.solution ? `<button class="btn ghost" id="solution">Solution</button>` : ""}
+          ${lesson.has_solution ? `<button class="btn ghost" id="hint">💡 Hint</button>` : ""}
+          <button class="btn ghost" id="solution" ${lesson.solution ? "" : "hidden"}>Solution</button>
           <button class="btn ghost" id="reset">Reset</button>
         </div>
+        <div class="hints" id="hints" aria-live="polite"></div>
         <div class="output" id="output" aria-live="polite">
           <p class="muted">${browserRunners[lang] ? "Your output will show here." : "Your code runs on the computer hosting CodeQuest. Output shows here."}</p>
         </div>
@@ -302,9 +309,25 @@ async function showLesson(course, slug) {
     if (confirm("Replace your code with the starter code?")) setCode(lesson.starter);
   };
   const solBtn = document.getElementById("solution");
-  if (solBtn) solBtn.onclick = () => {
+  solBtn.onclick = () => {
     if (confirm("Replace your code with the official solution?")) setCode(lesson.solution);
   };
+  const hintBtn = document.getElementById("hint");
+  let hintsUsed = 0;
+  if (hintBtn) hintBtn.onclick = async () => {
+    const h = await api("/api/hint", { course, slug, code: editor.state.doc.toString(), n: hintsUsed++ });
+    document.getElementById("hints").insertAdjacentHTML("beforeend", `<div class="hint"><strong>Hint ${hintsUsed}:</strong> ${escapeHtml(h.hint)}
+      ${h.line ? `<pre>${escapeHtml(h.line)}</pre>` : ""}</div>`);
+    hintBtn.textContent = "💡 Another hint";
+    if (h.solution && !lesson.solution) {
+      lesson.solution = h.solution;
+      solBtn.hidden = false;
+    }
+  };
+  setUpInteractive(app.querySelector(".lesson-body"));
+  setUpParts(app.querySelector(".lesson-body"), lesson);
+  setUpReview(app.querySelector(".lesson-body"), lesson);
+  setUpChecklists(app.querySelector(".lesson-body"), lesson);
 
   browserRunners[lang]?.warmUp();
 }
@@ -375,6 +398,10 @@ function renderResult(out, r, mode, lesson) {
   if (r.error) html += `<pre class="stderr">${escapeHtml(r.error)}</pre>`;
   if (r.warnings && !r.error) html += `<details><summary>Warnings</summary><pre class="warn-text">${escapeHtml(r.warnings)}</pre></details>`;
 
+  if (mode === "submit" && r.total > 1) {
+    html = `<div class="parts" title="Checks passed"><span style="width:${(r.done / r.total) * 100}%"></span></div>
+      <p class="parts-text">${"✓".repeat(r.done)}${"○".repeat(r.total - r.done)} ${r.done} of ${r.total} checks passed</p>` + html;
+  }
   if (mode === "submit") {
     if (r.passed) {
       html = `<div class="verdict pass">
@@ -462,3 +489,112 @@ function langName(lang) {
 route().catch((err) => {
   app.innerHTML = `<p class="stderr">Couldn't load CodeQuest: ${escapeHtml(err.message)}</p>`;
 });
+
+// ------------------------------------------------------- reading helpers ---
+
+// Focus mode: show a long lesson one "## part" at a time, so there's always one small next step.
+function setUpParts(body, lesson) {
+  const startBtn = body.querySelector(".to-code");
+  const parts = [[]];
+  for (const node of [...body.childNodes].filter((n) => n !== startBtn)) {
+    if (node.nodeName === "H2" && parts.at(-1).some((n) => n.nodeType === 1)) parts.push([]);
+    parts.at(-1).push(node);
+  }
+  if (parts.length < 3) return;
+  const sections = parts.map((nodes) => {
+    const sec = document.createElement("section");
+    sec.className = "part";
+    sec.append(...nodes);
+    return sec;
+  });
+  body.prepend(...sections);
+  const nav = document.createElement("div");
+  nav.className = "part-nav";
+  body.insertBefore(nav, startBtn);
+  let focus = true, at = 0;
+  try { focus = localStorage.getItem("codequest-focus") !== "off"; } catch {}
+  const show = () => {
+    sections.forEach((sec, i) => (sec.hidden = focus && i !== at));
+    nav.innerHTML = focus
+      ? `<button class="btn ghost" data-go="-1" ${at ? "" : "disabled"}>← Back</button>
+         <span class="dots">${sections.map((_, i) => `<span class="${i <= at ? "on" : ""}"></span>`).join("")}</span>
+         ${at < sections.length - 1 ? `<button class="btn primary" data-go="1">Next part (${at + 2} of ${sections.length}) →</button>` : ""}
+         <button class="btn ghost small" data-mode="off">Show all</button>`
+      : `<button class="btn ghost small" data-mode="on">One part at a time</button>`;
+    if (startBtn) startBtn.hidden = focus && at < sections.length - 1;
+  };
+  nav.onclick = (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.go) { at += Number(b.dataset.go); body.scrollIntoView({ block: "start" }); }
+    if (b.dataset.mode) {
+      focus = b.dataset.mode === "on";
+      try { localStorage.setItem("codequest-focus", focus ? "on" : "off"); } catch {}
+    }
+    show();
+  };
+  show();
+}
+
+// "- [ ]" task lists (like a capstone's "on your machine" steps) can be ticked; saved on this device.
+function setUpChecklists(body, lesson) {
+  const key = `codequest-tasks-${lesson.course}-${lesson.slug}`;
+  let ticked = [];
+  try { ticked = JSON.parse(localStorage.getItem(key) || "[]"); } catch {}
+  body.querySelectorAll('input[type="checkbox"]').forEach((box, i) => {
+    box.disabled = false;
+    box.checked = ticked.includes(i);
+    box.onchange = () => {
+      ticked = box.checked ? [...ticked, i] : ticked.filter((t) => t !== i);
+      try { localStorage.setItem(key, JSON.stringify(ticked)); } catch {}
+    };
+  });
+}
+
+// "## Review" questions: after opening one, say whether you knew it; it comes back later (spaced repetition).
+function setUpReview(body, lesson) {
+  const head = [...body.querySelectorAll("h2")].find((h) => h.textContent.trim() === "Review");
+  if (!head) return;
+  for (const d of body.querySelectorAll("details")) {
+    if (!(head.compareDocumentPosition(d) & Node.DOCUMENT_POSITION_FOLLOWING)) continue;
+    const question = d.querySelector("summary")?.textContent.trim();
+    if (!question) continue;
+    const answer = d.textContent.slice(d.querySelector("summary").textContent.length).trim();
+    d.insertAdjacentHTML("beforeend", `<div class="grade">Did you know it?
+      <button class="btn small" data-knew="1">✓ Yes</button><button class="btn small" data-knew="0">Not yet</button></div>`);
+    const grade = d.querySelector(".grade");
+    grade.onclick = async (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      const r = await api("/api/review", { course: lesson.course, slug: lesson.slug, question, answer, knew: b.dataset.knew === "1" });
+      grade.innerHTML = `<span class="muted">Saved. It comes back on ${r.due}.</span>`;
+    };
+  }
+}
+
+async function showReviews() {
+  document.title = "Review · CodeQuest";
+  const { reviews_due: due, profile } = await api("/api/courses");
+  showProfile(profile);
+  app.innerHTML = `
+    <div class="lesson-head"><a href="/" data-link class="back">← Quests</a><span class="muted">${due.length} due</span></div>
+    <article class="lesson-body review-list">
+      <h1>Review</h1>
+      <p class="muted">Think of the answer first, then open it. Say honestly if you knew it: what you knew comes back later, what you didn't comes back tomorrow.</p>
+      ${due.length ? due.map((q, i) => `
+        <details data-i="${i}"><summary>${escapeHtml(q.question)}</summary><p>${escapeHtml(q.answer)}</p>
+          <div class="grade"><button class="btn small" data-knew="1">✓ I knew it</button><button class="btn small" data-knew="0">Not yet</button>
+          <a class="muted" href="/learn/${q.course}/${q.slug}" data-link>Open lesson</a></div></details>`).join("")
+        : `<p>Nothing due. Nice work!</p>`}
+    </article>`;
+  app.querySelectorAll(".review-list details").forEach((d) => {
+    d.querySelector(".grade").onclick = async (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      const q = due[d.dataset.i];
+      await api("/api/review", { course: q.course, slug: q.slug, question: q.question, answer: q.answer, knew: b.dataset.knew === "1" });
+      d.remove();
+      if (!app.querySelector(".review-list details")) app.querySelector(".review-list").insertAdjacentHTML("beforeend", "<p>All done for today! 🎉</p>");
+    };
+  });
+}

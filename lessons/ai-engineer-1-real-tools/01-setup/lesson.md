@@ -16,7 +16,16 @@ So the AI engineer courses run your code with **Python on the computer where Cod
 
 A **virtual environment** ("venv") is a private folder of packages for one project, so different projects can't break each other. Real AI engineers make one per project. Let's make yours.
 
-## Make the venv
+## The quick way: one command
+
+In your CodeQuest folder:
+
+- **Windows:** double-click `setup-ai.bat` (needs Python 3.12 from python.org).
+- **Linux and NixOS:** run `./setup-ai.sh` in a terminal. On NixOS it builds the packages with Nix instead of pip.
+
+It takes a few minutes (PyTorch is big) and ends with "All AI packages work." Then go straight to **Your quest**. If it fails, the step-by-step version below shows what the script does, so you can find the step that broke.
+
+## Make the venv by hand
 
 **Windows** (PowerShell), with Python 3.12 from python.org:
 

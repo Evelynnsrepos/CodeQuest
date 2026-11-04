@@ -16,6 +16,18 @@ Not necessarily. Averages hide the slow tail: if 1 request in 20 takes 15 second
 
 **Cost** per call = input tokens × input price + output tokens × output price (prices per million tokens; LLMs 9 lesson 02). Sum it per day, per user and per feature, and set an **alert** before a bug or an abuser burns your budget. Local models cost electricity and hardware instead of per token, but latency still matters.
 
+## 🧮 Worked example
+
+Ten response times in milliseconds, already sorted:
+
+80, 85, 90, 95, **100**, 110, 120, 130, 300, **1500**
+
+- **average** = 2,610 ÷ 10 = **261 ms**, which describes nobody
+- **p50**: position ⌈0.50 · 10⌉ = 5 → **100 ms**, what a typical user gets
+- **p95**: position ⌈0.95 · 10⌉ = ⌈9.5⌉ = 10 → **1500 ms**, what the unlucky ones get
+
+**Cost** of one call with 2,000 input and 500 output tokens at $3 and $15 per million: 2,000 × 3 / 1,000,000 + 500 × 15 / 1,000,000 = 0.006 + 0.0075 = **$0.0135**.
+
 ## Your quest
 
 `PRICES` maps model → `(input_price, output_price)` per million tokens.

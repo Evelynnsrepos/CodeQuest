@@ -19,6 +19,16 @@ For open-ended answers there's no exact "right string", so teams use a strong mo
 
 κ above about 0.6 is "substantial agreement": trust the judge for this task. Below 0.4, fix the rubric.
 
+## 🧮 Worked example
+
+You and the judge each grade the same 10 answers "good" or "bad". You both say "good" 6 times, and you agree on 8 of the 10.
+
+1. **p_o** (agreement you saw) = 8 ÷ 10 = **0.8**
+2. **p_e** (agreement by luck) = 0.6 · 0.6 (both "good") + 0.4 · 0.4 (both "bad") = 0.36 + 0.16 = **0.52**
+3. **κ** = (0.8 − 0.52) ÷ (1 − 0.52) = 0.28 ÷ 0.48 = **0.58**
+
+80% agreement sounds great, but κ = 0.58 is just under "substantial": tighten the rubric a little before trusting this judge.
+
 ## Your quest
 
 1. `parse_verdict(text)`: find the first `{...}` in the text, `json.loads` it, and return its `"winner"` if it's `"A"`, `"B"` or `"tie"`; otherwise `None` (also on invalid JSON).

@@ -127,14 +127,7 @@ The **Math for AI** track (Math 1–6) assumes no math at all. Every lesson expl
 
 On the home page the AI and Math courses are grouped into **levels**. New to AI? Start with the **AI crash course** (11 short lessons, the whole picture in one evening), then Level 1 (LLMs 1–3), Level 2 (LLMs 4–7, AI beyond LLMs) and Level 3 (LLMs 8–9, AI engineer 1–3). **Data cleaning with Python** is its own course because it is useful far beyond training data.
 
-The **AI engineer** courses use real packages (numpy, pandas, PyTorch, scikit-learn, FastAPI, pytest), so they run on your computer, not in the browser. Set them up once:
-
-```
-python3 -m venv ~/.codequest/ai-venv
-~/.codequest/ai-venv/bin/pip install torch -r requirements-ai.txt
-```
-
-On Windows use `%USERPROFILE%\.codequest\ai-venv\Scripts\pip`. CodeQuest finds that venv by itself (or set `CODEQUEST_AI_PYTHON` to another Python). Lessons that talk to a model use Ollama or LM Studio when running and a built-in fake otherwise.
+The **AI engineer** courses use real packages (numpy, pandas, PyTorch, scikit-learn, FastAPI, pytest), so they run on your computer, not in the browser. Set them up once with one command in the CodeQuest folder: double-click `setup-ai.bat` on Windows, or run `./setup-ai.sh` on Linux and NixOS (on NixOS it builds the packages with Nix). Both make `~/.codequest/ai-venv`, and CodeQuest finds it by itself (or set `CODEQUEST_AI_PYTHON` to another Python). Lessons that talk to a model use Ollama or LM Studio when running and a built-in fake otherwise.
 
 **Nix** and **Nix flakes** evaluate your code with `nix-instantiate`. The flakes course passes your `outputs` a practice nixpkgs (`lessons/nix-flakes/prelude.nix`), so nothing is downloaded or built, and Run shows the outputs your flake produces. The last lessons of both courses are about your own NixOS configuration.
 
@@ -186,6 +179,17 @@ Checks per language:
 - **Rust** `tests.rs`: normal `#[test]` functions. They are placed in a test module next to the learner's code, so they can call its functions directly.
 - **Nix** `check.nix`: a function `{ result, prelude, expect }: [ (expect condition "message") ... ]`. `result` is the learner's value and `prelude` the course prelude, if any. Checks run in order and the first failing message is shown. Starter, solution and check files end in `.nix`.
 - **Git** `check.py`: Python `assert` statements, run after the learner's commands. `git("log", "-1", "--format=%s")` returns git's output, `read(path)` a file's text, `exists(path)` whether it exists, and `output` the whole transcript. Starter and solution files end in `.sh`; `setup.sh` is optional.
+
+### Made for focus (ADHD-friendly)
+
+- **One part at a time:** long lessons show one section with a "Next part" button and progress dots. "Show all" switches back to the full page (remembered per device).
+- **Hints before the solution:** 💡 Hint first shows the lesson's own hints (`hint:` lines in the front matter, as many as you like), then the next line of the solution you're still missing. After 3 hints or 3 failed submits the full solution is offered.
+- **Checks count up:** Python checks run one top-level statement at a time, so a submit shows "2 of 3 checks passed" instead of stopping at the first failure.
+- **Time estimates:** every lesson shows about how many minutes it takes (from its length and number of functions; set `minutes:` in the front matter to override).
+- **Spaced review:** under `## Review`, say whether you knew each answer. Questions come back after 1, 3, 7, 21 and 60 days (tomorrow if you didn't know it), and the home page shows how many are due.
+- **Checklists:** `- [ ]` task lists in a lesson can be ticked and stay ticked on that device.
+- **Try it drawings:** `<div class="explore" data-widget="NAME"></div>` adds a slider picture from `static/widgets.js`: `derivative`, `gradient-descent`, `temperature`, `vectors`, `pca`.
+- **Predict first:** `<div class="quiz" data-answer="1" data-why="Explanation"><p>Question</p><button>A</button><button>B</button></div>` (no blank lines inside; `data-answer` counts from 0). Wrong picks turn red and you can try again.
 
 ## Troubleshooting
 

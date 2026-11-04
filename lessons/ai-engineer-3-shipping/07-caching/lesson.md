@@ -17,6 +17,20 @@ This is different from the provider's **prompt cache** (LLMs 9 lesson 02), which
 
 Measure the **hit rate** (hits ÷ lookups) to see if it's worth it.
 
+## 🧮 Worked example
+
+Two requests with the same settings in a different order must give the same key:
+
+```python
+import hashlib, json
+a = {"model": "llama3.2", "temperature": 0}
+b = {"temperature": 0, "model": "llama3.2"}
+key = lambda r: hashlib.sha256(json.dumps(r, sort_keys=True).encode()).hexdigest()
+print(key(a) == key(b))   # True: sort_keys puts both in the same order first
+```
+
+**Hit rate:** 100 lookups, 30 found in the cache → 30 ÷ 100 = **30%** of model calls saved.
+
 ## Your quest
 
 1. `cache_key(model, messages, temperature)`: the hex `sha256` of `json.dumps({"model": ..., "messages": ..., "temperature": ...}, sort_keys=True)`.

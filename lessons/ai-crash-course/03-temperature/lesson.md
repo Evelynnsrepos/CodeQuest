@@ -22,6 +22,10 @@ Then the model **samples**: picks token 1 two thirds of the time, token 2 a quar
 
 **Go deeper:** LLMs 1, lessons 5, 8 and 9; Math 5 lesson 06.
 
+<div class="quiz" data-answer="0" data-why="Dividing by 0.2 makes the gaps between scores 5 times bigger, so the top token pulls further ahead."><p><b>Predict first:</b> you lower the temperature from 1 to 0.2. What happens to the top token’s probability?</p><button>it goes up</button><button>it goes down</button><button>it stays the same</button></div>
+
+<div class="explore" data-widget="temperature"></div>
+
 ## Your quest
 
 `softmax_t(scores, t)`: divide each score by `t`, then softmax. Subtract the biggest score first (`math.exp` of big numbers overflows; subtracting doesn't change the result).
