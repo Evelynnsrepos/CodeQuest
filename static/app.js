@@ -441,7 +441,8 @@ function showReplay(out, replay, mode) {
       <input type="range" min="0" max="${frames.length - 1}" value="0" aria-label="Replay time">
       <span class="muted time">0.0 s</span></div>
     <p class="replay-key muted"><span class="k you"></span>you <span class="k solid"></span>floor and walls <span class="k area"></span>areas <span class="k other"></span>other bodies</p>`;
-  out.prepend(box);
+  const verdict = out.querySelector(".verdict");
+  if (verdict) verdict.after(box); else out.prepend(box);
   const canvas = box.querySelector("canvas"), ctx = canvas.getContext("2d");
   const slider = box.querySelector("input"), timeLabel = box.querySelector(".time"), playBtn = box.querySelector("[data-play]");
 

@@ -274,7 +274,8 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
 /* Godot replay and run progress */
 .replay { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; margin-bottom: 10px; background: var(--surface); }
 .replay-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 6px; }
-.replay canvas { display: block; width: 100%; height: 220px; background: var(--surface-2); border-radius: 8px; }
+.output:has(.replay) { max-height: none; }
+.replay canvas { display: block; width: 100%; height: 190px; background: var(--surface-2); border-radius: 8px; }
 .replay-controls { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .replay-controls input { flex: 1; min-width: 0; }
 .replay-key { margin: 6px 0 0; font-size: 0.8rem; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }

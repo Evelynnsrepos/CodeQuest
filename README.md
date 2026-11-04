@@ -81,20 +81,22 @@ Python, Lua and TypeScript run inside the browser. GDScript, Rust, Nix and Git l
 - **Nix** for the Nix courses. NixOS has it; elsewhere get it from [nixos.org/download](https://nixos.org/download). Lessons are only evaluated with `nix-instantiate --eval`, never built. There's no Nix for Windows itself, so on Windows these two courses only work inside WSL.
 - **Git** from [git-scm.com](https://git-scm.com) (on NixOS: `pkgs.git`).
 
-The home page tells you if either is missing. Each run has a 10-second limit so an endless loop can't hang the computer.
+The home page tells you if either is missing.
+
+In the Godot lessons that move something, **Run** drops your node into a small test scene (a floor, and CodeQuest pressing →, Space, ↑ and ←) and prints where it was every quarter second. After Run or Submit a **Replay** shows what moved, as boxes you can play, pause and scrub through. Each run has a 10-second limit so an endless loop can't hang the computer.
 
 ## Courses
 
 | Course | Language | Runs in |
 | --- | --- | --- |
 | Python | Python | browser |
-| Godot 1: GDScript basics | GDScript | host computer (Godot) |
-| Godot 2: Game dev foundations | GDScript | host computer (Godot) |
-| Godot 3: 2D platformer | GDScript | host computer (Godot) |
-| Godot 4: 2D shooter | GDScript | host computer (Godot) |
-| Godot 5: Survival systems | GDScript | host computer (Godot) |
-| Godot 6: Into 3D | GDScript | host computer (Godot) |
-| Godot 7: Build the six games | GDScript | host computer (Godot) |
+| Godot Basics 1: GDScript | GDScript | host computer (Godot) |
+| Godot Basics 2: Game dev foundations (ends with your first scene in the Godot editor) | GDScript | host computer (Godot) |
+| Godot 2D Platformer (ends with building the platformer) | GDScript | host computer (Godot) |
+| Godot 2D Shooter (ends with building the arena shooter) | GDScript | host computer (Godot) |
+| Godot Survival systems (ends with building a 2D survival game) | GDScript | host computer (Godot) |
+| Godot Into 3D | GDScript | host computer (Godot) |
+| Godot: Build three 3D games | GDScript | host computer (Godot) |
 | Lua | Lua | browser |
 | Lua for Hyprland | Lua | browser |
 | TypeScript | TypeScript | browser |
