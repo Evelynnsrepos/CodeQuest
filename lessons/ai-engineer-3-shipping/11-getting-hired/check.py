@@ -1,0 +1,10 @@
+rr, sc, MY = ns.get("readme_report"), ns.get("score"), ns.get("MY_README")
+assert rr and sc and MY, "Keep readme_report, score and MY_README."
+weak = "my project\nsome text\n"
+assert rr(weak) == {"title": False, "run": False, "docker": False, "eval": False, "numbers": False, "license": False}, f"Got {rr(weak)!r}."
+ok = "# X\n\n## Installation\nUse docker run x\n## Eval\nrecall 0.9\n## License\nMIT\n"
+assert rr(ok) == dict.fromkeys(["title", "run", "docker", "eval", "numbers", "license"], True), f"Got {rr(ok)!r}."
+assert rr("# X\nIt runs well.\n")["run"] is False, "'run' must be in a heading, not just the text."
+assert rr("\n\n# X")["title"], "Skip blank lines before the title."
+assert sc(ok) == 6, "score counts the True values."
+assert sc(MY) == 6, f"Your MY_README scores {sc(MY)}: {rr(MY)!r}."

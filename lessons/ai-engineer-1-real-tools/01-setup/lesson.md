@@ -40,7 +40,7 @@ python3 -m venv ~/.codequest/ai-venv
 
 The `--index-url …/cpu` line gets the small CPU-only PyTorch (about 200 MB instead of several GB with CUDA). Every lesson here runs fine on a CPU. For an AMD GPU later, PyTorch's website lists a ROCm command.
 
-**NixOS:** pip's prebuilt packages often can't find system libraries. Easiest: make a shell with the packages from nixpkgs (`nix-shell -p "python3.withPackages (ps: with ps; [ torch numpy pandas scikit-learn fastapi httpx pydantic pytest ])"`), run `which python3` inside it, and start CodeQuest with `CODEQUEST_AI_PYTHON` set to that path.
+**NixOS:** pip's prebuilt packages often can't find system libraries. Easiest: make a shell with the packages from nixpkgs (`nix-shell -p "python3.withPackages (ps: with ps; [ torch numpy pandas scikit-learn fastapi httpx pydantic pytest uvicorn pyyaml ])"`), run `which python3` inside it, and start CodeQuest with `CODEQUEST_AI_PYTHON` set to that path.
 
 No restart needed: CodeQuest looks for the venv every time you press Run.
 

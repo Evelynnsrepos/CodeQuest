@@ -7,3 +7,5 @@ fastapi
 httpx
 pydantic
 pytest
+uvicorn
+pyyaml
