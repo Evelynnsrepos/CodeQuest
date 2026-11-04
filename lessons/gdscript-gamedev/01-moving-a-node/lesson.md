@@ -1,8 +1,12 @@
 ---
 title: Moving a node
 xp: 15
+hint: delta is the time since the last frame, in seconds.
+hint: position += velocity * delta
 ---
 # Make it move
+
+> **Warm-up:** If a car drives at 100 km/h for half an hour, how far does it get?
 
 In Godot, game objects are **nodes**. A `Node2D` has a `position` (a `Vector2` with `x` and `y`).
 
@@ -24,3 +28,8 @@ From here on, your script is a real Godot node in a real scene. **Run** loads it
 Your node has `velocity := Vector2(100, 0)`. Fill in `_process(delta)` so the node moves by `velocity` every second.
 
 After half a second (`_process(0.5)`), the node should be at `(50, 0)`.
+
+## Review
+
+<details><summary>Why multiply by delta?</summary>So the speed is per second, the same on fast and slow computers.</details>
+<details><summary>How far does velocity (100, 0) move a node in 0.5 s?</summary>(50, 0)</details>

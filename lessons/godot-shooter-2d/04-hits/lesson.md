@@ -1,8 +1,12 @@
 ---
 title: Bullets that hit
 xp: 25
+hint: body_entered.connect(_on_body_entered) in _ready.
+hint: In the handler: if body.is_in_group("player") return. Then if body.has_method("take_damage") call it, and queue_free() the bullet.
 ---
 # Ouch
+
+> **Warm-up:** A bullet touches something. What should it do if it's an enemy, and what if it's you?
 
 A bullet is an `Area2D`, so it notices bodies with `body_entered` (from the collisions lesson). When it touches something:
 
@@ -26,3 +30,8 @@ One more thing: the player's own bullets shouldn't hurt the player. Here we skip
 
 1. In `_ready()`, connect `body_entered` to `_on_body_entered`.
 2. In `_on_body_entered(body)`: ignore bodies in the `"player"` group. For anything else, call `take_damage(damage)` if it has that method, and then `queue_free()` the bullet.
+
+## Review
+
+<details><summary>What does has_method do?</summary>Asks whether a node has a function with that name, so you can call it safely.</details>
+<details><summary>Why free the bullet even if the body has no take_damage?</summary>A wall should stop bullets too.</details>

@@ -1,8 +1,12 @@
 ---
 title: Saving the game
 xp: 25
+hint: JSON.stringify can't store a Vector2, so save position as {"x": position.x, "y": position.y}.
+hint: JSON gives numbers back as floats: use int(data.health) and int(data.day), and Vector2(data.position.x, data.position.y).
 ---
 # Don't lose my base!
+
+> **Warm-up:** What does a game need to write down so you can continue tomorrow?
 
 A survival game without saving is cruel. Saving means turning the game's state into **text** you can write to a file, and loading means turning that text back.
 
@@ -34,3 +38,8 @@ var text := FileAccess.get_file_as_string("user://save.json")
 
 1. `save_text() -> String` returns JSON with `health`, `day`, `items` and `position` (as `{"x": ..., "y": ...}`).
 2. `load_text(text: String)` reads it back and sets all four. `health` and `day` must be `int` again, and `position` a `Vector2`.
+
+## Review
+
+<details><summary>Why save position as x and y?</summary>JSON only knows numbers, text, lists and dictionaries, not Vector2.</details>
+<details><summary>What type does JSON give numbers back as in Godot?</summary>float, so wrap whole numbers in int().</details>

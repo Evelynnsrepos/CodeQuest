@@ -1,8 +1,12 @@
 ---
 title: The gun
 xp: 25
+hint: Start with the cooldown: if _cooldown > 0 return null, else set _cooldown = cooldown_time.
+hint: The muzzle is global_position + Vector2.from_angle(rotation) * muzzle_distance. Give the bullet the same rotation and add it to get_parent().
 ---
 # Pew pew
+
+> **Warm-up:** Why do bullets start at the tip of the gun, not in the middle of the player?
 
 Time to put the pieces together: the **cooldown** from Basics 2, **instancing** a scene, and the **angle** maths.
 
@@ -32,3 +36,8 @@ Write `shoot() -> Node2D`:
 2. Otherwise restart the cooldown, make a bullet from `bullet_scene`, place it at the muzzle with the player's rotation, add it to `get_parent()` and return it.
 
 The `_process` cooldown countdown is already written.
+
+## Review
+
+<details><summary>Why add bullets to the parent instead of the player?</summary>Children move with their parent, so the bullets would turn when the player turns.</details>
+<details><summary>How do you find the muzzle position?</summary>Start at the player and go muzzle_distance along the facing direction.</details>

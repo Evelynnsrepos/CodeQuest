@@ -1,8 +1,12 @@
 ---
 title: Jumping to an exact height
 xp: 30
+hint: The formula is jump_velocity = -sqrt(2.0 * gravity * jump_height). The minus means up.
+hint: if Input.is_action_just_pressed("ui_accept") and is_on_floor(): velocity.y = jump_velocity
 ---
 # How high is a jump?
+
+> **Warm-up:** Level designers say a ledge is 64 pixels high. What do you need to know to make the player reach it?
 
 A jump is just a quick **upward speed**. Up is **negative y** in 2D, so a jump sets `velocity.y` to a negative number, and gravity (from lesson 1) slowly turns it around until the player falls again.
 
@@ -59,3 +63,9 @@ Now you can change `jump_height` and the speed follows. That's how designers tun
 2. In `_physics_process`, jump when `ui_accept` (Space or Enter) is just pressed **and** the player is on the floor.
 
 The check measures your jump: its top should be about 64 pixels above the floor, and pressing jump in mid-air must do nothing.
+
+## Review
+
+<details><summary>Why is jump_velocity negative?</summary>Up is negative y in 2D.</details>
+<details><summary>What speed reaches a 64-pixel jump with gravity 980?</summary>About 354, from the square root of 2 x 980 x 64.</details>
+<details><summary>Why is_action_just_pressed and not is_action_pressed?</summary>Just pressed is true for one frame only, so holding the key doesn't keep jumping.</details>

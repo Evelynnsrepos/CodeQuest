@@ -1,8 +1,12 @@
 ---
 title: Project: 3D platformer
 xp: 40
+hint: time += delta every frame.
+hint: position = start + axis * sin(time / period * TAU) * distance
 ---
 # Build it: a 3D platformer
+
+> **Warm-up:** How would you make a platform glide smoothly back and forth?
 
 Uses **Into 3D** lessons 1–4: a body that walks and jumps, moving relative to an orbiting camera.
 
@@ -50,3 +54,8 @@ position = start + offset
 Example: `distance = 3`, `period = 4`, `axis = (1, 0, 0)`. At `time = 1` (a quarter period): `sin(1 / 4 × TAU) = sin(quarter turn) = 1`, so the platform is 3 m right of `start`. At `time = 3` it's 3 m left.
 
 Write `_physics_process(delta)`: add `delta` to `time`, then set `position` with the formula.
+
+## Review
+
+<details><summary>What does sin do over one period?</summary>Goes 0, 1, 0, -1, 0: a smooth swing.</details>
+<details><summary>Why an AnimatableBody3D for platforms?</summary>It moves by code and carries the player standing on it.</details>

@@ -1,8 +1,12 @@
 ---
 title: The basis, or which way is forward
 xp: 30
+hint: Turn with rotation.y += turn * turn_speed * delta.
+hint: var direction := transform.basis * Vector3(0, 0, forward) turns local forward into world space.
 ---
 # Walking where you face
+
+> **Warm-up:** You turn your character to the left. Which way is forward now?
 
 Last lesson, "up arrow" always moved towards -z, wherever the player was looking. In most 3D games, forward should mean **the way the character faces**. For that we need the **basis**.
 
@@ -52,3 +56,8 @@ Turn the player with the left and right arrows, and walk forward and back with u
 1. `rotation.y += turn * turn_speed * delta`, where `turn` is `Input.get_axis("ui_right", "ui_left")` (right first, so the right arrow gives -1, a turn to the right).
 2. `var forward := Input.get_axis("ui_up", "ui_down")` gives -1 for up.
 3. Turn `Vector3(0, 0, forward)` into a world direction with the basis and use it for `velocity.x` and `velocity.z` at `speed`.
+
+## Review
+
+<details><summary>What is the basis?</summary>The three arrows (x, y, z) that say which way the node's right, up and back point in the world.</details>
+<details><summary>Which direction is forward for a Godot 3D node?</summary>-z.</details>

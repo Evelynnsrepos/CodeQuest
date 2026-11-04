@@ -1,8 +1,12 @@
 ---
 title: Day and night
 xp: 30
+hint: Time moves by 24.0 / day_length * delta hours; fposmod(..., 24.0) wraps 24 back to 0.
+hint: angle = time_of_day / 24.0 * TAU, day_amount = (1.0 - cos(angle)) / 2.0, then lerpf(night_brightness, 1.0, day_amount).
 ---
 # The sun goes down
+
+> **Warm-up:** How bright is it at midnight, at sunrise and at noon?
 
 A survival day might last 10 real minutes. We keep the in-game clock as `time_of_day`, in hours from `0` to `24`, and move it forward every frame.
 
@@ -55,3 +59,9 @@ In a 2D game you'd put this brightness into a `CanvasModulate` node's colour; in
 1. `_process(delta)`: move `time_of_day` forward by `24.0 / day_length * delta` hours and wrap it with `fposmod`.
 2. `brightness() -> float`: return the blended brightness from steps 1 to 4.
 3. `is_night() -> bool`: `true` from 20:00 until 6:00 (20 or later, or before 6).
+
+## Review
+
+<details><summary>What does fposmod(25.0, 24.0) give?</summary>1.0: the clock wraps past midnight.</details>
+<details><summary>What does lerpf(a, b, 0.5) give?</summary>The value halfway between a and b.</details>
+<details><summary>Why use cos for brightness?</summary>It rises and falls smoothly in a loop, like the sun.</details>

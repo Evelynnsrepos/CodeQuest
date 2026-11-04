@@ -1,8 +1,12 @@
 ---
 title: Aiming with angles
 xp: 25
+hint: The arrow from you to the target is target - global_position.
+hint: rotation = (target - global_position).angle()
 ---
 # Look at the mouse
+
+> **Warm-up:** In a top-down shooter, how does the game know which way to turn your character?
 
 In a top-down shooter the player turns to face the mouse. A node's `rotation` is an **angle**, so let's look at how Godot measures angles.
 
@@ -43,3 +47,8 @@ In a game you'd get the mouse with `get_global_mouse_position()`. Godot also has
 ## Your quest
 
 Write `aim_at(target: Vector2)` that sets `rotation` so the player faces `target`, without using `look_at` (so you see what it does).
+
+## Review
+
+<details><summary>What does Vector2.angle() return?</summary>The angle of the arrow in radians, measured from pointing right.</details>
+<details><summary>What is a radian?</summary>A unit for angles: a full turn is TAU (about 6.28) radians, half a turn is PI.</details>

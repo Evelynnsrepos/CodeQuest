@@ -1,8 +1,12 @@
 ---
 title: Project: 3D first-person shooter
 xp: 40
+hint: cycle: current = posmod(current + step, weapons.size())
+hint: select: only change current if 0 <= index < weapons.size(). current_damage returns weapons[current].damage.
 ---
 # Build it: a first-person shooter
+
+> **Warm-up:** You have 3 weapons and scroll past the last one. What should happen?
 
 Uses **Into 3D** lessons 2, 3, 5, 6 and 8, plus the ammo and waves from 2D Shooter.
 
@@ -51,3 +55,8 @@ Write:
 1. `cycle(step: int)`: move `current` by `step` (1 for wheel down, -1 for wheel up) and wrap it.
 2. `select(index: int)`: pick that weapon, but ignore an `index` that doesn't exist (a player pressing 7 with 3 weapons).
 3. `current_damage() -> int`: the current weapon's `damage`.
+
+## Review
+
+<details><summary>What does posmod(-1, 3) give?</summary>2, so stepping back from the first weapon wraps to the last.</details>
+<details><summary>Why check the index in select?</summary>So pressing 9 with only 3 weapons doesn't crash.</details>

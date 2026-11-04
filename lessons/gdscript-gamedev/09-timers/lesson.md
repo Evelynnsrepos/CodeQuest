@@ -1,8 +1,12 @@
 ---
 title: Timer nodes
 xp: 20
+hint: Timer.new(), set name and wait_time, then timer.timeout.connect(_on_spawn_timer_timeout).
+hint: add_child(timer) and timer.start(). The timeout function only needs spawned += 1.
 ---
 # Every two seconds, a zombie
+
+> **Warm-up:** How would you make a new enemy appear every 2 seconds?
 
 In the cooldown lesson you counted time down yourself. Godot's **Timer** node does that for you and emits its `timeout` signal when the time is up.
 
@@ -38,3 +42,8 @@ Make a wave spawner. In `_ready()`:
 3. Add it as a child and start it.
 
 `_on_spawn_timer_timeout()` adds 1 to `spawned`. The check waits half a second, so about 2 enemies should have spawned.
+
+## Review
+
+<details><summary>Which signal does a Timer send when it runs out?</summary>timeout</details>
+<details><summary>Does a Timer repeat by default?</summary>Yes, unless you set one_shot to true.</details>

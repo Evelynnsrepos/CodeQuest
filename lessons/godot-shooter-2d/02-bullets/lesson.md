@@ -1,8 +1,12 @@
 ---
 title: Bullets that fly
 xp: 25
+hint: Vector2.from_angle(rotation) is the direction the bullet faces, length 1.
+hint: position += Vector2.from_angle(rotation) * speed * delta, then lifetime -= delta and queue_free() when lifetime <= 0.
 ---
 # From angle back to arrow
+
+> **Warm-up:** A bullet points at 45 degrees. How does it know how far to move right and how far down?
 
 Last lesson turned an arrow into an angle. A bullet needs the opposite: it has a `rotation` and must fly that way. Which arrow (of length 1) points at an angle?
 
@@ -44,3 +48,8 @@ Write the bullet's `_physics_process(delta)`:
 
 1. Move along its `rotation` at `speed` pixels per second.
 2. Count `lifetime` down by `delta`, and `queue_free()` the bullet when it reaches `0` or less.
+
+## Review
+
+<details><summary>What does Vector2.from_angle(a) give?</summary>A length-1 arrow pointing at angle a.</details>
+<details><summary>Why give bullets a lifetime?</summary>So missed bullets are removed instead of flying forever and slowing the game.</details>

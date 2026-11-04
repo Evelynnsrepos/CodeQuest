@@ -1,8 +1,12 @@
 ---
 title: Hitscan shooting
 xp: 30
+hint: Forward is -global_transform.basis.z. The end point is from + forward * max_range.
+hint: PhysicsRayQueryParameters3D.create(from, to), then get_world_3d().direct_space_state.intersect_ray(query). An empty result means no hit.
 ---
 # Bang, instantly
+
+> **Warm-up:** Why do bullets in many shooters hit instantly instead of flying?
 
 Fast guns in shooters usually don't fire a flying bullet. They **hitscan**: draw an invisible straight line from the gun and hit the first thing on it, instantly. That line is a **ray**.
 
@@ -46,3 +50,8 @@ This script is the gun, a `Node3D` that faces forward. Write `shoot() -> Node`:
 2. Ask the space state for the first hit.
 3. If something was hit and it has `take_damage`, call `take_damage(damage)`.
 4. Return the collider, or `null` if nothing was hit.
+
+## Review
+
+<details><summary>What is hitscan?</summary>Shooting by casting a ray and hitting the first thing it touches, instantly.</details>
+<details><summary>What does intersect_ray return when nothing is hit?</summary>An empty dictionary.</details>

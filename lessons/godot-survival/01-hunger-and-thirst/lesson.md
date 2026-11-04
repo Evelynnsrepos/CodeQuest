@@ -1,8 +1,12 @@
 ---
 title: Hunger and thirst
 xp: 20
+hint: hunger = clampf(hunger - hunger_rate * delta, 0.0, 100.0), and the same for thirst.
+hint: Use one if with or: if hunger == 0 or thirst == 0, health -= starve_damage * delta.
 ---
 # Getting hungry
+
+> **Warm-up:** In a survival game, what happens if you never eat?
 
 Survival games keep the player busy with **stats that drain over time**: hunger, thirst, warmth, stamina. Each one is a number that goes down a little every frame and is refilled by eating, drinking or resting.
 
@@ -26,3 +30,8 @@ When a stat is empty, the player starts losing health instead. That's what makes
 
 1. In `_process(delta)`: lower `hunger` by `hunger_rate * delta` and `thirst` by `thirst_rate * delta`, clamped to `0`–`100`. Then, if either one is `0`, lower `health` by `starve_damage * delta` (once, even if both are empty).
 2. `eat(amount: float)` adds to `hunger`, but never above `100`.
+
+## Review
+
+<details><summary>What does clampf(x, 0, 100) do?</summary>Keeps x between 0 and 100.</details>
+<details><summary>Why multiply the rates by delta?</summary>So hunger drops per second, not per frame.</details>

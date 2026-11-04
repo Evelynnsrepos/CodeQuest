@@ -1,8 +1,12 @@
 ---
 title: A HUD with Control nodes
 xp: 20
+hint: score_label.text = "Score: %d" % score
+hint: health_bar.max_value = max_health, then health_bar.value = health.
 ---
 # Score: 9001
+
+> **Warm-up:** What are the first two things you look at on a game's screen, besides the game itself?
 
 Menus, health bars and score counters are built from **Control** nodes, Godot's UI nodes. Unlike `Node2D`, they're laid out with anchors and containers so they fit any screen size. A few you'll use all the time:
 
@@ -29,3 +33,8 @@ The HUD (`extends VBoxContainer`) builds its own `Label` and `ProgressBar` in `_
 
 1. `on_score_changed(score: int)` sets the label's text to `Score: ` followed by the number, e.g. `Score: 42`.
 2. `on_health_changed(health: int, max_health: int)` sets the bar's `max_value` to `max_health` and its `value` to `health`.
+
+## Review
+
+<details><summary>Which node shows text in the UI?</summary>Label.</details>
+<details><summary>Why set max_value before value?</summary>A ProgressBar clamps value to max_value, so a bigger health would be cut off.</details>

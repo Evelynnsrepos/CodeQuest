@@ -1,8 +1,12 @@
 ---
 title: Project: 2D platformer
 xp: 40
+hint: collect_coin: coins += 1, then if coins == 100 add a life and reset coins to 0.
+hint: next_level: current += 1; if current >= levels.size() return the win screen, else return levels[current].
 ---
 # Build it: a 2D platformer
+
+> **Warm-up:** Which of the earlier lessons do you think a real platformer needs most?
 
 You have every piece from the lessons before this one. This guide puts them together in the real Godot editor. Work through it with Godot open next to CodeQuest.
 
@@ -56,3 +60,8 @@ Write the manager:
 ## 5. Ship it
 
 **Project → Export**, add a preset for your system, download the export templates when asked, and **Export Project**. Now you have a game other people can play.
+
+## Review
+
+<details><summary>What is an Autoload?</summary>A script Godot always keeps loaded, so it remembers things while scenes change.</details>
+<details><summary>How do you switch to another level?</summary>get_tree().change_scene_to_file(path)</details>

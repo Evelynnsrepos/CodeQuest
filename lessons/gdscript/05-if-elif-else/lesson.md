@@ -1,8 +1,12 @@
 ---
 title: Making decisions
 xp: 15
+hint: Check the two special matchups first, then the same-element case, then return 1.0.
+hint: and means both parts must be true: element == "fire" and enemy == "ice".
 ---
 # if, elif, else
+
+> **Warm-up:** In Pokémon-style games, why does fire beat ice?
 
 Games make decisions all the time: *is the player dead? is the door locked?* `if` runs a block only when its condition is true. `elif` ("else if") tries another condition, and `else` catches everything left over.
 
@@ -28,3 +32,8 @@ Write `damage_multiplier(element: String, enemy: String) -> float` for a little 
 - `"water"` against `"fire"` does double damage: `2.0`
 - the same element against itself (`"fire"` vs `"fire"`) does half damage: `0.5`
 - everything else: `1.0`
+
+## Review
+
+<details><summary>When does elif run?</summary>Only when every if and elif above it was false.</details>
+<details><summary>Why check fire vs ice before element == enemy?</summary>Order matters: the first true branch wins, so the most specific cases go first.</details>

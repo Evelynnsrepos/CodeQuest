@@ -1,8 +1,12 @@
 ---
 title: Walking and jumping in 3D
 xp: 30
+hint: In 3D, up is positive y, so gravity subtracts: velocity.y -= gravity * delta.
+hint: Input.get_vector(...) gives x and y; use input.x for velocity.x and input.y for velocity.z.
 ---
 # A body in 3D
+
+> **Warm-up:** What changes from 2D when your character walks on the floor of a 3D world?
 
 `CharacterBody3D` works just like `CharacterBody2D`: set `velocity`, call `move_and_slide()`, ask `is_on_floor()`. Godot's own **CharacterBody3D template** (the one you get when you attach a new script to a CharacterBody3D) looks almost like what you'll write here.
 
@@ -38,3 +42,8 @@ Write `_physics_process(delta)`:
 2. When `ui_accept` is just pressed on the floor, set `velocity.y` to `jump_velocity`.
 3. Move on x and z from the arrow keys at `speed`.
 4. `move_and_slide()`.
+
+## Review
+
+<details><summary>Why is gravity subtracted in 3D but added in 2D?</summary>In 3D up is +y; in 2D up is -y.</details>
+<details><summary>Which axes does a 3D character walk on?</summary>x and z; y is height.</details>

@@ -1,8 +1,12 @@
 ---
 title: Camera-relative movement
 xp: 30
+hint: Basis(Vector3.UP, camera_yaw) is a turn around the up axis by the camera's yaw.
+hint: Multiply it with Vector3(input.x, 0, input.y). In face, look_at(global_position + direction) when the length is above 0.
 ---
 # Up means "away from the camera"
+
+> **Warm-up:** In a third-person game, why does pressing up walk away from the camera, not always north?
 
 In 3D platformers and third-person games, the camera orbits around the player, and **up always means "away from the camera"**, whatever way the character faces. The character then turns to face where it's walking.
 
@@ -30,3 +34,8 @@ In a real scene the camera usually sits on a `SpringArm3D` (it pulls the camera 
 
 1. `move_direction(input: Vector2, camera_yaw: float) -> Vector3`: the world direction for this input, relative to the camera yaw.
 2. `face(direction: Vector3)`: if `direction` isn't zero (`direction.length() > 0`), turn to face it with `look_at`.
+
+## Review
+
+<details><summary>What is yaw?</summary>Turning left or right around the up axis.</details>
+<details><summary>Why check direction.length() &gt; 0 before look_at?</summary>look_at with no direction has nothing to look at and gives an error.</details>

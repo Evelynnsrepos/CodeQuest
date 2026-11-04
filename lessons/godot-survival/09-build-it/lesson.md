@@ -1,8 +1,12 @@
 ---
 title: Project: 2D survival game
 xp: 40
+hint: Loop while points.size() < count and tries < count * 30, adding 1 to tries each time.
+hint: Pick a random spot with randf_range, keep it only if it's at least min_gap from every point you already have.
 ---
 # Build it: a top-down survival game
+
+> **Warm-up:** Why do trees placed fully at random sometimes look wrong?
 
 Everything from this course comes together here, with movement from Basics 2.
 
@@ -50,3 +54,8 @@ Vector2(randf_range(area.position.x, area.end.x), randf_range(area.position.y, a
 (`area.end` is `position + size`, the bottom-right corner.)
 
 Write `scatter(count: int, area: Rect2, min_gap: float) -> Array` that returns up to `count` points inside `area`, each at least `min_gap` from all others. Give up after `count * 30` tries.
+
+## Review
+
+<details><summary>What is rejection sampling?</summary>Pick a random candidate and throw it away if it breaks a rule; repeat.</details>
+<details><summary>Why limit the number of tries?</summary>If the area is too small the loop would never end and freeze the game.</details>

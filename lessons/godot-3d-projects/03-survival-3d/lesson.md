@@ -1,8 +1,12 @@
 ---
 title: Project: 3D survival game
 xp: 40
+hint: In _ready: process_mode = Node.PROCESS_MODE_ALWAYS and visible = false.
+hint: toggle_pause: get_tree().paused = not get_tree().paused, then visible = get_tree().paused.
 ---
 # Build it: a 3D survival game
+
+> **Warm-up:** If the game is paused, how can the pause menu still work?
 
 The big one. Survival systems's systems don't care whether the world is 2D or 3D, so they carry over almost unchanged. Movement and looking come from Into 3D.
 
@@ -46,3 +50,8 @@ Write:
 2. `toggle_pause()`: flip `get_tree().paused` and show the menu exactly when the game is paused.
 
 When you've built all six games, you've done what this course set out to do. Next, make one of them **yours**: a twist, a story, your own art. That's how every indie game starts.
+
+## Review
+
+<details><summary>What does get_tree().paused = true do?</summary>Stops _process, _physics_process and input for pausable nodes.</details>
+<details><summary>Which process_mode keeps a menu working while paused?</summary>PROCESS_MODE_ALWAYS (or WHEN_PAUSED).</details>

@@ -1,8 +1,12 @@
 ---
 title: Coyote time and jump buffering
 xp: 30
+hint: On the floor, reset coyote_timer to coyote_time; in the air, count it down. Same idea for buffer_timer when jump is just pressed.
+hint: Jump when buffer_timer > 0 and coyote_timer > 0, then set both to 0 so it can't jump twice.
 ---
 # Forgiving jumps
+
+> **Warm-up:** Have you ever pressed jump just after running off a ledge, and the game still let you?
 
 Two hidden tricks make a platformer feel **fair**. Players almost never notice them, but they notice when they're missing.
 
@@ -35,3 +39,8 @@ Then the jump happens when **both** timers are still above zero: "jump was press
 Replace the plain `is_on_floor()` jump with coyote time and jump buffering, using `coyote_timer` and `buffer_timer`.
 
 The check walks off a ledge and jumps 3 frames later, presses jump just before landing, and makes sure the player can't jump half a second after leaving the ground.
+
+## Review
+
+<details><summary>What is coyote time?</summary>A short grace time after leaving a ledge during which you can still jump.</details>
+<details><summary>What is jump buffering?</summary>Remembering a jump press shortly before landing and jumping as soon as you land.</details>

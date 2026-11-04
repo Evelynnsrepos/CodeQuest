@@ -1,8 +1,12 @@
 ---
 title: Project: 2D top-down shooter
 xp: 40
+hint: pow(0.85, wave - 1) shrinks each wave. Multiply it by start_interval.
+hint: Wrap it in maxf(..., min_interval). game_over: if score > high_score, store it and return true.
 ---
 # Build it: a top-down shooter
+
+> **Warm-up:** What makes a wave shooter get harder over time?
 
 All the pieces come from this course. A wave-survival arena shooter is a great first shooter: one screen, endless replay.
 
@@ -58,3 +62,8 @@ Write:
 
 1. `spawn_interval(wave: int) -> float` with the formula and the `min_interval` floor.
 2. `game_over(score: int) -> bool`: if `score` beats `high_score`, store it and return `true` (show "New high score!"), otherwise return `false`. Saving it to a file comes in the Survival systems course (the save lesson).
+
+## Review
+
+<details><summary>What does pow(0.85, 2) mean?</summary>0.85 x 0.85 = 0.7225.</details>
+<details><summary>Why put a floor under the spawn interval?</summary>Otherwise it keeps shrinking towards 0 and later waves become impossible.</details>

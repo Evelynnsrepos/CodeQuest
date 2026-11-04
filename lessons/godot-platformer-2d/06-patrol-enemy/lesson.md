@@ -1,8 +1,12 @@
 ---
 title: A patrolling enemy
 xp: 30
+hint: The flip condition is: is_on_floor() and (is_on_wall() or not ledge_ray.is_colliding()).
+hint: When flipping: direction *= -1, ledge_ray.position.x = 16 * direction, ledge_ray.force_raycast_update().
 ---
 # Back and forth
+
+> **Warm-up:** How would an enemy know it's about to walk off a cliff?
 
 The classic platformer enemy walks until it hits a wall or reaches the edge of a platform, then turns around. It needs two senses:
 
@@ -33,3 +37,8 @@ The ray is created for you. In `_physics_process`, before moving:
 2. Set `velocity.x` to `direction * speed`.
 
 The check puts the enemy on a platform with a wall at one end and a drop at the other. It must keep patrolling without falling off.
+
+## Review
+
+<details><summary>What does the ledge ray point at?</summary>Down, just in front of the enemy: if it hits nothing, there's a drop ahead.</details>
+<details><summary>Why call force_raycast_update() after moving the ray?</summary>Rays update once per physics frame; forcing it gives the new answer straight away.</details>

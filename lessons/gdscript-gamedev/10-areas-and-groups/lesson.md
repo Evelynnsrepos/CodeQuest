@@ -1,8 +1,12 @@
 ---
 title: Collisions, areas and groups
 xp: 25
+hint: body_entered.connect(_on_body_entered) in _ready.
+hint: if body.is_in_group("player"): collected.emit() and queue_free().
 ---
 # Picking up a coin
+
+> **Warm-up:** A coin should vanish when you touch it, but not when an enemy walks over it. How does it tell you apart?
 
 Godot's 2D physics has a few kinds of collision objects. You'll meet these the most:
 
@@ -44,3 +48,8 @@ This script is a coin (`extends Area2D`). The check gives it a collision shape a
 
 1. In `_ready()`, connect `body_entered` to `_on_body_entered`.
 2. In `_on_body_entered(body)`: only if `body` is in the `"player"` group, emit `collected` and remove the coin with `queue_free()`. An enemy walking over the coin must not collect it.
+
+## Review
+
+<details><summary>What is an Area2D for?</summary>Noticing when bodies enter or leave it, without blocking them.</details>
+<details><summary>How do you ask whether a node is the player?</summary>body.is_in_group("player") after adding the player to that group.</details>

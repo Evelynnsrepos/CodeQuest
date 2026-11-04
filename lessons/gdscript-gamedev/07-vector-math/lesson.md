@@ -1,8 +1,12 @@
 ---
 title: Vector math, step by step
 xp: 25
+hint: The arrow from A to B is B - A. Here A is the enemy and B is the player: position - enemy_position.
+hint: (position - enemy_position).normalized() * strength, added to position.
 ---
 # Arrows that point somewhere
+
+> **Warm-up:** You stand at (100, 0) and an enemy at (0, 0) hits you. Which way should you fly?
 
 You've used `Vector2` for positions. A vector is just **two numbers, x and y**. You can read it in two ways:
 
@@ -69,3 +73,9 @@ Write `knockback(enemy_position: Vector2, strength: float)`:
 3. Move the player's `position` by that direction times `strength`.
 
 Example: the player at `(100, 0)`, the enemy at `(0, 0)`, strength `50`. The arrow from enemy to player is `(100, 0)`, normalized `(1, 0)`, so the player ends at `(150, 0)`.
+
+## Review
+
+<details><summary>What is the arrow from A to B?</summary>B - A.</details>
+<details><summary>What does normalized() do?</summary>Keeps the direction but makes the length 1.</details>
+<details><summary>How long is Vector2(3, 4)?</summary>5, because 3x3 + 4x4 = 25 and the square root of 25 is 5.</details>

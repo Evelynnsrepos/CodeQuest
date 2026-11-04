@@ -1,8 +1,12 @@
 ---
 title: Choosing the animation
 xp: 20
+hint: In the air: return "jump" if velocity.y < 0 else "fall".
+hint: On the floor: "run" if velocity.x != 0, otherwise "idle". update_facing only changes facing_left when velocity.x isn't 0.
 ---
 # Idle, run, jump, fall
+
+> **Warm-up:** Which animations does a simple platformer hero need?
 
 A character usually has a few animations. In Godot an `AnimatedSprite2D` holds them (you add the frames in the **SpriteFrames** panel), and you switch with `play("run")`. Calling `play()` with the animation that's already playing does nothing, so it's fine to call it every frame.
 
@@ -32,3 +36,8 @@ The floor check comes in as a parameter, `on_floor`, so the check can try every 
 
 1. Write `pick_animation(on_floor: bool) -> String` using the table.
 2. Write `update_facing()`: if `velocity.x` isn't `0`, set `facing_left` to whether `velocity.x` is negative.
+
+## Review
+
+<details><summary>Why not change facing when velocity.x is 0?</summary>Then the player keeps looking the way it last moved instead of snapping right.</details>
+<details><summary>How do you flip a sprite to face left?</summary>Set its flip_h to true.</details>

@@ -1,8 +1,12 @@
 ---
 title: Building on a grid
 xp: 25
+hint: to_cell: Vector2i((world / cell_size).floor()).
+hint: place: get the cell, return false if occupied.has(cell), else store the thing and return true. cell_to_world is Vector2(cell * cell_size).
 ---
 # Place a wall
+
+> **Warm-up:** In a building game, why do walls snap into neat squares?
 
 Base building in survival games snaps everything to a **grid**, so walls line up neatly. Two jobs:
 
@@ -36,3 +40,8 @@ A Dictionary with cells as keys: `occupied[Vector2i(2, 0)] = "wall"`. Checking a
 1. `to_cell(world: Vector2) -> Vector2i` turns a world position into a cell.
 2. `place(thing: String, world: Vector2) -> bool`: if that cell is free, store `thing` there and return `true`; otherwise return `false`.
 3. `cell_to_world(cell: Vector2i) -> Vector2` returns the cell's top-left corner.
+
+## Review
+
+<details><summary>Why floor() before turning into a cell?</summary>So -1 pixel lands in cell -1, not cell 0.</details>
+<details><summary>How do you remember which cells are taken?</summary>A dictionary with the cell (Vector2i) as key.</details>
