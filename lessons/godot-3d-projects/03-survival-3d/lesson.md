@@ -8,6 +8,8 @@ hint: toggle_pause: get_tree().paused = not get_tree().paused, then visible = ge
 
 > **Warm-up:** If the game is paused, how can the pause menu still work?
 
+> ✅ Tick the boxes as you go. Your ticks are saved on this device, so you can stop and come back any time.
+
 The big one. Survival systems's systems don't care whether the world is 2D or 3D, so they carry over almost unchanged. Movement and looking come from Into 3D.
 
 ## 1. Pieces
@@ -23,9 +25,24 @@ The big one. Survival systems's systems don't care whether the world is 2D or 3D
 | building | Survival systems, lesson 6 with a 3D grid: `Vector3i` and `(position / cell_size).floor()` |
 | saving | Survival systems, lesson 7 (save `x`, `y` and `z` now) |
 
+**Tick when done:**
+
+- [ ] First-person body and camera
+- [ ] Press E to chop trees and rocks
+- [ ] Hunger, thirst, inventory and crafting
+- [ ] Sun that moves and night
+- [ ] Wolves
+- [ ] Building on a 3D grid
+- [ ] Saving with x, y and z
+
 ## 2. Terrain
 
 For a first version, a big `CSGBox3D` or a `MeshInstance3D` with a `PlaneMesh` and a `StaticBody3D` is enough. Later, the free **Terrain3D** add-on (in the **AssetLib** tab) gives you sculpting and painting. For trees, use `MultiMeshInstance3D` when you have hundreds of them: it draws them all in one go.
+
+**Tick when done:**
+
+- [ ] Ground with collision
+- [ ] Trees placed (MultiMeshInstance3D if there are hundreds)
 
 ## 3. The pause menu (your quest)
 
@@ -50,6 +67,11 @@ Write:
 2. `toggle_pause()`: flip `get_tree().paused` and show the menu exactly when the game is paused.
 
 When you've built all six games, you've done what this course set out to do. Next, make one of them **yours**: a twist, a story, your own art. That's how every indie game starts.
+
+**Tick when done:**
+
+- [ ] Esc opens the pause menu and the game freezes behind it
+- [ ] Resume button unpauses
 
 ## Review
 

@@ -8,6 +8,8 @@ hint: position = start + axis * sin(time / period * TAU) * distance
 
 > **Warm-up:** How would you make a platform glide smoothly back and forth?
 
+> ✅ Tick the boxes as you go. Your ticks are saved on this device, so you can stop and come back any time.
+
 Uses **Into 3D** lessons 1–4: a body that walks and jumps, moving relative to an orbiting camera.
 
 ## 1. Block out the level
@@ -15,6 +17,11 @@ Uses **Into 3D** lessons 1–4: a body that walks and jumps, moving relative to 
 Don't model anything yet. Use **CSG** nodes (`CSGBox3D`, `CSGCylinder3D`): boxes you can stretch in the editor. Tick **Use Collision** on each, and they're solid. Designers call this a **blockout**: get the jumps fun first, art later.
 
 Add light and sky: in the 3D view's toolbar, the **sun** and **globe** buttons preview them. Click the **⋮** menu next to them and choose *Add Sun to Scene* and *Add Environment to Scene* to make them real nodes.
+
+**Tick when done:**
+
+- [ ] Level blocked out with CSG boxes, Use Collision ticked
+- [ ] Sun and environment added to the scene
 
 ## 2. The player
 
@@ -32,6 +39,12 @@ Rotate `CameraPivot` with the mouse (lesson 5's code, on the pivot) and pass `Ca
 Give the `SpringArm3D` the player's RID to ignore: `$CameraPivot/SpringArm3D.add_excluded_object(get_rid())`.
 
 The 2D tricks still work in 3D: coyote time, jump buffer, variable jump height (just flip the sign, up is +y).
+
+**Tick when done:**
+
+- [ ] Player scene with capsule, model and camera pivot
+- [ ] Camera pivot follows the player and turns with the mouse
+- [ ] Movement is relative to the camera; you can run and jump (F5)
 
 ## 3. Moving platforms (your quest)
 
@@ -54,6 +67,11 @@ position = start + offset
 Example: `distance = 3`, `period = 4`, `axis = (1, 0, 0)`. At `time = 1` (a quarter period): `sin(1 / 4 × TAU) = sin(quarter turn) = 1`, so the platform is 3 m right of `start`. At `time = 3` it's 3 m left.
 
 Write `_physics_process(delta)`: add `delta` to `time`, then set `position` with the formula.
+
+**Tick when done:**
+
+- [ ] At least one moving platform that carries the player
+- [ ] A goal at the end of the level
 
 ## Review
 

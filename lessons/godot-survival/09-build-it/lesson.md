@@ -8,6 +8,8 @@ hint: Pick a random spot with randf_range, keep it only if it's at least min_gap
 
 > **Warm-up:** Why do trees placed fully at random sometimes look wrong?
 
+> ✅ Tick the boxes as you go. Your ticks are saved on this device, so you can stop and come back any time.
+
 Everything from this course comes together here, with movement from Basics 2.
 
 ## 1. Scenes
@@ -32,6 +34,15 @@ Hook up the day cycle: `$CanvasModulate.color = Color(b, b, b * 1.1)` with `b = 
 
 Save the game every in-game morning, and load it in `_ready()` if `FileAccess.file_exists("user://save.json")`.
 
+**Tick when done:**
+
+- [ ] World scene with ground, CanvasModulate and the containers
+- [ ] Player with stats, inventory and crafting from lessons 1 to 3
+- [ ] UI with stat bars, a hotbar and a craft menu
+- [ ] Y Sort Enabled on World
+- [ ] Day and night colouring hooked up
+- [ ] Saving every morning and loading in _ready()
+
 ## 2. Scattering resources (your quest)
 
 Placing 50 trees by hand is boring, and placing them **completely** at random puts some right on top of each other. The fix is simple: pick a random spot, and only keep it if it isn't too close to a spot you already have. Otherwise try again. This is called **rejection sampling**.
@@ -54,6 +65,11 @@ Vector2(randf_range(area.position.x, area.end.x), randf_range(area.position.y, a
 (`area.end` is `position + size`, the bottom-right corner.)
 
 Write `scatter(count: int, area: Rect2, min_gap: float) -> Array` that returns up to `count` points inside `area`, each at least `min_gap` from all others. Give up after `count * 30` tries.
+
+**Tick when done:**
+
+- [ ] Trees and rocks placed with scatter() when the world starts
+- [ ] You can walk around, chop a tree and see the wood in the hotbar (F5)
 
 ## Review
 

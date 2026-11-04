@@ -8,12 +8,14 @@ hint: Wrap it in maxf(..., min_interval). game_over: if score > high_score, stor
 
 > **Warm-up:** What makes a wave shooter get harder over time?
 
+> ✅ Tick the boxes as you go. Your ticks are saved on this device, so you can stop and come back any time.
+
 All the pieces come from this course. A wave-survival arena shooter is a great first shooter: one screen, endless replay.
 
 ## 1. Set up
 
-1. Input Map: `move_left/right/up/down` (WASD) and `shoot` (left mouse button: in the Input Map, click **+**, then pick **Mouse Buttons → Left**).
-2. Art: Kenney's *Top-down Shooter* pack.
+- [ ] Input Map: `move_left/right/up/down` (WASD) and `shoot` (left mouse button: in the Input Map, click **+**, then pick **Mouse Buttons → Left**).
+- [ ] Art: Kenney's *Top-down Shooter* pack.
 
 ## 2. Scenes
 
@@ -42,6 +44,14 @@ With a `Marker2D` you can use `$Muzzle.global_position` instead of computing the
 
 Turn on **Debug → Visible Collision Shapes** while testing. It shows every hitbox.
 
+**Tick when done:**
+
+- [ ] Player scene with Sprite2D, CollisionShape2D and a Muzzle marker
+- [ ] Bullet scene (Area2D) from lessons 2 and 4
+- [ ] Enemy scene that chases and has take_damage and died
+- [ ] Arena scene with walls, the player, a WaveManager and the HUD
+- [ ] Visible Collision Shapes turned on, and you can shoot an enemy (F5)
+
 ## 3. Difficulty that ramps up (your quest)
 
 Linear growth (lesson 6) is fine for enemy *count*. For the time between spawns, games often use **exponential decay**: each wave multiplies the time by the same number, like 0.85. It drops fast at first and then levels off.
@@ -62,6 +72,11 @@ Write:
 
 1. `spawn_interval(wave: int) -> float` with the formula and the `min_interval` floor.
 2. `game_over(score: int) -> bool`: if `score` beats `high_score`, store it and return `true` (show "New high score!"), otherwise return `false`. Saving it to a file comes in the Survival systems course (the save lesson).
+
+**Tick when done:**
+
+- [ ] WaveManager waits spawn_interval(wave) between enemies
+- [ ] Game over screen shows "New high score!" when game_over() returns true
 
 ## Review
 

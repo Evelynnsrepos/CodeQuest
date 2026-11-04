@@ -8,14 +8,16 @@ hint: next_level: current += 1; if current >= levels.size() return the win scree
 
 > **Warm-up:** Which of the earlier lessons do you think a real platformer needs most?
 
+> ✅ Tick the boxes as you go. Your ticks are saved on this device, so you can stop and come back any time.
+
 You have every piece from the lessons before this one. This guide puts them together in the real Godot editor. Work through it with Godot open next to CodeQuest.
 
 ## 1. Set up the project
 
-1. In the Project Manager click **Create**, name it, pick **Forward+** (or **Compatibility** for older PCs) and create.
-2. **Project → Project Settings → Input Map**: add `move_left`, `move_right` and `jump` and bind keys (A/D/Space and the arrow keys). Use these names instead of `ui_left`... in your scripts.
-3. Free art: [kenney.nl](https://kenney.nl) has free (CC0) platformer packs. Drag the folder into the **FileSystem** dock.
-4. For crisp pixel art: **Project Settings → Rendering → Textures → Default Texture Filter → Nearest**.
+- [ ] In the Project Manager click **Create**, name it, pick **Forward+** (or **Compatibility** for older PCs) and create.
+- [ ] **Project → Project Settings → Input Map**: add `move_left`, `move_right` and `jump` and bind keys (A/D/Space and the arrow keys). Use these names instead of `ui_left`... in your scripts.
+- [ ] Free art: [kenney.nl](https://kenney.nl) has free (CC0) platformer packs. Drag the folder into the **FileSystem** dock.
+- [ ] For crisp pixel art: **Project Settings → Rendering → Textures → Default Texture Filter → Nearest**.
 
 ## 2. The player scene
 
@@ -29,6 +31,13 @@ Player (CharacterBody2D)        ← script: lessons 1–5, 8, 9
 ```
 
 Add the player to the `player` group (**Node → Groups**). Save as `player.tscn`.
+
+**Tick when done:**
+
+- [ ] Player scene built: CharacterBody2D, AnimatedSprite2D, CollisionShape2D, Camera2D
+- [ ] Idle, run, jump and fall animations added to the SpriteFrames
+- [ ] Script from lessons 1 to 5, 8 and 9 attached
+- [ ] Player added to the player group and saved as player.tscn
 
 ## 3. The level
 
@@ -46,6 +55,14 @@ Level1 (Node2D)
 
 Set the Camera2D's **Limit** values so it doesn't show past the level's edges.
 
+**Tick when done:**
+
+- [ ] TileSet made, with a Physics Layer so tiles are solid
+- [ ] Ground painted in the TileMapLayer
+- [ ] Player dropped in; you can run and jump (press F5)
+- [ ] Enemies, coins, a checkpoint and a goal placed
+- [ ] Camera2D limits set
+
 ## 4. The game manager (your quest)
 
 Something has to remember the coins and which level comes next, even while levels change. In Godot that's an **Autoload**: a script that's always loaded. Add it in **Project Settings → Globals → Autoload**, name it `Game`, and any script can use `Game.collect_coin()`.
@@ -57,9 +74,19 @@ Write the manager:
 1. `collect_coin()`: add 1 to `coins`. Every 100 coins gives an extra life: when `coins` reaches 100, add 1 to `lives` and set `coins` back to `0`.
 2. `next_level() -> String`: move `current` to the next level and return its path from `levels`. After the last level, return `"res://win_screen.tscn"`.
 
+**Tick when done:**
+
+- [ ] Game script added as an Autoload named Game
+- [ ] Coins call Game.collect_coin(); the goal changes to Game.next_level()
+
 ## 5. Ship it
 
 **Project → Export**, add a preset for your system, download the export templates when asked, and **Export Project**. Now you have a game other people can play.
+
+**Tick when done:**
+
+- [ ] Export preset added and templates downloaded
+- [ ] Game exported and played outside the editor
 
 ## Review
 
