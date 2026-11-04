@@ -1,2 +1,10 @@
-{"lang": "python", "name": "LLMs 6: Fine-tuning and its alternatives", "icon": "🧪", "order": 75,
- "blurb": "Pretraining vs fine-tuning vs RAG, datasets and chat templates, LoRA and QLoRA math, DPO, the Hugging Face stack, merging and GGUF conversion, and training on AMD or a rented GPU. Do LLMs 5 first."}
+{
+ "lang": "python",
+ "name": "LLMs 6: Fine-tuning and its alternatives",
+ "icon": "🧪",
+ "order": 75,
+ "blurb": "Pretraining vs fine-tuning vs RAG, datasets and chat templates, LoRA and QLoRA math, DPO, the Hugging Face stack, merging and GGUF conversion, and training on AMD or a rented GPU. Do LLMs 5 first.",
+ "track": "AI",
+ "level": "Level 2 · Train your own",
+ "topic": "Fine-tuning"
+}

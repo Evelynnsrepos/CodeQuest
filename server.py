@@ -140,6 +140,9 @@ def load_courses():
             "icon": meta.get("icon"),
             "blurb": meta.get("blurb"),
             "order": meta.get("order", 100),
+            "track": meta.get("track", "Programming"),
+            "level": meta.get("level", ""),
+            "topic": meta.get("topic", ""),
             "prelude": prelude_code,
             "lessons": lessons,
         }
@@ -980,6 +983,9 @@ class Handler(BaseHTTPRequestHandler):
                 "name": course["name"],
                 "icon": course["icon"],
                 "blurb": course["blurb"],
+                "track": course["track"],
+                "level": course["level"],
+                "topic": course["topic"],
                 "runs_on": info["runs_on"],
                 "available": available,
                 "lessons": [{

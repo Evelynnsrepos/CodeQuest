@@ -1,2 +1,10 @@
-{"lang": "python", "name": "Math 4: Probability and statistics", "icon": "🎲", "order": 63,
- "blurb": "Probability from zero: events, AND/OR, conditional probability, Bayes' rule, distributions, expected value, variance, the normal distribution, sampling, maximum likelihood, confidence intervals and significance tests."}
+{
+ "lang": "python",
+ "name": "Math 4: Probability and statistics",
+ "icon": "🎲",
+ "order": 63,
+ "blurb": "Probability from zero: events, AND/OR, conditional probability, Bayes' rule, distributions, expected value, variance, the normal distribution, sampling, maximum likelihood, confidence intervals and significance tests.",
+ "track": "Math for AI",
+ "level": "Level 2 · Core",
+ "topic": "Probability and statistics"
+}

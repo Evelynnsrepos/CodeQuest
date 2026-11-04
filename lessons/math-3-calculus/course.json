@@ -1,2 +1,10 @@
-{"lang": "python", "name": "Math 3: Calculus", "icon": "📈", "order": 62,
- "blurb": "Calculus from zero: slopes, limits, derivatives and their rules, the chain rule, partial derivatives, gradients, gradient descent, backpropagation by hand and integrals as areas."}
+{
+ "lang": "python",
+ "name": "Math 3: Calculus",
+ "icon": "📈",
+ "order": 62,
+ "blurb": "Calculus from zero: slopes, limits, derivatives and their rules, the chain rule, partial derivatives, gradients, gradient descent, backpropagation by hand and integrals as areas.",
+ "track": "Math for AI",
+ "level": "Level 2 · Core",
+ "topic": "Calculus"
+}

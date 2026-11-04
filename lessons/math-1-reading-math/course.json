@@ -1,2 +1,10 @@
-{"lang": "python", "name": "Math 1: Reading math", "icon": "🔣", "order": 60,
- "blurb": "Math from absolute zero, ADHD-friendly: plain words and real numbers first, then every sign one at a time, then the full formula colour-coded and taken apart. Arithmetic, solving for x, brackets, fractions, powers, big numbers, graphs, lines and slope, functions, Σ, Π, logarithms, e, sets and Greek letters."}
+{
+ "lang": "python",
+ "name": "Math 1: Reading math",
+ "icon": "🔣",
+ "order": 60,
+ "blurb": "Math from absolute zero, ADHD-friendly: plain words and real numbers first, then every sign one at a time, then the full formula colour-coded and taken apart. Arithmetic, solving for x, brackets, fractions, powers, big numbers, graphs, lines and slope, functions, Σ, Π, logarithms, e, sets and Greek letters.",
+ "track": "Math for AI",
+ "level": "Level 1 · Basics",
+ "topic": "Notation"
+}
