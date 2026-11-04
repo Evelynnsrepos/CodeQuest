@@ -75,7 +75,8 @@ func _physics_tick() -> void:
 # One entry per node: [id, kind, x, y, w, h] in 2D, [id, kind, x, y, z, w, h, d] in 3D.
 # kind: 0 = the learner's node, 1 = solid (StaticBody), 2 = area, 3 = other bodies and spawned nodes.
 func _collect(node: Node, frame: Array) -> void:
-	for child in node.get_children():
+	for found in node.get_children():
+		var child = found  # untyped, so Node2D and Node3D properties can be read after the "is" checks
 		if frame.size() >= MAX_NODES:
 			return
 		var kind := -1
@@ -88,17 +89,18 @@ func _collect(node: Node, frame: Array) -> void:
 		elif child is CollisionObject2D or child is CollisionObject3D or child.get_script() != null:
 			kind = 3
 		if kind >= 0 and child is Node2D:
-			var s := _size_2d(child)
+			var s: Vector2 = _size_2d(child)
 			frame.append([child.get_instance_id() % 100000, kind, roundf(child.global_position.x), roundf(child.global_position.y), s.x, s.y])
 		elif kind >= 0 and child is Node3D:
-			var s := _size_3d(child)
+			var s: Vector3 = _size_3d(child)
 			var g: Vector3 = child.global_position
 			frame.append([child.get_instance_id() % 100000, kind, snappedf(g.x, 0.01), snappedf(g.y, 0.01), snappedf(g.z, 0.01), s.x, s.y, s.z])
 		_collect(child, frame)
 
 
 func _size_2d(node: Node) -> Vector2:
-	for c in node.get_children():
+	for found in node.get_children():
+		var c = found
 		if c is CollisionShape2D and c.shape:
 			if c.shape is RectangleShape2D:
 				return c.shape.size
@@ -110,7 +112,8 @@ func _size_2d(node: Node) -> Vector2:
 
 
 func _size_3d(node: Node) -> Vector3:
-	for c in node.get_children():
+	for found in node.get_children():
+		var c = found
 		if c is CollisionShape3D and c.shape:
 			if c.shape is BoxShape3D:
 				return c.shape.size
