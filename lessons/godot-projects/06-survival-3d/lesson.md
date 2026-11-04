@@ -1,0 +1,48 @@
+---
+title: Project: 3D survival game
+xp: 40
+---
+# Build it: a 3D survival game
+
+The big one. Godot 5's systems don't care whether the world is 2D or 3D, so they carry over almost unchanged. Movement and looking come from Godot 6.
+
+## 1. Pieces
+
+| Part | From |
+| --- | --- |
+| first-person body and camera | Godot 6, lessons 3 and 5 |
+| "Press E to chop" | Godot 6, lesson 7 |
+| trees and rocks | Godot 5, lesson 4 (make them `StaticBody3D` with `interact()` calling `hit()`) |
+| hunger, thirst, inventory, crafting | Godot 5, lessons 1–3 |
+| sun and night | Godot 5, lesson 5: brightness → `DirectionalLight3D.light_energy`, and rotate the light: `rotation.x = -time_of_day / 24 × TAU` |
+| wolves | Godot 5, lesson 8 for the decision, Godot 6 lesson 8 to move |
+| building | Godot 5, lesson 6 with a 3D grid: `Vector3i` and `(position / cell_size).floor()` |
+| saving | Godot 5, lesson 7 (save `x`, `y` and `z` now) |
+
+## 2. Terrain
+
+For a first version, a big `CSGBox3D` or a `MeshInstance3D` with a `PlaneMesh` and a `StaticBody3D` is enough. Later, the free **Terrain3D** add-on (in the **AssetLib** tab) gives you sculpting and painting. For trees, use `MultiMeshInstance3D` when you have hundreds of them: it draws them all in one go.
+
+## 3. The pause menu (your quest)
+
+Every game needs a pause menu, and the inventory and crafting screens usually pause too.
+
+`get_tree().paused = true` freezes the game: nodes stop getting `_process`, `_physics_process` and input. But the **menu** must keep working while everything else is frozen, or you could never unpause! Each node has a `process_mode`:
+
+| `process_mode` | runs when... |
+| --- | --- |
+| `PROCESS_MODE_INHERIT` | same as its parent (the default) |
+| `PROCESS_MODE_PAUSABLE` | only when not paused |
+| `PROCESS_MODE_ALWAYS` | always, even when paused |
+| `PROCESS_MODE_WHEN_PAUSED` | only while paused |
+
+So the pause menu is `PROCESS_MODE_ALWAYS`. Its children inherit that, so its buttons work too. In the editor it's under **Process → Mode** in the Inspector.
+
+In a first-person game, also free the mouse while paused so the player can click the buttons: `Input.mouse_mode = Input.MOUSE_MODE_VISIBLE`, and capture it again when resuming.
+
+Write:
+
+1. `_ready()`: set this node's `process_mode` to always, and hide the menu (`visible = false`).
+2. `toggle_pause()`: flip `get_tree().paused` and show the menu exactly when the game is paused.
+
+When you've built all six games, you've done what this course set out to do. Next, make one of them **yours**: a twist, a story, your own art. That's how every indie game starts.

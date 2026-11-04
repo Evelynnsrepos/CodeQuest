@@ -1,0 +1,2 @@
+{"lang": "gdscript", "name": "Godot 3: 2D platformer", "icon": "🍄", "order": 25.1,
+ "blurb": "Level 3. Gravity, running, jumping with exact heights, coyote time, patrolling enemies, stomping, checkpoints and animation states, with real Godot physics. Do Godot 2 first."}

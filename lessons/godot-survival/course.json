@@ -1,0 +1,2 @@
+{"lang": "gdscript", "name": "Godot 5: Survival systems", "icon": "🪓", "order": 25.3,
+ "blurb": "Level 5. The systems behind survival games, in 2D or 3D: hunger and thirst, an inventory with stacks, crafting, gathering, a day and night cycle, grid building, saving and a creature AI. Do Godot 4 first."}
