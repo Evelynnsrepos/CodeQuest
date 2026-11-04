@@ -55,22 +55,22 @@ const WIDGETS = {
     const { svg, readout } = frame(el, slider("lr", "learning rate", 0.05, 1.1, 0.05, 0.3) +
       ` <button type="button" class="btn small" data-step>Take a step</button> <button type="button" class="btn small ghost" data-reset>Start again</button>`,
       "Gradient descent steps on a curve");
-    const s = scale([-2, 6], [0, 18]), f = (x) => (x - 2) ** 2 + 1;
-    let path = [-1.5];
+    const s = scale([-1.5, 7.5], [0, 20]), f = (x) => (x - 3) ** 2;
+    let path = [0];
     const draw = () => {
       const lr = Number(el.querySelector("#lr").value), x = path.at(-1);
       el.querySelector("output").textContent = fmt(lr);
-      svg.innerHTML = s.axes + s.curve(f) + path.map((p, i) => `<circle cx="${s.sx(p)}" cy="${s.sy(Math.min(f(p), 18))}" r="${i === path.length - 1 ? 6 : 3.5}" fill="${i === path.length - 1 ? RED : ORANGE}"/>`).join("");
-      const note = Math.abs(x - 2) < 0.01 ? "You reached the bottom!" : lr > 1 ? "Too big: each step jumps past the bottom and lands higher." : lr >= 0.9 ? "Big steps: it zig-zags across the valley." : lr < 0.15 ? "Small steps: safe but slow." : "";
-      readout.innerHTML = `step ${path.length - 1}: x = ${fmt(x)}, loss = ${fmt(f(x))}, slope = 2·(x − 2) = ${fmt(2 * (x - 2))}. ${note}`;
+      svg.innerHTML = s.axes + s.curve(f) + path.map((p, i) => `<circle cx="${s.sx(p)}" cy="${s.sy(Math.min(f(p), 20))}" r="${i === path.length - 1 ? 6 : 3.5}" fill="${i === path.length - 1 ? RED : ORANGE}"/>`).join("");
+      const note = Math.abs(x - 3) < 0.01 ? "You reached the bottom!" : lr > 1 ? "Too big: each step jumps past the bottom and lands higher." : Math.abs(lr - 1) < 1e-9 ? "Exactly 1: it bounces between 0 and 6 forever." : lr > 0.5 ? "Big steps: it zig-zags across the valley." : lr < 0.15 ? "Small steps: safe but slow." : "";
+      readout.innerHTML = `step ${path.length - 1}: x = ${fmt(x)}, loss = ${fmt(f(x))}, slope = 2·(x − 3) = ${fmt(2 * (x - 3))}. ${note}`;
     };
     el.querySelector("[data-step]").onclick = () => {
       const lr = Number(el.querySelector("#lr").value), x = path.at(-1);
-      if (Math.abs(x) < 1e6) path.push(x - lr * 2 * (x - 2));
+      if (Math.abs(x) < 1e6 && path.length < 60) path.push(x - lr * 2 * (x - 3));
       draw();
     };
-    el.querySelector("[data-reset]").onclick = () => { path = [-1.5]; draw(); };
-    wire(el, () => { path = [-1.5]; draw(); });
+    el.querySelector("[data-reset]").onclick = () => { path = [0]; draw(); };
+    wire(el, () => { path = [0]; draw(); });
   },
 
   // LLMs 1 / crash course: temperature divides the scores before softmax.

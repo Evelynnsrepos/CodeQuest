@@ -19,6 +19,8 @@ A real LLM doesn't count whole phrases; it computes the probabilities with a neu
 
 **Go deeper:** LLMs 1 (How an LLM works), lessons 1–7.
 
+<div class="quiz" data-answer="0" data-why="It always picks the most frequent follower. A real LLM samples, so “hill” would still come out about 10% of the time."><p><b>Predict first:</b> after “a” the counts are time: 9, hill: 1. Which word does the counting model pick?</p><button>time</button><button>hill</button><button>either, 50/50</button></div>
+
 ## Your quest
 
 1. `next_word(counts, word)`: the most frequent word after `word`, or `None` if `word` isn't in `counts`.
