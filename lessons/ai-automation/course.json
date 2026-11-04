@@ -1,0 +1,10 @@
+{
+ "lang": "python",
+ "name": "AI automation 1: Scripts",
+ "icon": "🤖",
+ "order": 72.5,
+ "blurb": "Make AI do your boring tasks: when automating pays off, prompt templates, one-call scripts, batches of files, pipelines, routers, folder watchers, never doing work twice, approval gates, dry runs and cost budgets. 12 short lessons, about 10 minutes each. Do the Python basics and the AI crash course first. Part 2 does the same with n8n.",
+ "track": "AI",
+ "level": "Level 1 · Understand and use AI",
+ "topic": "Automation"
+}

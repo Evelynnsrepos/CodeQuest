@@ -100,6 +100,8 @@ In the Godot lessons that move something, **Run** drops your node into a small t
 | Lua | Lua | browser |
 | Lua for Hyprland | Lua | browser |
 | TypeScript | TypeScript | browser |
+| AI automation 1: Scripts | Python | browser |
+| AI automation 2: n8n with local AI | Python (then n8n on your computer) | browser |
 | Rust | Rust | host computer |
 | Git | Git commands | host computer |
 | Nix | Nix | host computer (Nix) |
