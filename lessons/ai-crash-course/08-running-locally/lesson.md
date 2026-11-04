@@ -20,6 +20,8 @@ So: **GB ≈ billions of parameters × bits ÷ 8**. Add 1–2 GB for the **KV ca
 
 **Go deeper:** LLMs 2 (Running models locally), Math 5 lessons 12–13.
 
+<div class="quiz" data-answer="0" data-why="8 × 4.5 ÷ 8 = 4.5 GB, plus 1–2 GB for the KV cache."><p><b>Predict first:</b> how many GB is an 8B model at Q4_K_M (4.5 bits per weight)?</p><button>4.5 GB</button><button>8 GB</button><button>36 GB</button></div>
+
 ## Your quest
 
 1. `model_gb(params_b, bits)`: `params_b × bits / 8`.

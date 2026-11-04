@@ -16,6 +16,8 @@ The interval is about **p ± 2·√(p(1−p)/n)**, where p is the measured rate 
 
 **Go deeper:** LLMs 7 lesson 05 (blind eval), Math 4 lessons 11–12, AI engineer 2 (evals in practice).
 
+<div class="quiz" data-answer="1" data-why="0.55 ± 2·√(0.55·0.45/100) ≈ 0.45 to 0.65. That range includes 50%, so you can’t call a winner yet."><p><b>Predict first:</b> the new prompt won 55 of 100 blind comparisons. Is it clearly better?</p><button>yes, 55% is more than half</button><button>not yet</button></div>
+
 ## Your quest
 
 1. `accuracy(preds, gold)`: share of positions where the prediction equals the gold answer (compare stripped, lowercased strings).

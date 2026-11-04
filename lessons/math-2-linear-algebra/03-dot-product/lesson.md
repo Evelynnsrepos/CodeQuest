@@ -20,6 +20,10 @@ Points: (2, 5, 1). Basket: (3, 1, 4). 2 times 3 = 6, 5 times 1 = 5, 1 times 4 = 
 
 Arrows (1, 2) and (2, −1): 1 times 2 + 2 times (−1) = 2 − 2 = **0** → at a right angle.
 
+<div class="quiz" data-answer="0" data-why="1 × 2 + 3 × 1 = 2 + 3 = 5."><p><b>Predict first:</b> what is (1, 3) · (2, 1)?</p><button>5</button><button>6</button><button>7</button></div>
+
+<div class="explore" data-widget="vectors"></div>
+
 ## 🔣 The signs
 
 | Sign | Say it | Means | In Python |

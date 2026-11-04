@@ -21,6 +21,8 @@ a = [1, 2]  b = [2, 4]   a·b = 2 + 8 = 10   |a| = √5   |b| = √20   cos = 10
 
 **Go deeper:** LLMs 1 lesson 11, LLMs 3 (RAG), Math 2 lessons 03–05, AI engineer 2.
 
+<div class="quiz" data-answer="1" data-why="The dot product is 1·0 + 0·1 = 0: they point at a right angle, so they’re unrelated."><p><b>Predict first:</b> what is the cosine similarity of [1, 0] and [0, 1]?</p><button>1</button><button>0</button><button>−1</button></div>
+
 ## Your quest
 
 1. `cosine(a, b)`.

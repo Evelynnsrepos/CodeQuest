@@ -16,6 +16,8 @@ The rule of thumb: **prompt first; add RAG for knowledge; fine-tune for behaviou
 
 **Go deeper:** LLMs 3 (RAG and tools), LLMs 6 (fine-tuning and its alternatives), AI engineer 2 (real RAG).
 
+<div class="quiz" data-answer="1" data-why="Facts that change belong in RAG: update the documents, no retraining."><p><b>Predict first:</b> your bot must know this week’s prices, which change every day. What do you use?</p><button>fine-tuning</button><button>RAG</button><button>a longer prompt with no data</button></div>
+
 ## Your quest
 
 `choose(prompt_works, needs_facts, needs_style)`: return `"prompt"` if `prompt_works`; otherwise `"rag"` if it needs facts the model doesn't have; otherwise `"fine-tune"` if it needs a style or behaviour; otherwise `"prompt"` (keep improving the prompt).

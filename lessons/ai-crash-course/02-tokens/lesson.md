@@ -16,6 +16,8 @@ Tokens matter because everything is counted in them:
 
 **Go deeper:** LLMs 1, lessons 1–3 (you build a real tokenizer), LLMs 9 lesson 02 (context budgets and caching).
 
+<div class="quiz" data-answer="1" data-why="400 ÷ 4 characters per token = 100 tokens."><p><b>Predict first:</b> about how many tokens is a 400-character English paragraph?</p><button>40</button><button>100</button><button>400</button></div>
+
 ## Your quest
 
 1. `estimate_tokens(text)`: `len(text) / 4`, rounded **up** to a whole number (`math.ceil`).

@@ -197,6 +197,8 @@ Checks per language:
 - **Time estimates:** every lesson shows about how many minutes it takes (from its length and number of functions; set `minutes:` in the front matter to override).
 - **Spaced review:** under `## Review`, say whether you knew each answer. Questions come back after 1, 3, 7, 21 and 60 days (tomorrow if you didn't know it), and the home page shows how many are due.
 - **Checklists:** `- [ ]` task lists in a lesson can be ticked and stay ticked on that device.
+- **Try it drawings:** `<div class="explore" data-widget="NAME"></div>` adds a slider picture from `static/widgets.js`: `derivative`, `gradient-descent`, `temperature`, `vectors`, `pca`.
+- **Predict first:** `<div class="quiz" data-answer="1" data-why="Explanation"><p>Question</p><button>A</button><button>B</button></div>` (no blank lines inside; `data-answer` counts from 0). Wrong picks turn red and you can try again.
 
 ## Troubleshooting
 

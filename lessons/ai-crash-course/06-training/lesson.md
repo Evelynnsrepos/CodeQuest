@@ -19,6 +19,10 @@ For a one-weight model `prediction = w · x` with squared-error loss, the gradie
 
 **Go deeper:** LLMs 5 (How training works), Math 3 lessons 09–11, AI engineer 1 lesson 08.
 
+<div class="quiz" data-answer="0" data-why="The steps overshoot the bottom. Smaller steps fix it. Try it in the drawing below with a learning rate above 1."><p><b>Predict first:</b> your loss gets bigger every step until it explodes. What do you change?</p><button>make the learning rate smaller</button><button>make the learning rate bigger</button><button>train for more steps</button></div>
+
+<div class="explore" data-widget="gradient-descent"></div>
+
 ## Your quest
 
 `train(xs, ys, steps, lr)`: start with `w = 0.0`, and each step set `w = w − lr · gradient`. Return `w`.

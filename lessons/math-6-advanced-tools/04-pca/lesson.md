@@ -29,6 +29,10 @@ Covariance matrix C = [[2, 1], [1, 2]].
 
 The other direction is (0.707, −0.707) with eigenvalue 1. Share of variance on the first: 3 / (3 + 1) = **75%**.
 
+<div class="quiz" data-answer="1" data-why="3 ÷ (3 + 1) = 75%."><p><b>Predict first:</b> the eigenvalues are 3 and 1. What share of the variance does the first direction keep?</p><button>50%</button><button>75%</button><button>300%</button></div>
+
+<div class="explore" data-widget="pca"></div>
+
 ## 🔣 The signs
 
 | Sign | Say it | Means | In Python |

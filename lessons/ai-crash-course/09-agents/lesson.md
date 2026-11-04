@@ -14,6 +14,8 @@ Two dangers: an agent can loop forever, so cap the steps; and text it reads (web
 
 **Go deeper:** LLMs 3 (tools, MCP, agents), LLMs 9 lesson 09 (prompt injection), AI engineer 2 lesson 11 (traces).
 
+<div class="quiz" data-answer="1" data-why="The model only writes a request like {&quot;tool&quot;: &quot;weather&quot;}. Your code runs it and sends back the result."><p><b>Predict first:</b> the model wants the weather in Berlin. Who actually runs the weather tool?</p><button>the model itself</button><button>your code, after the model asks</button></div>
+
 ## Your quest
 
 `run_agent(model, tools, max_steps=5)`: keep a list `history`. Each step call `model(history)`:

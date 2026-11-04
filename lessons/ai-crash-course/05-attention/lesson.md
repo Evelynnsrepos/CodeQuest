@@ -29,6 +29,8 @@ The scores come from learned vectors called **queries** and **keys**, and the av
 
 **Go deeper:** LLMs 1 lesson 12, LLMs 8 lesson 01, Math 2 lesson 11.
 
+<div class="quiz" data-answer="0" data-why="Softmax always gives numbers that add up to 1, so the new vector is a true weighted average."><p><b>Predict first:</b> one token’s attention weights come out of a softmax. What do they add up to?</p><button>1</button><button>the number of tokens</button><button>it depends</button></div>
+
 ## Your quest
 
 1. `weights(scores)`: softmax of the scores (no temperature).
