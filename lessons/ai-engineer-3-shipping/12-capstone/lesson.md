@@ -24,7 +24,18 @@ Build `app` with:
 
 The check calls every endpoint with a fake model, checks citations point to real sources, and wants `recall@3 ≥ 0.9`.
 
-**On your machine (the real capstone):** put this in a git repo with `main.py`, `requirements.txt`, the Dockerfile from lesson 08, the workflow from lesson 09, tests with fakes (lesson 03), a `.env.example`, your own notes and 30+ golden questions; replace `get_llm` with a call to Ollama (AI engineer 2 lesson 08) and add the embedding half of the hybrid search (AI engineer 2 lessons 02–05). Write the README from lesson 11 with your numbers, and publish it on GitHub. That repository is your portfolio piece.
+**On your machine (the real capstone).** Tick each step as you finish it; the ticks are saved on this device. One step per sitting is a fine pace.
+
+- [ ] Make a git repo with `main.py` and `requirements.txt`
+- [ ] Add the Dockerfile from lesson 08
+- [ ] Add the CI workflow from lesson 09
+- [ ] Add tests with fakes (lesson 03)
+- [ ] Add a `.env.example` (lesson 01)
+- [ ] Put in your own notes and write 30+ golden questions
+- [ ] Replace `get_llm` with a call to Ollama (AI engineer 2 lesson 08)
+- [ ] Add the embedding half of hybrid search (AI engineer 2 lessons 02 to 05)
+- [ ] Write the README from lesson 11 with your own numbers
+- [ ] Publish it on GitHub: that repository is your portfolio piece
 
 ## Review
 

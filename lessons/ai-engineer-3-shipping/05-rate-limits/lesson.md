@@ -16,6 +16,21 @@ It allows short **bursts** (up to `capacity` at once) but limits the average to 
 
 Time is passed in as a function (`now`), so tests can use a fake clock instead of waiting.
 
+## 🧮 Worked example
+
+A bucket with `capacity = 3` and `rate = 1` token per second:
+
+| time | tokens before | request? | tokens after |
+|---|---|---|---|
+| 0.0 s | 3 | yes, allowed | 2 |
+| 0.0 s | 2 | yes, allowed | 1 |
+| 0.0 s | 1 | yes, allowed | 0 |
+| 0.0 s | 0 | **429**, rejected | 0 |
+| 1.0 s | 0 + 1 s × 1 = 1 | yes, allowed | 0 |
+| 5.0 s | 0 + 4 s × 1 = 4 → capped at **3** | yes, allowed | 2 |
+
+A burst of 3 goes through at once; after that, about 1 request per second.
+
 ## Your quest
 
 1. `TokenBucket(rate, capacity, now=time.monotonic)`: starts full. `allow()` first refills by `(now() − last) × rate` (capped at capacity), then takes a token and returns `True`, or returns `False` if fewer than 1 is left. `retry_after()` returns the seconds until 1 token is available (0 if one is).

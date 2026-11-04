@@ -22,6 +22,24 @@ So one small client works with all of them (Anthropic's own API has a different 
 
 **Always set a timeout.** Without one, a stuck request hangs your app forever.
 
+## 🧮 Worked example
+
+A call fails with 503 three times, then works. The waits double each time:
+
+| attempt | result | wait before the next try |
+|---|---|---|
+| 1 | 503 | 1 s |
+| 2 | 503 | 2 s |
+| 3 | 429 with `Retry-After: 10` | 10 s (the server's number wins) |
+| 4 | 200 OK | done |
+
+A 401 on attempt 1 would stop right away: a wrong API key stays wrong however often you retry.
+
+```python
+for attempt in range(4):
+    print(f"attempt {attempt + 1}: wait {2 ** attempt} s if it fails")   # 1, 2, 4, 8
+```
+
 ## Your quest
 
 `chat(messages, model, base, client, retries=3, sleep=time.sleep)`:

@@ -13,6 +13,19 @@ You can't improve what you don't measure. A **retrieval eval** needs a **golden 
 
 Compare settings on the **same** golden set: keyword only, embeddings only, hybrid, hybrid + rerank. The `NOTES` and `GOLDEN` in the starter are a small real-shaped example.
 
+## 🧮 Worked example
+
+Four golden questions. The right chunk came back at rank 1, rank 3, not at all, and rank 2.
+
+- **recall@3** = questions with the right chunk in the top 3 ÷ all questions = 3 ÷ 4 = **0.75**
+- **MRR** = (1/1 + 1/3 + 0 + 1/2) ÷ 4 = 1.833 ÷ 4 = **0.458**
+
+```python
+ranks = [1, 3, None, 2]   # None: not retrieved
+print(sum(1 for r in ranks if r and r <= 3) / len(ranks))   # 0.75
+print(sum(1 / r if r else 0 for r in ranks) / len(ranks))   # 0.458...
+```
+
 ## Your quest
 
 1. `recall_at_k(results, golden, k)`: `results` maps each question to its ranked list of ids; `golden` is a list of `(question, right_id)`.

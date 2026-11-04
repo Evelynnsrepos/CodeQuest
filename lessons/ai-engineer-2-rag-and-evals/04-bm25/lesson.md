@@ -19,6 +19,17 @@ Embeddings are great at meaning, but weak at **exact terms**: command names, err
 
 Tokenizing: lowercase and split on anything that isn't a letter, digit, `-` or `_` (so `nix-collect-garbage` stays one word): `re.findall(r"[\w-]+", text.lower())`.
 
+## 🧮 Worked example
+
+Three tiny documents, each 4 words long (so `len / avglen` = 1 and the length penalty cancels out):
+
+1. "nix gc frees disk"  2. "nix flakes pin inputs"  3. "git gc packs objects"
+
+- **Query "nix", document 1.** N = 3 documents, n = 2 contain "nix". IDF = ln( (3 − 2 + 0.5) / (2 + 0.5) + 1 ) = ln(1.6) = **0.47**. The word appears once (f = 1), so the fraction is 1 · 2.5 / (1 + 1.5 · 1) = 1. Score = **0.47**.
+- **Query "flakes", document 2.** Only n = 1 document has it. IDF = ln( 2.5 / 1.5 + 1 ) = ln(2.67) = **0.98**. Same fraction, score = **0.98**.
+
+The rare word scores twice as much as the common one. That's BM25's whole idea in one line.
+
 ## Your quest
 
 Complete `BM25(docs, k1=1.5, b=0.75)`, where `docs` is a list of strings:

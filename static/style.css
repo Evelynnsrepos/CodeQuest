@@ -252,3 +252,21 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
   .lesson-body .k5 { color: #b79bff; }
   .lesson-body .k6 { color: #ff8f78; }
 }
+
+/* ADHD-friendly helpers: hints, check progress, one part at a time, review */
+[hidden] { display: none !important; }
+.btn.small { padding: 4px 10px; font-size: 0.85rem; }
+.lessons .mins { color: var(--muted); font-size: 0.8rem; margin-right: 8px; white-space: nowrap; }
+.hints:empty { display: none; }
+.hint { border-left: 4px solid var(--gold); background: var(--surface-2); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+.hint pre { margin: 6px 0 0; padding: 6px 10px; background: var(--surface); border-radius: 6px; overflow-x: auto; }
+.parts { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin-bottom: 4px; }
+.parts span { display: block; height: 100%; background: var(--good); }
+.parts-text { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); letter-spacing: 0.04em; }
+.part-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border); }
+.part-nav .dots { display: flex; gap: 4px; flex: 1; }
+.part-nav .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--surface-2); }
+.part-nav .dots span.on { background: var(--accent); }
+.grade { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.9rem; }
+.review-card { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; padding: 12px 16px; margin: 0 0 20px;
+  border-radius: var(--radius); background: var(--surface); border: 1px solid var(--accent); color: inherit; text-decoration: none; }

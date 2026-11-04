@@ -17,6 +17,21 @@ Rules every AI engineer follows:
 
 If a key ever lands in a public repo, assume it's stolen: **revoke it** immediately; deleting the commit isn't enough (bots scan GitHub within minutes).
 
+## 🧮 Worked example
+
+All four rules in five lines:
+
+```python
+import os
+temperature = float(os.environ.get("TEMPERATURE", "0.2"))  # rule 4: text → number, once, at startup
+api_key = os.environ.get("API_KEY")
+if not api_key:
+    raise SystemExit("API_KEY is missing. Copy .env.example to .env and fill it in.")  # rule 2: fail fast
+print("key:", api_key[:3] + "****")  # rule 3: never print the whole secret
+```
+
+And rule 1: the real key lives only in `.env` (which is in `.gitignore`); git only ever sees `.env.example` with `API_KEY=put-your-key-here`.
+
 ## Your quest
 
 `SPEC` (in the starter) describes each setting: `(type, default)`; a default of `REQUIRED` means it must be set. Names ending in `_KEY`, `_TOKEN` or `_PASSWORD` are secrets.

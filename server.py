@@ -81,9 +81,31 @@ def parse_front_matter(text):
             for line in text[3:end].strip().splitlines():
                 if ":" in line:
                     key, value = line.split(":", 1)
-                    meta[key.strip()] = value.strip()
+                    if key.strip() == "hint":  # repeatable: one "hint:" line per hint, shown in order
+                        meta.setdefault("hints", []).append(value.strip())
+                    else:
+                        meta[key.strip()] = value.strip()
             text = text[end + 4:].lstrip("\n")
     return meta, text
+
+
+def estimate_minutes(body):
+    """About how long a lesson takes: reading at a slow, careful pace plus a few minutes per quest step."""
+    # shortcut: words/120 + 4 min per numbered quest step is a rough guess; "minutes:" in the front matter overrides it.
+    text = re.sub(r"<[^>]+>", " ", re.sub(r"<svg.*?</svg>", " ", body, flags=re.S))
+    quest = re.split(r"^## .*(?:quest|problems)\b.*$", body, maxsplit=1, flags=re.M | re.I)
+    steps = len(re.findall(r"^\s*(?:\d+\.|\*\*\d+\.)", quest[1].split("\n## ")[0], re.M)) if len(quest) > 1 else 0
+    return max(5, round((len(text.split()) / 120 + 4 * max(steps, 1)) / 5) * 5)
+
+
+def missing_line(solution, code):
+    """The first meaningful line of the solution that isn't in the learner's code yet (for hints)."""
+    have = {line.strip() for line in code.splitlines()}
+    for number, line in enumerate((solution or "").splitlines(), 1):
+        bare = line.strip()
+        if bare and not bare.startswith(("#", "--", "//")) and bare not in have:
+            return number, line.rstrip()
+    return None
 
 
 def read_optional(path):
@@ -115,6 +137,7 @@ def load_courses():
             if not lesson_md.exists():
                 continue
             front, body = parse_front_matter(lesson_md.read_text(encoding="utf-8"))
+            solution = read_optional(folder / f"solution.{ext}")
             lessons.append({
                 "course": course_dir.name,
                 "lang": lang,
@@ -122,8 +145,10 @@ def load_courses():
                 "title": front.get("title", folder.name),
                 "xp": int(front.get("xp", 10)),
                 "body": body,
+                "hints": front.get("hints", []),
+                "minutes": int(front.get("minutes") or estimate_minutes(body)),
                 "starter": read_optional(folder / f"starter.{ext}") or "",
-                "solution": read_optional(folder / f"solution.{ext}"),
+                "solution": solution,
                 "expected_output": read_optional(folder / "expected_output.txt"),
                 "check": read_optional(folder / f"check.{LANGUAGES[lang].get('check_ext', ext)}"),
                 "setup": read_optional(folder / "setup.sh"),
@@ -179,6 +204,15 @@ def db():
         CREATE TABLE IF NOT EXISTS profile (
             key TEXT PRIMARY KEY,
             value TEXT
+        );
+        CREATE TABLE IF NOT EXISTS reviews (
+            course TEXT NOT NULL,
+            slug TEXT NOT NULL,
+            question TEXT NOT NULL,
+            answer TEXT NOT NULL,
+            box INTEGER NOT NULL DEFAULT 0,
+            due TEXT NOT NULL,
+            PRIMARY KEY (course, slug, question)
         );
         """
     )
@@ -269,9 +303,36 @@ def save_draft(lang, slug, code):
         conn.close()
 
 
+REVIEW_DAYS = [1, 3, 7, 21, 60]  # spaced repetition: each "I knew it" waits longer before asking again
+
+
+def grade_review(course, slug, question, answer, knew):
+    with DB_LOCK:
+        conn = db()
+        row = conn.execute("SELECT box FROM reviews WHERE course=? AND slug=? AND question=?",
+                           (course, slug, question)).fetchone()
+        box = min((row["box"] + 1) if row else 1, len(REVIEW_DAYS) - 1) if knew else 0
+        due = (dt.date.today() + dt.timedelta(days=REVIEW_DAYS[box])).isoformat()
+        conn.execute(
+            "INSERT INTO reviews (course, slug, question, answer, box, due) VALUES (?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(course, slug, question) DO UPDATE SET answer=excluded.answer, box=excluded.box, due=excluded.due",
+            (course, slug, question, answer, box, due))
+        conn.commit()
+        conn.close()
+    return due
+
+
+def reviews_due(limit=30):
+    conn = db()
+    rows = conn.execute("SELECT course, slug, question, answer FROM reviews WHERE due <= ? ORDER BY due LIMIT ?",
+                        (dt.date.today().isoformat(), limit)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 def progress_map():
     conn = db()
-    rows = conn.execute("SELECT lang, slug, code, completed_at FROM progress").fetchall()
+    rows = conn.execute("SELECT lang, slug, code, attempts, completed_at FROM progress").fetchall()
     conn.close()
     return {(r["lang"], r["slug"]): dict(r) for r in rows}
 
@@ -827,8 +888,10 @@ def judge(lesson, program_output, check_message, has_check, runtime_error=""):
     if has_check:
         if not check_message:
             return {"passed": False, "message": "The checks didn't finish. Look for an error above."}
+        parts = {k: check_message[k] for k in ("done", "total") if k in check_message}
         if not check_message.get("passed"):
-            return {"passed": False, "message": check_message.get("message") or "Not quite yet."}
+            return {"passed": False, "message": check_message.get("message") or "Not quite yet.", **parts}
+        return {"passed": True, "message": "", **parts}
     return {"passed": True, "message": ""}
 
 
@@ -888,7 +951,7 @@ class Handler(BaseHTTPRequestHandler):
     # -- routes
     def do_GET(self):
         path = unquote(urlparse(self.path).path)
-        if path in ("/", "/index.html") or path.startswith("/learn/"):
+        if path in ("/", "/index.html", "/review") or path.startswith("/learn/"):
             return self.send_file(STATIC_DIR / "index.html")
         if path.startswith("/static/"):
             target = self.safe_join(STATIC_DIR, path[len("/static/"):])
@@ -959,12 +1022,37 @@ class Handler(BaseHTTPRequestHandler):
                 result.update(gained=gained, profile=profile)
             return self.send_json(result)
 
+        if path == "/api/hint":
+            return self.send_json(self.hint(course, lesson, code, data.get("n")))
+
+        if path == "/api/review":
+            question, answer = data.get("question"), data.get("answer", "")
+            if not (isinstance(question, str) and isinstance(answer, str) and 0 < len(question) <= 500 and len(answer) <= 4000):
+                return self.send_json({"error": "Bad review"}, HTTPStatus.BAD_REQUEST)
+            return self.send_json({"due": grade_review(course, slug, question, answer, bool(data.get("knew")))})
+
         if path == "/api/complete":
             # Python and Lua lessons are checked in the browser and report back here.
             gained, profile = record_attempt(course, slug, code, bool(data.get("passed")), lesson["xp"])
             return self.send_json({"gained": gained, "profile": profile})
 
         self.send_error(HTTPStatus.NOT_FOUND)
+
+    def hint(self, course, lesson, code, n):
+        """Hint number n (0-based): the lesson's own hints first, then the next solution line you're missing.
+
+        After 3 hints or 3 failed submits the full solution is offered too, so nobody stays stuck."""
+        n = n if isinstance(n, int) and n >= 0 else 0
+        hints = lesson["hints"]
+        if n < len(hints):
+            text, line = hints[n], None
+        else:
+            found = missing_line(lesson["solution"], code)
+            text = f"Line {found[0]} of the solution:" if found else "Your code already has every line of the solution. Check the order and the indentation."
+            line = found[1] if found else None
+        attempts = progress_map().get((course, lesson["slug"]), {}).get("attempts") or 0
+        give_solution = n + 1 >= 3 or attempts >= 3
+        return {"hint": text, "line": line, "solution": lesson["solution"] if give_solution else None}
 
     def host_tool(self, lang):
         return {"gdscript": self.godot, "rust": self.rustc, "nix": self.nix, "git": self.git,
@@ -989,14 +1077,14 @@ class Handler(BaseHTTPRequestHandler):
                 "runs_on": info["runs_on"],
                 "available": available,
                 "lessons": [{
-                    "slug": l["slug"], "title": l["title"], "xp": l["xp"],
+                    "slug": l["slug"], "title": l["title"], "xp": l["xp"], "minutes": l["minutes"],
                     "completed": bool(progress.get((course["id"], l["slug"]), {}).get("completed_at")),
                 } for l in course["lessons"]],
             })
         conn = db()
         profile = get_profile(conn)
         conn.close()
-        return {"courses": courses, "profile": profile}
+        return {"courses": courses, "profile": profile, "reviews_due": reviews_due()}
 
     def lesson_payload(self, course_id, slug):
         course = load_courses().get(course_id)
@@ -1013,6 +1101,7 @@ class Handler(BaseHTTPRequestHandler):
             "slug": slug,
             "title": lesson["title"],
             "xp": lesson["xp"],
+            "minutes": lesson["minutes"],
             "body": lesson["body"],
             "starter": lesson["starter"],
             "code": saved.get("code") or lesson["starter"],
