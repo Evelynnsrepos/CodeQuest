@@ -14,7 +14,7 @@ Each request = **system prompt** + **tool descriptions** + **memory files** (CLA
 
 When that gets near the window size, the harness **compacts**: it replaces old history with a summary. Details can get lost, which is why anything important belongs in a memory file.
 
-**Prompt caching:** the unchanged **start** of the prompt can be reused from the provider's cache, so it is much cheaper (with Anthropic's API, cache reads cost a tenth of the normal input price). That's why system prompts and memory files are cheap after the first request, and why changing something near the **top** of the prompt is expensive: everything after it must be re-read.
+**Prompt caching:** the unchanged **start** of the prompt can be reused from the provider's cache, so it is much cheaper (with Anthropic's API, cache reads cost a tenth of the normal input price). The catch: the **first** request that writes those tokens into the cache costs a bit **more** than normal (with Anthropic, 1.25× the input price for the 5-minute cache, 2× for the 1-hour cache), and the cache expires if it isn't reused. So caching pays off from the second request on. That's why system prompts and memory files are cheap after the first request, and why changing something near the **top** of the prompt is expensive: everything after it must be re-read.
 
 ## 🪜 With numbers
 

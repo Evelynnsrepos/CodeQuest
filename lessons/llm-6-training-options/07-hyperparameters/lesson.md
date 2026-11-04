@@ -10,7 +10,7 @@ Starting points that work for most (Q)LoRA SFT runs (they are starting points, n
 
 | Setting | Typical | Why |
 |---|---|---|
-| learning rate | `1e-4` – `2e-4` (LoRA) | LoRA matrices start at zero and are tiny, so they tolerate higher rates than full fine-tuning (`~1e-5`) |
+| learning rate | `1e-4` – `2e-4` (LoRA) | LoRA update starts at zero (B is all zeros, A is random, so B·A = 0) and is tiny, so they tolerate higher rates than full fine-tuning (`~1e-5`) |
 | scheduler | linear or cosine, ~3–10% warmup | LLMs 5, lesson 9 |
 | epochs | 1–3 | more mostly memorizes small datasets |
 | rank `r` | 8–64 | higher = more capacity, more memory; start at 16 |

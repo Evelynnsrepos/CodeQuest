@@ -22,6 +22,8 @@ The p-value is **not** "the chance the boring explanation is true". It's "how su
 
 **Model:** preferred in 60 of 100 comparisons. If it were really 50/50, P(60 or more) = **0.028**. Significant at 5% (just).
 
+**One-sided or two-sided?** "P(60 or more)" only looks in **one direction**: "is it *better*?". That's a **one-sided** test. If you ask "is it *different*, better *or* worse?", you must also count results as extreme on the other side (40 or fewer), which doubles it: p = **0.057**, *not* significant at 5%. Decide which question you're asking **before** you look at the data, and always say which one you used. Picking one-sided after seeing that two-sided "failed" is cheating.
+
 **Many tests:** test 20 prompts that are all secretly useless, each at the 5% level: P(at least one looks "significant") = 1 − 0.95²⁰ = **0.64** (lesson 02!). Try enough things and something will look like a win.
 
 ## 🔣 The signs
@@ -58,6 +60,7 @@ The p-value is **not** "the chance the boring explanation is true". It's "how su
 <div class="wrong"><b>Only P(X = 15)</b>, not "or more": 0.015. Any single exact outcome is rare (even exactly 10 heads is only 18%), so this would call everything suspicious.</div>
 <div class="wrong"><b>"p = 0.028 means a 2.8% chance the model isn't better"</b>: no. It's the chance of data this good <i>if</i> it weren't better. Those are different (Bayes, lesson 04).</div>
 <div class="wrong"><b>Test 20 things, report the one with p &lt; 0.05</b>: 64% chance of a fake win. Fix: fewer, planned tests, or a stricter α (e.g. 0.05 / 20).</div>
+<div class="wrong"><b>Switch to two-sided without saying so</b>: 60/100 gives p = 0.057, and the "win" disappears. Same data, different question. Always name the side.</div>
 <div class="right">p = 0.021 for 15/20 heads, 0.028 for 60/100 wins ✓</div>
 
 ## 🗣️ Say it out loud
@@ -71,7 +74,7 @@ A/B tests of models and prompts, "is this eval improvement real?", and spotting 
 ## 🎯 Your quest
 
 1. `binom_pmf(k, n, p)`.
-2. `p_value_at_least(k, n, p)`: P(X ≥ k).
+2. `p_value_at_least(k, n, p)`: P(X ≥ k), the **one-sided** p-value.
 3. `significant(p_value, alpha=0.05)`: `True` if below alpha.
 
 **Remember:** small p = "luck rarely does this", not "probably true".

@@ -26,9 +26,18 @@ If the whole range is above 50%, you have decent evidence the model really is pr
 **Average score** of 5 runs: 70, 72, 68, 75, 65.
 - mean 70, sample σ = 3.81 (dividing by n − 1 = 4, see below)
 - SE = 3.81 / √5 = 1.70
-- 95% CI = 70 ± 3.34 = **66.7 to 73.3**
+- With only 5 numbers, 1.96 is too optimistic. Use **t = 2.776** instead (see below).
+- 95% CI = 70 ± 2.776 · 1.70 = 70 ± 4.73 = **65.3 to 74.7**
 
 Why **n − 1** for a sample? Your sample's own mean sits a bit closer to the data than the true mean does, so dividing by n slightly underestimates σ. Dividing by n − 1 corrects that (statistics calls it "Bessel's correction").
+
+Why **2.776** and not 1.96? With few numbers, σ itself is a wobbly guess, so the range must be wider to stay honest. Statisticians worked out the right multiplier for every sample size: the **t-value**. It depends on n − 1 (called the "degrees of freedom"):
+
+| n | 2 | 3 | 5 | 10 | 30 | lots |
+|---|---|---|---|---|---|---|
+| t (95%) | 12.71 | 4.30 | 2.78 | 2.26 | 2.05 | 1.96 |
+
+See how it shrinks to 1.96 as n grows? For a **proportion** with n = 100, 1.96 is fine. For an average of a handful of runs, use t.
 
 ## 🔣 The signs
 
@@ -37,6 +46,7 @@ Why **n − 1** for a sample? Your sample's own mean sits a bit closer to the da
 | `p̂` | "p hat" | the measured proportion (hat = estimate) | `wins / n` |
 | `±` | "plus or minus" | the range from minus to plus | `(m - e, m + e)` |
 | `1.96` | "one point nine six" | how many SEs for 95% | |
+| `t` | "t" | the small-sample multiplier (2.776 for n = 5) | `T95[n - 1]` |
 | `s` | "s" | the **sample** standard deviation (divide by n − 1) | `statistics.stdev` |
 | `CI` | "confidence interval" | the range | |
 | `[a, b]` | "from a to b" | an interval (Math 1) | `(a, b)` |
@@ -53,14 +63,15 @@ Why **n − 1** for a sample? Your sample's own mean sits a bit closer to the da
 | <span class="k3">±</span> | "plus or minus" | go that far down **and** up | ± 0.096 |
 | <span class="k1">CI</span> | "confidence interval" | the range | 0.504 to 0.696 |
 
-For an average: <span class="k2">x̄</span> ± <span class="k4">1.96</span> · <span class="k5">s / √n</span>.
+For an average of few numbers: <span class="k2">x̄</span> ± <span class="k4">t</span> · <span class="k5">s / √n</span> (t = 2.776 for n = 5; t ≈ 1.96 once n is above about 30).
 
 ## 🔀 What if it were different?
 
-<div class="wrong"><b>Forget √n</b>: 0.6 ± 1.96 · 0.49 = −0.36 to 1.56. A range wider than 0..1: meaningless. For the scores: 70 ± 7.46.</div>
+<div class="wrong"><b>Forget √n</b>: 0.6 ± 1.96 · 0.49 = −0.36 to 1.56. A range wider than 0..1: meaningless. For the scores: 70 ± 10.6.</div>
 <div class="wrong"><b>Use 1 instead of 1.96</b>: 0.551 to 0.649. Looks tighter, but it only catches the truth 68% of the time. You'd be wrong about 1 time in 3.</div>
 <div class="wrong"><b>Report "60%" with no interval</b>: with 10 comparisons (6 wins) the interval is 0.30 to 0.90. Same 60%, almost no information.</div>
-<div class="right">0.504 to 0.696 for 60/100; 66.7 to 73.3 for the scores ✓</div>
+<div class="wrong"><b>Use 1.96 for the 5 scores</b>: 66.7 to 73.3. Too narrow: with only 5 numbers it catches the truth about 88% of the time, not 95%.</div>
+<div class="right">0.504 to 0.696 for 60/100; 65.3 to 74.7 for the 5 scores (t = 2.776) ✓</div>
 
 ## 🗣️ Say it out loud
 
@@ -74,7 +85,7 @@ Every serious leaderboard (LMArena shows CIs), every A/B test of a prompt or mod
 
 1. `proportion_ci(wins, n)`: `(low, high)`.
 2. `sample_std(xs)`: σ dividing by n − 1.
-3. `mean_ci(xs)`: `(low, high)` using `sample_std` and 1.96.
+3. `mean_ci(xs)`: `(low, high)` using `sample_std` and `T95[n - 1]` (the table is in the starter; if n − 1 is above 30, use 1.96).
 
 **Remember:** a number without ± is half a result.
 

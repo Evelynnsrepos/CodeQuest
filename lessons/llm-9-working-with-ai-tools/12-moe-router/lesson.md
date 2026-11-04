@@ -56,7 +56,7 @@ Load balance, E = 4. f = share of tokens each expert got, P = router's average p
 
 ## 🔀 What if it were different?
 
-<div class="wrong"><b>Softmax over all experts, then take the top 2</b>: weights 0.61 and 0.22 (they don't add to 1, output shrinks). Mixtral-style routers softmax only the kept scores.</div>
+<div class="alt"><b>Softmax over all experts, then take the top 2</b>: weights 0.61 and 0.22. They don't add to 1, and that is fine: it's a real design used by Switch Transformer, GShard and Qwen's MoE models. The router then also learns how much to trust the chosen experts at all. It just gives different numbers from Mixtral's "top 2 first, then softmax", which is what this lesson builds, so the check expects that one.</div>
 <div class="wrong"><b>No balancing loss</b>: a few experts get everything; the "30B" model behaves like a much smaller one.</div>
 <div class="wrong"><b>Only use f (not P) in the loss</b>: f comes from a hard top-k choice and has no gradient; P is what lets training push the router.</div>
 <div class="right">softmax of the top-k scores; α·E·Σ fP is 1 when balanced ✓</div>

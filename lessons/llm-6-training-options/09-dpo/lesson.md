@@ -14,7 +14,7 @@ From **preferences**. A preference dataset holds a prompt with a **chosen** and 
  "rejected": "LoRA is a thing for AI that makes it better at stuff."}
 ```
 
-**RLHF** (as used for the original ChatGPT): train a separate **reward model** to score answers like humans would, then optimize the LLM with reinforcement learning (**PPO**) to get high reward, with a **KL penalty** (LLMs 4, lesson 10) keeping it close to the original so it doesn't drift into gibberish that fools the reward model. Powerful, but three models in memory and notoriously finicky.
+**RLHF** (as used for the original ChatGPT): train a separate **reward model** to score answers like humans would, then optimize the LLM with reinforcement learning (**PPO**) to get high reward, with a **KL penalty** (LLMs 4, lesson 10) keeping it close to the original so it doesn't drift into gibberish that fools the reward model. Powerful, but with PPO that is **four** models in memory (the policy being trained, a frozen reference copy for the KL penalty, the reward model, and a value model; see LLMs 8 lesson 12) and notoriously finicky.
 
 **DPO** (Direct Preference Optimization, Rafailov et al., 2023) showed the same objective can be optimized **directly** with a simple classification-style loss, no reward model, no RL. It needs the model being trained (`π`) and a frozen copy of where it started (`π_ref`, usually the SFT model). Using each answer's total log-probability (LLMs 1, lesson 6):
 

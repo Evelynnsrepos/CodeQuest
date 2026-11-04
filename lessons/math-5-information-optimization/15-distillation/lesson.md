@@ -51,7 +51,7 @@ In practice it's often mixed with the ordinary hard-label loss: α · distill + 
 
 <div class="wrong"><b>Forget T²</b>: at T = 4 the gradients are about 16× smaller; the distillation part barely trains, and changing T secretly changes the effective learning rate.</div>
 <div class="wrong"><b>Soften only the teacher</b> (student at T = 1): the student is told to match a flat distribution with sharp logits; it learns to be underconfident.</div>
-<div class="wrong"><b>KL(student ‖ teacher)</b> (order swapped): a different objective that lets the student ignore the teacher's second choices (lesson 04: KL isn't symmetric).</div>
+<div class="alt"><b>KL(student ‖ teacher)</b> (order swapped, "reverse KL"): a different objective, because KL isn't symmetric (lesson 04). The student then focuses on the teacher's top choices and may drop the second choices. Some LLM distillation work (for example MiniLLM) prefers exactly this, because a small student can't copy everything anyway. Classic distillation (Hinton) uses KL(teacher ‖ student), which is what this lesson builds.</div>
 <div class="right">T² · KL(soft teacher ‖ soft student), both at the same T ✓</div>
 
 ## 🗣️ Say it out loud

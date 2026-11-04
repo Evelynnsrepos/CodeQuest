@@ -56,4 +56,4 @@ Write `make_lora_config(r, include_mlp=True)` and `make_sft_config(epochs, lr, p
 ## Review
 
 <details><summary>How do you compute the effective batch size?</summary>Per-device batch × gradient accumulation steps × number of GPUs.</details>
-<details><summary>What's a typical LoRA learning rate, and why is it higher than for full fine-tuning?</summary>About 1e-4 to 2e-4; the LoRA matrices start at zero and are small, so they tolerate bigger steps.</details>
+<details><summary>What's a typical LoRA learning rate, and why is it higher than for full fine-tuning?</summary>About 1e-4 to 2e-4; the LoRA update B·A starts at zero (only B is zeros; A is random) and stays small, so they tolerate bigger steps.</details>

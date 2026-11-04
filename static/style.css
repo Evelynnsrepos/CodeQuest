@@ -238,6 +238,8 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
 .lesson-body .k6 { color: #a33a26; }
 .lesson-body .wrong { background: var(--bad-bg); border-left: 4px solid var(--bad); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
 .lesson-body .right { background: var(--good-bg); border-left: 4px solid var(--good); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
+.lesson-body .alt { background: var(--surface-2); border-left: 4px solid var(--accent); padding: 8px 12px; border-radius: 8px; margin: 10px 0; }
+.lesson-body .alt::before { content: "🔁 Also valid: "; font-weight: 600; }
 @media (prefers-color-scheme: dark) {
   .lesson-body .k1 { color: #ff7ab8; }
   .lesson-body .k2 { color: #6fb3ff; }

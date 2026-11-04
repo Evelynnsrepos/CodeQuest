@@ -29,7 +29,7 @@ Each token wins exactly as often as its probability, because its slice of the 0�
 
 The **law of large numbers**: averages over many samples approach the expected value. It's why you need many evaluation prompts before trusting a result (lesson 11), and why a model's output varies run to run but its *behaviour* is stable.
 
-Two more ideas you'll meet constantly: **conditional probability** `P(A | B)`, "probability of A given B" (a language model *is* `P(next token | previous tokens)`), and **independence**, `P(A and B) = P(A)·P(B)`, which is how the chain rule of probability in LLMs 1 multiplied token probabilities.
+Two more ideas you'll meet constantly: **conditional probability** `P(A | B)`, "probability of A given B" (a language model *is* `P(next token | previous tokens)`), and the **chain rule**, `P(A and B) = P(A) · P(B | A)`. That's how LLMs 1 multiplied token probabilities: P("the cat sat") = P(the) · P(cat | the) · P(sat | the cat). Each factor is *conditional* on the tokens before it, which is exactly what the model predicts. Only when two events are **independent** (B doesn't care about A, like two coin flips) does it shrink to `P(A)·P(B)`. Tokens in a sentence are not independent.
 
 ## Your quest
 

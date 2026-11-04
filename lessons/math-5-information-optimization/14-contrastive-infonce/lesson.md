@@ -54,7 +54,7 @@ Same embeddings, very different signal: τ controls how hard the model must sepa
 ## 🔀 What if it were different?
 
 <div class="wrong"><b>Loss = −sim(a, p) only</b> (no negatives): the easiest solution is mapping every input to the same vector: similarity 1 for everything. "Collapse": useless embeddings.</div>
-<div class="wrong"><b>Leave the positive out of the bottom sum</b>: the fraction can exceed 1, and the loss can go negative without bound; training chases infinity.</div>
+<div class="alt"><b>Leave the positive out of the bottom sum</b>: the fraction can now exceed 1, so the loss can go below 0. It can't fall forever, though: cosine similarity is capped at 1 and −1, so the loss has a floor. This variant ("decoupled contrastive learning") is used in research and can train faster with small batches. It's just a different number from the standard InfoNCE that CLIP uses, which is what the check expects.</div>
 <div class="wrong"><b>τ = 1</b> with cosines: loss stays around 0.67 even when the pair is clearly best; the signal is too weak to sharpen embeddings.</div>
 <div class="right">−log softmax(sims / τ)[positive]: 0.666 at τ = 1, 0.00125 at τ = 0.1 ✓</div>
 

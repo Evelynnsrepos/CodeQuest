@@ -14,7 +14,7 @@ Combine this course into one honest verdict:
 
 1. **Win rate** p̂ = wins / n (lesson 01).
 2. **95% CI** = p̂ ± 1.96 · √(p̂(1 − p̂)/n) (lesson 11).
-3. **p-value** = P(X ≥ wins) if the true rate were 0.5 (lesson 12).
+3. **p-value** = P(X ≥ wins) if the true rate were 0.5 (lesson 12). This is **one-sided**: we only ask "is the new model *better*?". (Two-sided, "better or worse?", would give 0.057 for 60/100 and not pass.)
 4. **Verdict:** "better" only if p < 0.05 **and** the whole CI is above 0.5.
 
 ## 🔬 The formulas, one more time
