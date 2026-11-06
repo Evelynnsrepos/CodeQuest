@@ -7,7 +7,8 @@ def model_gb(params_b, bits):
 
 def best_fit(params_b, vram_gb, overhead=1.5):
     for name, bits in FORMATS:
-        if model_gb(params_b, bits) + overhead <= vram_gb:
+        needed = model_gb(params_b, bits) + overhead
+        if needed <= vram_gb:
             return name
     return None
 

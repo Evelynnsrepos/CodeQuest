@@ -1,16 +1,24 @@
 def next_word(counts, word):
     if word not in counts:
         return None
-    return max(counts[word], key=counts[word].get)
+    followers = counts[word]
+    best = None
+    best_count = 0
+    for w in followers:
+        if followers[w] > best_count:
+            best = w
+            best_count = followers[w]
+    return best
 
 
 def generate(counts, start, n):
     words = [start]
-    for _ in range(n):
-        w = next_word(counts, words[-1])
-        if w is None:
+    for step in range(n):
+        last = words[-1]
+        nxt = next_word(counts, last)
+        if nxt is None:
             break
-        words.append(w)
+        words.append(nxt)
     return " ".join(words)
 
 
