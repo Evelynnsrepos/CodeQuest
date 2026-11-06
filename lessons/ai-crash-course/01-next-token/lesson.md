@@ -1,5 +1,6 @@
 ---
 title: An LLM guesses the next word
+minutes: 25
 xp: 25
 hint: next_word, first line: if word not in counts: and under it (8 spaces) return None
 hint: Then copy the "most liked fruit" example: followers = counts[word], best = None, best_count = 0, and a for loop.

@@ -1,5 +1,6 @@
 ---
 title: Tokens and what they cost
+minutes: 20
 xp: 20
 hint: estimate_tokens has one line: return math.ceil(len(text) / 4)
 hint: cost, step 1: input_dollars = input_tokens * in_price / 1_000_000

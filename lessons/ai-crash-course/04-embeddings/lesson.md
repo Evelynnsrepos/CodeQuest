@@ -1,5 +1,6 @@
 ---
 title: Embeddings: meaning as numbers
+minutes: 30
 xp: 30
 hint: dot: total = 0, then for i in range(len(a)): and inside it total = total + a[i] * b[i], then return total
 hint: length: like dot, but loop over one list: total = total + x * x, and at the end return math.sqrt(total)

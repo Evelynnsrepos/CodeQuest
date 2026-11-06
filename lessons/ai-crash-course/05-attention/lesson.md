@@ -1,5 +1,6 @@
 ---
 title: Attention in one picture
+minutes: 30
 xp: 30
 hint: weights is lesson 03's softmax without the temperature: biggest = max(scores), exps with math.exp(s - biggest), then shares of the total.
 hint: attend starts with w = weights(scores) and size = len(values[0]), then result = []

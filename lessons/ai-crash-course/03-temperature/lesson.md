@@ -1,5 +1,6 @@
 ---
 title: Probabilities and temperature
+minutes: 30
 xp: 30
 hint: First loop: scaled = [] then for s in scores: and inside it scaled.append(s / t)
 hint: biggest = max(scaled), then a second loop: exps.append(math.exp(s - biggest))

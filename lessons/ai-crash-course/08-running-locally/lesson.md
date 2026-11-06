@@ -1,5 +1,6 @@
 ---
 title: Running models on your own PC
+minutes: 25
 xp: 25
 hint: model_gb has one line: return params_b * bits / 8
 hint: best_fit: for name, bits in FORMATS: and inside it needed = model_gb(params_b, bits) + overhead

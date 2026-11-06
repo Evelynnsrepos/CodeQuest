@@ -1,5 +1,6 @@
 ---
 title: Prompt, RAG or fine-tune?
+minutes: 20
 xp: 25
 hint: choose, first two lines: if prompt_works: and under it return "prompt"
 hint: Then the same for needs_facts (return "rag") and needs_style (return "fine-tune"), and a last return "prompt" at 4 spaces.

@@ -1,5 +1,6 @@
 ---
 title: Python from zero: how to read and write code
+minutes: 20
 xp: 20
 hint: Start the line with def, then the name double, then (x) and a colon: def double(x):
 hint: The line under def starts with 4 spaces. It gives the answer back with return: return x * 2

@@ -1,5 +1,6 @@
 ---
 title: Tools and agents
+minutes: 30
 xp: 30
 hint: Start with history = [] and then for step in range(max_steps): and inside it action = model(history)
 hint: if "answer" in action: return action["answer"] (12 spaces for the return)

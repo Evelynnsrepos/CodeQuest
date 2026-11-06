@@ -1,5 +1,6 @@
 ---
 title: Training: nudge, check, repeat
+minutes: 30
 xp: 30
 hint: gradient: total = 0, then for i in range(len(xs)): error = w * xs[i] - ys[i] and total = total + 2 * error * xs[i]
 hint: gradient ends with return total / len(xs) (back at 4 spaces, after the loop)
