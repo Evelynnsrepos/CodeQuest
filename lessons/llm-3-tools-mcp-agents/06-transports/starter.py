@@ -2,7 +2,21 @@ import json
 
 
 def read_stdio(raw):
-    responses, notifications, bad_lines = {}, [], 0
+    responses = {}
+    notifications = []
+    bad_lines = 0
+    # for line in raw.splitlines():
+    #     if line.strip() == "":
+    #         continue
+    #     try:
+    #         message = json.loads(line)
+    #     except ValueError:
+    #         bad_lines = bad_lines + 1
+    #         continue
+    #     if "id" in message:
+    #         responses[message["id"]] = message
+    #     else:
+    #         notifications.append(message["method"])
     return responses, notifications, bad_lines
 
 

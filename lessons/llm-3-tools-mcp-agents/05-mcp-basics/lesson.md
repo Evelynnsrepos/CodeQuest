@@ -1,8 +1,15 @@
 ---
 title: MCP, the plug standard for tools
+minutes: 35
 xp: 35
+hint: request: message = {"jsonrpc": "2.0", "id": id, "method": method}, then if params is not None: message["params"] = params, then return message
+hint: notification: return {"jsonrpc": "2.0", "method": method}
+hint: tool_call_request: return request(id, "tools/call", {"name": name, "arguments": arguments})
+hint: text_of: texts = [], for item in response["result"]["content"]: if item["type"] == "text": texts.append(item["text"]), then return "\n".join(texts)
 ---
 # Model Context Protocol
+
+⏱️ About 35 minutes
 
 > **Warm-up:** in the last lessons, the tools were Python functions inside the same program. What if you want the *same* file-reading tool in LM Studio, in Claude and in your editor, without rewriting it three times?
 
@@ -36,12 +43,67 @@ The host turns the `tools/list` result into the `tools` array of the chat reques
 
 The protocol version string changes as the spec evolves; modelcontextprotocol.io lists the current one.
 
-## Your quest
+## 🐍 Python you need
 
-1. `request(id, method, params)`: return a JSON-RPC request dictionary with `"jsonrpc": "2.0"`, `"id"`, `"method"` and, only if `params` isn't `None`, `"params"`.
-2. `notification(method)`: a dictionary with `"jsonrpc"` and `"method"` only.
-3. `tool_call_request(id, name, arguments)`: a `tools/call` request built with `request`.
-4. `text_of(response)`: join the `"text"` of every content item of type `"text"` in a `tools/call` response, separated by newlines.
+| You write | Say it | What it does |
+|---|---|---|
+| `def request(id, method, params=None):` | "params is None unless given" | an input with a **default**: `request(2, "tools/list")` works without params |
+| `{"jsonrpc": "2.0", "id": id}` | | the key `"id"` (quotes) gets the value from the box `id` (no quotes) |
+| `if params is not None:` | | only when params were given |
+| `message["params"] = params` | | adds one more key |
+| `request(id, "tools/call", {...})` | | your third function calls your first one |
+| `response["result"]["content"]` | | a list of content items |
+| `"\n".join(texts)` | "newline join" | glues the texts with a line break between them |
+
+### 👀 Worked example: building a letter
+
+```python
+def letter(to, subject, ps=None):
+    message = {"to": to, "subject": subject}
+    if ps is not None:
+        message["ps"] = ps
+    return message
+
+print(letter("Ana", "Hi"))                # {'to': 'Ana', 'subject': 'Hi'}
+print(letter("Ana", "Hi", "see you"))     # {'to': 'Ana', 'subject': 'Hi', 'ps': 'see you'}
+```
+
+Without a `ps`, the dictionary simply has no `"ps"` key. That's exactly how JSON-RPC requests without `params` look.
+
+And joining only some items:
+
+```python
+lines = []
+for item in [{"kind": "word", "v": "Hi"}, {"kind": "pic", "v": "🐱"}, {"kind": "word", "v": "there"}]:
+    if item["kind"] == "word":
+        lines.append(item["v"])
+print("\n".join(lines))   # Hi, then there on the next line
+```
+
+## 🎯 Your quest
+
+**Part 1:** `request(id, method, params=None)`. Replace `return {}` with:
+
+1. `message = {"jsonrpc": "2.0", "id": id, "method": method}`
+2. `if params is not None:`
+3. `    message["params"] = params`
+4. `return message`
+
+**Part 2:** `notification(method)`. Replace `return {}` with:
+
+- `return {"jsonrpc": "2.0", "method": method}`
+
+**Part 3:** `tool_call_request(id, name, arguments)`. Replace `return {}` with:
+
+- `return request(id, "tools/call", {"name": name, "arguments": arguments})`
+
+**Part 4:** `text_of(response)`. Replace `return ""` with:
+
+1. `texts = []`
+2. `for item in response["result"]["content"]:`
+3. `    if item["type"] == "text":`
+4. `        texts.append(item["text"])`
+5. `return "\n".join(texts)`
 
 ## Review
 

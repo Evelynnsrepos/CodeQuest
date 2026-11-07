@@ -24,6 +24,8 @@ def run_tool_calls(message, tools):
             try:
                 args = json.loads(call["function"]["arguments"])
             except ValueError:
+                args = None
+            if args is None:
                 content = "error: invalid arguments"
             else:
                 content = str(tools[name](**args))
@@ -32,7 +34,7 @@ def run_tool_calls(message, tools):
 
 
 def scripted_model(script):
-    """Stands in for LM Studio: returns the next recorded reply each time it's called."""
+    """Given: stands in for LM Studio. Each call returns the next recorded reply."""
     replies = iter(script)
     def model(messages):
         print("  model sees", len(messages), "messages")
@@ -41,11 +43,20 @@ def scripted_model(script):
 
 
 def tool_call(i, name, args):
+    """Given: builds one recorded tool-call reply."""
     return {"role": "assistant", "content": None,
             "tool_calls": [{"id": i, "type": "function", "function": {"name": name, "arguments": json.dumps(args)}}]}
 
 
 def run_agent(messages, model, tools, max_steps):
+    # for _ in range(max_steps):
+    #     reply = model(messages)
+    #     messages.append(reply)
+    #     if reply.get("tool_calls"):
+    #         messages.extend(run_tool_calls(reply, tools))
+    #     else:
+    #         return reply["content"]
+    # return "stopped: too many steps"
     return ""
 
 

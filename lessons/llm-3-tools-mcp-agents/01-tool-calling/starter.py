@@ -5,7 +5,7 @@ ROLL_DICE = {
     "function": {
         "name": "",
         "description": "",
-        "parameters": {},
+        "parameters": {},  # replace {} with type, properties and required (see the quest)
     },
 }
 

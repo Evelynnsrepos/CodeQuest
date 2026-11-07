@@ -1,8 +1,16 @@
 ---
 title: The harness around the model
+minutes: 40
 xp: 40
+hint: decide has one line: return policy.get(tool_name, "ask")
+hint: trim_history: system = messages[0] and rest = list(messages[1:])
+hint: while total_tokens([system] + rest, tokens) > budget and len(rest) > 1: and inside it rest.pop(0)
+hint: Still inside that while, a second while: while len(rest) > 1 and rest[0]["role"] == "tool": rest.pop(0)
+hint: At the end: return [system] + rest
 ---
 # What an AI harness is
+
+⏱️ About 40 minutes
 
 > **Warm-up:** the model only ever outputs text. So who actually reads your files, runs the commands, and decides when the job is finished?
 
@@ -22,12 +30,54 @@ Examples: **Claude Code**, Codex CLI and Cursor's agent are coding harnesses; **
 
 The word also has an older meaning in machine learning: an **evaluation harness** (like EleutherAI's `lm-evaluation-harness`) is a program that feeds a model benchmark questions and scores the answers. Same idea: code around the model that drives it.
 
-## Your quest
+## 🐍 Python you need
 
-Build two harness parts.
+`total_tokens(msgs, tokens)` is given: it adds up `tokens(m)` for every message in the list.
 
-1. `decide(tool_name, policy)`: `policy` maps tool names to `"allow"`, `"ask"` or `"deny"`. Return the tool's entry, and `"ask"` for any tool not in the policy (unknown tools must never run silently).
-2. `trim_history(messages, budget, tokens)`: `tokens(message)` gives a message's size. Keep `messages[0]` (the system prompt) and the newest message always. While the total is over `budget`, delete the oldest message after the system prompt, and then also delete any `"tool"` messages that are now right after the system prompt (a tool result without its call confuses the model). Never delete the newest message. Return the new list (don't change the input).
+| You write | Say it | What it does |
+|---|---|---|
+| `policy.get(name, "ask")` | "policy get name, else ask" | the entry for that tool, or `"ask"` if the tool isn't in the policy |
+| `list(messages[1:])` | | a **copy** of everything after the first message, so the input isn't changed |
+| `[system] + rest` | | the system prompt back in front |
+| `while a and b:` | | repeats while **both** are true |
+| `len(rest) > 1` | | more than one message left: the newest must always stay |
+| `rest.pop(0)` | | removes the oldest message |
+| `rest[0]["role"] == "tool"` | | is the oldest one left a tool result? |
+| a `while` inside a `while` | | after each drop, clean up any tool results that lost their call |
+
+### 👀 Worked example: clearing a queue of orders
+
+Remove the oldest orders until 3 or fewer are left. A "side" order can't stay without its main order, so remove sides that end up first:
+
+```python
+orders = ["main", "side", "side", "main", "main"]
+while len(orders) > 3 and len(orders) > 1:
+    orders.pop(0)
+    while len(orders) > 1 and orders[0] == "side":
+        orders.pop(0)
+print(orders)   # ['main', 'main']
+```
+
+1. 5 orders > 3 → pop "main". Now the first one is "side" → inner loop pops it, and the next "side" too. Left: `["main", "main"]`.
+2. 2 > 3? No. Stop.
+
+Without the inner loop you'd stop at `["side", "main", "main"]`: a side with no main.
+
+## 🎯 Your quest
+
+**Part 1:** `decide(tool_name, policy)`. Replace `return "allow"` with:
+
+- `return policy.get(tool_name, "ask")`
+
+**Part 2:** `trim_history(messages, budget, tokens)`. Replace `return messages` with:
+
+1. `system = messages[0]`
+2. `rest = list(messages[1:])`
+3. `while total_tokens([system] + rest, tokens) > budget and len(rest) > 1:`
+4. `    rest.pop(0)`
+5. `    while len(rest) > 1 and rest[0]["role"] == "tool":`
+6. `        rest.pop(0)`
+7. `return [system] + rest`
 
 ## Review
 

@@ -1,8 +1,14 @@
 ---
 title: stdio vs HTTP transports
+minutes: 35
 xp: 35
+hint: Loop: for line in raw.splitlines(): and first skip empty ones: if line.strip() == "": continue
+hint: try: message = json.loads(line) except ValueError: bad_lines = bad_lines + 1 and continue
+hint: if "id" in message: responses[message["id"]] = message, else: notifications.append(message["method"])
 ---
 # How the messages travel
+
+⏱️ About 35 minutes
 
 > **Warm-up:** the JSON-RPC messages from the last lesson have to get from LM Studio to the server and back somehow. What are two ways two programs can talk to each other?
 
@@ -29,15 +35,66 @@ MCP defines two standard **transports**:
 
 Because many messages travel over one channel, the client matches each response to its request by `id`. Messages without an `id` are notifications.
 
-## Your quest
+## 🐍 Python you need
 
-Write `read_stdio(raw)` for the text a stdio server wrote to its stdout. Go through the lines and return a tuple `(responses, notifications, bad_lines)`:
+| You write | Say it | What it does |
+|---|---|---|
+| `raw.splitlines()` | | a list with one text per line |
+| `line.strip() == ""` | | the line is empty (or only spaces) |
+| `continue` | | skip to the next line |
+| `try:` / `except ValueError:` | | `json.loads` raises a `ValueError` for text that isn't JSON |
+| `bad_lines = bad_lines + 1` | | count one more bad line |
+| `"id" in message` | | does the message have an `"id"` key? |
+| `responses[message["id"]] = message` | | store the message under its id |
+| `notifications.append(message["method"])` | | collect the method name |
 
-- `responses`: a dictionary from `id` to the message, for every message that has an `"id"`
-- `notifications`: a list of the `"method"` of every message without an `"id"`
-- `bad_lines`: how many non-empty lines weren't valid JSON (a buggy server printing to stdout)
+### 👀 Worked example: sorting the post
 
-Skip empty lines.
+```python
+import json
+
+post = '{"to": "Ana"}\nhello?\n\n{"note": "flyer"}'
+letters = {}
+flyers = []
+junk = 0
+for line in post.splitlines():
+    if line.strip() == "":
+        continue
+    try:
+        item = json.loads(line)
+    except ValueError:
+        junk = junk + 1
+        continue
+    if "to" in item:
+        letters[item["to"]] = item
+    else:
+        flyers.append(item["note"])
+print(letters, flyers, junk)   # {'to': ...} ['flyer'] 1
+```
+
+| line | what happens |
+|---|---|
+| `{"to": "Ana"}` | valid JSON with `"to"` → a letter for Ana |
+| `hello?` | not JSON → junk = 1 |
+| (empty) | skipped |
+| `{"note": "flyer"}` | no `"to"` → a flyer |
+
+## 🎯 Your quest
+
+Write `read_stdio(raw)`. Between the first line and `return`, add:
+
+1. `for line in raw.splitlines():`
+2. `    if line.strip() == "":`
+3. `        continue`
+4. `    try:`
+5. `        message = json.loads(line)`
+6. `    except ValueError:`
+7. `        bad_lines = bad_lines + 1`
+8. `        continue`
+9. `    if "id" in message:`
+10. `        responses[message["id"]] = message`
+11. `    else:`
+12. `        notifications.append(message["method"])`
 
 ## Review
 
