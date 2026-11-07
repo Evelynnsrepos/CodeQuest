@@ -1,16 +1,28 @@
 def split(data, val_fraction):
+    # n_val = int(len(data) * val_fraction)
+    # cut = len(data) - n_val
+    # return data[:cut], data[cut:]
     return data, []
 
 
 def best_epoch(val_losses):
+    # return val_losses.index(min(val_losses))
     return 0
 
 
 def overfitting_starts(train_losses, val_losses):
+    # for i in range(1, len(train_losses)):
+    #     train_down = train_losses[i] < train_losses[i - 1]
+    #     val_up = val_losses[i] > val_losses[i - 1]
+    #     if train_down and val_up:
+    #         return i
+    # return None
     return None
 
 
-examples = [f"example {i}" for i in range(50)]
+examples = []
+for i in range(50):
+    examples.append("example " + str(i))
 train, val = split(examples, 0.2)
 print(len(train), "training,", len(val), "validation")
 

@@ -1,8 +1,15 @@
 ---
 title: Overfitting and the validation set
+minutes: 40
 xp: 40
+hint: split: n_val = int(len(data) * val_fraction), cut = len(data) - n_val, return data[:cut], data[cut:]
+hint: best_epoch: return val_losses.index(min(val_losses))
+hint: overfitting_starts: for i in range(1, len(train_losses)): then train_down = train_losses[i] < train_losses[i - 1] and val_up = val_losses[i] > val_losses[i - 1]
+hint: Then if train_down and val_up: return i. After the loop: return None
 ---
 # Learning vs memorizing
+
+⏱️ About 40 minutes
 
 > **Warm-up:** a student memorizes last year's exam answers word for word. They ace the practice exam. What happens on the real one?
 
@@ -33,13 +40,54 @@ Remedies: **early stopping** (keep the checkpoint with the lowest validation los
 
 One rule matters more than any formula: **never let validation or test examples leak into training.** Duplicates across the split make the validation score lie.
 
-## Your quest
+## 🐍 Python you need
 
-1. `split(data, val_fraction)`: return `(train, val)`, where `val` is the **last** `int(len(data) * val_fraction)` items and `train` is the rest. (Real code shuffles first; the data here is already shuffled.)
-2. `best_epoch(val_losses)`: the index of the lowest validation loss (early stopping picks it).
-3. `overfitting_starts(train_losses, val_losses)`: the first epoch `i ≥ 1` where training loss went **down** but validation loss went **up** compared with epoch `i − 1`. Return `None` if that never happens.
+| You write | Say it | What it does |
+|---|---|---|
+| `int(50 * 0.2)` | "int of ten point zero" | cuts off the decimals: `10` |
+| `data[:cut]` | "data up to cut" | everything before position `cut` |
+| `data[cut:]` | "data from cut on" | everything from `cut` to the end |
+| `min(val_losses)` | | the smallest number in the list |
+| `val_losses.index(x)` | | the **position** of `x` in the list (the first one, if it appears twice) |
+| `range(1, len(train_losses))` | | starts at 1, because epoch 0 has nothing before it to compare with |
+| `train_losses[i - 1]` | | the epoch before |
+| `a < b` stored in a name | | `train_down` becomes `True` or `False` |
+| `if train_down and val_up:` | | both must be true |
+| `return None` | | "no answer": it never happened |
 
-The program uses a recorded training run's loss curves.
+### 👀 Worked example: reading the recorded run
+
+```
+epoch:   0     1     2     3     4     5     6
+train: 2.10  1.62  1.31  1.12  0.95  0.80  0.66
+val:   2.15  1.70  1.45  1.33  1.30  1.32  1.38
+```
+
+1. Epochs 1 to 4: both go down. Not overfitting.
+2. Epoch 5: train 0.95 → 0.80 (down ✅), val 1.30 → 1.32 (up ✅). **Overfitting starts at 5.**
+3. The lowest val loss is 1.30, at position **4**: that's the checkpoint early stopping keeps.
+
+The split with 50 examples and 0.2: n_val = int(10.0) = 10, cut = 50 − 10 = 40 → 40 training, 10 validation.
+
+## 🎯 Your quest
+
+`split(data, val_fraction)`: replace `return data, []` with:
+
+1. `    n_val = int(len(data) * val_fraction)`
+2. `    cut = len(data) - n_val`
+3. `    return data[:cut], data[cut:]`
+
+`best_epoch(val_losses)`: replace `return 0` with `    return val_losses.index(min(val_losses))`
+
+`overfitting_starts(train_losses, val_losses)`: above `return None`, add:
+
+1. `    for i in range(1, len(train_losses)):`
+2. `        train_down = train_losses[i] < train_losses[i - 1]`
+3. `        val_up = val_losses[i] > val_losses[i - 1]`
+4. `        if train_down and val_up:`
+5. `            return i`
+
+It prints `40 training, 10 validation`, then epochs 4 and 5.
 
 ## Review
 

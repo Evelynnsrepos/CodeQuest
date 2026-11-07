@@ -4,10 +4,20 @@ import math
 def adamw_step(params, grads, m, v, t, lr, wd):
     beta1, beta2, eps = 0.9, 0.999, 1e-8
     for i in range(len(params)):
+        # g = grads[i]
+        # m[i] = beta1 * m[i] + (1 - beta1) * g
+        # v[i] = beta2 * v[i] + (1 - beta2) * g * g
+        # m_hat = m[i] / (1 - beta1 ** t)
+        # v_hat = v[i] / (1 - beta2 ** t)
+        # params[i] = params[i] - lr * wd * params[i] - lr * m_hat / (math.sqrt(v_hat) + eps)
         pass
 
 
 def lr_at(step, max_lr, warmup, total):
+    # if step < warmup:
+    #     return max_lr * (step + 1) / warmup
+    # progress = (step - warmup) / (total - warmup)
+    # return max_lr * 0.5 * (1 + math.cos(math.pi * progress))
     return max_lr
 
 

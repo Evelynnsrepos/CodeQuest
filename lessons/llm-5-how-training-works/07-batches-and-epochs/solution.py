@@ -2,25 +2,35 @@ import math
 import random
 
 random.seed(0)
-DATA = [(x / 10, 3 * x / 10 + 1 + random.gauss(0, 0.1)) for x in range(40)]
+DATA = []
+for x in range(40):
+    DATA.append((x / 10, 3 * x / 10 + 1 + random.gauss(0, 0.1)))
 random.shuffle(DATA)
 
 
 def loss(w, b, data):
-    return sum((w * x + b - y) ** 2 for x, y in data) / len(data)
+    total = 0
+    for x, y in data:
+        error = w * x + b - y
+        total = total + error ** 2
+    return total / len(data)
 
 
 def gradients(w, b, data):
-    dw = db = 0.0
+    dw = 0.0
+    db = 0.0
     for x, y in data:
         e = w * x + b - y
-        dw += 2 * e * x
-        db += 2 * e
+        dw = dw + 2 * e * x
+        db = db + 2 * e
     return dw / len(data), db / len(data)
 
 
 def make_batches(data, batch_size):
-    return [data[i:i + batch_size] for i in range(0, len(data), batch_size)]
+    batches = []
+    for i in range(0, len(data), batch_size):
+        batches.append(data[i:i + batch_size])
+    return batches
 
 
 def steps_per_epoch(n_examples, batch_size):
@@ -32,8 +42,8 @@ def train(data, lr, epochs, batch_size):
     for epoch in range(epochs):
         for batch in make_batches(data, batch_size):
             dw, db = gradients(w, b, batch)
-            w -= lr * dw
-            b -= lr * db
+            w = w - lr * dw
+            b = b - lr * db
     return w, b
 
 

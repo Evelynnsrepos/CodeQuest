@@ -1,8 +1,15 @@
 ---
 title: Learning rate, batches and epochs
+minutes: 45
 xp: 40
+hint: make_batches: batches = [], for i in range(0, len(data), batch_size): batches.append(data[i:i + batch_size]), return batches
+hint: steps_per_epoch: return math.ceil(n_examples / batch_size)
+hint: train: for epoch in range(epochs): and inside it for batch in make_batches(data, batch_size):
+hint: Inside both loops: dw, db = gradients(w, b, batch), w = w - lr * dw, b = b - lr * db
 ---
 # The knobs of a training run
+
+⏱️ About 45 minutes
 
 > **Warm-up:** an LLM's training set has trillions of tokens. Can you compute the exact gradient over *all* of it before every single step?
 
@@ -21,15 +28,60 @@ The noise of small batches isn't all bad: it helps escape flat regions and often
 
 LLM pretraining is usually measured in **tokens** rather than epochs, often less than one epoch over the data. Fine-tuning typically runs 1–3 epochs over a small dataset; more invites **overfitting** (next lesson).
 
-## Python you need
+## 🔬 Take the formula apart
 
-`data[i:i + size]` for `i` in `range(0, len(data), size)` walks the data in chunks. `math.ceil(x)` rounds up.
+<div class="formula">steps per epoch = <span class="k1">⌈</span> <span class="k2">examples</span> ÷ <span class="k3">batch size</span> <span class="k1">⌉</span></div>
 
-## Your quest
+- <span class="k1">⌈ ⌉</span> are "ceiling" brackets: **round up** to the next whole number. ⌈2.1⌉ = 3, ⌈2.0⌉ = 2.
+- Why up? 40 examples in batches of 16: 40 ÷ 16 = 2.5. Two full batches (32 examples) plus one smaller batch with the last 8. That's **3** steps, and 2.5 rounded up is 3.
 
-1. `make_batches(data, batch_size)`: split the list into consecutive batches; the last may be smaller.
-2. `steps_per_epoch(n_examples, batch_size)`.
-3. `train(data, lr, epochs, batch_size)`: for each epoch, for each batch, compute the batch's gradients (the `gradients` function from lesson 1 is given) and update `w` and `b`. Return `(w, b)`.
+Python: `math.ceil(40 / 16)` → 3.
+
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `range(0, 40, 16)` | "range from 0 to 40 in steps of 16" | 0, 16, 32 |
+| `data[i:i + batch_size]` | "data from i up to i plus batch size" | the slice for one batch. Past the end it just stops: `data[32:48]` on 40 items gives the last 8. |
+| `math.ceil(x)` | "ceiling of x" | rounds up |
+| a loop inside a loop | | for **every** epoch, go through **every** batch |
+| `gradients(w, b, batch)` | | the given function from lesson 1, on just this batch |
+
+### 👀 Worked example: 7 cards in packs of 3
+
+```python
+cards = ["A", "B", "C", "D", "E", "F", "G"]
+packs = []
+for i in range(0, len(cards), 3):
+    packs.append(cards[i:i + 3])
+print(packs)                  # [['A', 'B', 'C'], ['D', 'E', 'F'], ['G']]
+print(math.ceil(7 / 3))       # 3
+```
+
+1. `i` = 0: `cards[0:3]` → A, B, C.
+2. `i` = 3: `cards[3:6]` → D, E, F.
+3. `i` = 6: `cards[6:9]` → only G is left.
+
+## 🎯 Your quest
+
+`make_batches(data, batch_size)`: replace `return []` with:
+
+1. `    batches = []`
+2. `    for i in range(0, len(data), batch_size):`
+3. `        batches.append(data[i:i + batch_size])`
+4. `    return batches`
+
+`steps_per_epoch(n_examples, batch_size)`: replace `return 0` with `    return math.ceil(n_examples / batch_size)`
+
+`train(data, lr, epochs, batch_size)`: between `w, b = 0.0, 0.0` and `return w, b`, add:
+
+1. `    for epoch in range(epochs):`
+2. `        for batch in make_batches(data, batch_size):`
+3. `            dw, db = gradients(w, b, batch)`
+4. `            w = w - lr * dw`
+5. `            b = b - lr * db`
+
+The output shows the three learning-rate stories: lr 0.001 crawls (still far off), lr 0.05 lands near w = 3, b = 1, and lr 0.3 explodes into huge numbers.
 
 ## Review
 
