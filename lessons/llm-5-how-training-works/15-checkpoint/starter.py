@@ -12,9 +12,14 @@ TEXT = ("a language model reads tokens and predicts the next one. it learns by g
 
 def softmax(row):
     m = max(row)
-    e = [math.exp(x - m) for x in row]
+    e = []
+    for x in row:
+        e.append(math.exp(x - m))
     s = sum(e)
-    return [x / s for x in e]
+    out = []
+    for x in e:
+        out.append(x / s)
+    return out
 
 
 vocab = []
@@ -22,8 +27,66 @@ train_losses = []
 val_loss_start = None
 val_loss_end = None
 
+# Part 1: data
+# vocab = sorted(set(TEXT))
+# V = len(vocab)
+# stoi = {}
+# for i in range(V):
+#     stoi[vocab[i]] = i
+# pairs = []
+# for i in range(len(TEXT) - 1):
+#     pairs.append((stoi[TEXT[i]], stoi[TEXT[i + 1]]))
+# cut = int(len(pairs) * 0.9)
+# train = pairs[:cut]
+# val = pairs[cut:]
+# W = []
+# for i in range(V):
+#     W.append([0.0] * V)
 
+
+# def loss_on(data):
+#     probs = []
+#     for row in W:
+#         probs.append(softmax(row))
+#     total = 0.0
+#     for a, b in data:
+#         total = total - math.log(probs[a][b])
+#     return total / len(data)
+
+
+# Part 2: training
+# val_loss_start = loss_on(val)
+# for epoch in range(40):
+#     probs = []
+#     for row in W:
+#         probs.append(softmax(row))
+#     grad = []
+#     for i in range(V):
+#         grad.append([0.0] * V)
+#     loss = 0.0
+#     for a, b in train:
+#         loss = loss - math.log(probs[a][b])
+#         for j in range(V):
+#             grad[a][j] = grad[a][j] + probs[a][j]
+#         grad[a][b] = grad[a][b] - 1
+#     train_losses.append(loss / len(train))
+#     for i in range(V):
+#         for j in range(V):
+#             W[i][j] = W[i][j] - 30 * grad[i][j] / len(train)
+#     if epoch % 5 == 0:
+#         print("epoch", epoch, "train loss", round(train_losses[-1], 3))
+# val_loss_end = loss_on(val)
+# print("validation loss:", round(val_loss_start, 3), "->", round(val_loss_end, 3))
+
+
+# Part 3: generate
 def generate(start, length, rng):
+    # i = stoi[start]
+    # out = ""
+    # for step in range(length):
+    #     i = rng.choices(range(V), weights=softmax(W[i]))[0]
+    #     out = out + vocab[i]
+    # return out
     return ""
 
 

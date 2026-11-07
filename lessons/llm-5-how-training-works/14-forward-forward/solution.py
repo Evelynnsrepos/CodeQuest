@@ -2,7 +2,10 @@ import math
 
 
 def goodness(h):
-    return sum(x * x for x in h)
+    total = 0
+    for x in h:
+        total = total + x * x
+    return total
 
 
 def softplus(x):
@@ -19,7 +22,10 @@ def normalize(h):
     length = math.sqrt(goodness(h))
     if length == 0:
         return h
-    return [x / length for x in h]
+    out = []
+    for x in h:
+        out.append(x / length)
+    return out
 
 
 real = [2.0, 1.5, 0.0, 1.0]     # activities on a positive example
