@@ -1,8 +1,10 @@
 def size_gb(params_billion, bpw):
+    # return params_billion * bpw / 8
     return 0
 
 
 def speed_from_ram(active_billion, bpw, ram_bw):
+    # return ram_bw / size_gb(active_billion, bpw)
     return 0
 
 

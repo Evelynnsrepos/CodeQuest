@@ -2,13 +2,21 @@ import json
 
 
 def build_request(model, messages, temperature, max_tokens):
-    return {"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
+    request = {}
+    request["model"] = model
+    request["messages"] = messages
+    request["temperature"] = temperature
+    request["max_tokens"] = max_tokens
+    return request
 
 
 def parse_reply(text):
     data = json.loads(text)
     choice = data["choices"][0]
-    return choice["message"]["content"], choice["finish_reason"], data["usage"]["total_tokens"]
+    content = choice["message"]["content"]
+    reason = choice["finish_reason"]
+    tokens = data["usage"]["total_tokens"]
+    return content, reason, tokens
 
 
 request = build_request("qwen3-8b", [{"role": "user", "content": "Say hi in German."}], 0.7, 100)

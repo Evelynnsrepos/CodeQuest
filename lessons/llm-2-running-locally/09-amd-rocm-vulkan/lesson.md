@@ -1,8 +1,14 @@
 ---
 title: AMD on Linux, ROCm vs Vulkan
+minutes: 20
 xp: 30
+hint: First: if gfx.startswith("gfx103"): and under it return "10.3.0"
+hint: Then: if gfx.startswith("gfx110"): and under it return "11.0.0"
+hint: The last line stays: return None
 ---
 # Getting your Radeon to do the work
+
+⏱️ About 20 minutes
 
 > **Warm-up:** LM Studio on your machine can use a "Vulkan" or a "ROCm" runtime. Which one are you using right now, and do you know why?
 
@@ -35,15 +41,37 @@ The supported list changes with every ROCm release, so check AMD's "ROCm compati
 
 **On NixOS** the relevant switches are `nixpkgs.config.rocmSupport = true;` (packages like PyTorch and llama-cpp get built with ROCm) and per-package overrides such as `llama-cpp.override { vulkanSupport = true; }` or `{ rocmSupport = true; }`. With `services.ollama`, the `acceleration = "rocm";` and `rocmOverrideGfx = "10.3.0";` options do the same. Option names in nixpkgs change over time; `nixos-option` or search.nixos.org show the current ones.
 
-## Your quest
+## 🐍 Python you need
 
-Write `hsa_override(gfx)`:
+| You write | Say it | What it does |
+|---|---|---|
+| `gfx.startswith("gfx103")` | "gfx starts with gfx103" | `True` for `"gfx1030"`, `"gfx1031"`, … and `False` for `"gfx1101"` |
+| `return "10.3.0"` | | gives back the text and **ends** the function |
+| `return None` at the end | | only reached when no `if` returned before |
 
-- `gfx103` followed by anything (RDNA2) → `"10.3.0"`
-- `gfx110` followed by anything (RDNA3) → `"11.0.0"`
-- anything else → `None` (no known override; check the docs)
+### 👀 Worked example: which shelf?
 
-`text.startswith("gfx103")` checks the beginning of a string.
+```python
+def shelf(code):
+    if code.startswith("BK"):
+        return "books"
+    if code.startswith("TY"):
+        return "toys"
+    return None
+
+print(shelf("BK-0042"), shelf("TY-7"), shelf("XX"))   # books toys None
+```
+
+`"BK-0042"` starts with `"BK"` → `"books"`, and the function ends right there. `"XX"` matches neither, so it reaches `return None`.
+
+## 🎯 Your quest
+
+Write `hsa_override(gfx)`. Above the `return None` line, add:
+
+1. `if gfx.startswith("gfx103"):`
+2. `    return "10.3.0"`
+3. `if gfx.startswith("gfx110"):`
+4. `    return "11.0.0"`
 
 ## Review
 

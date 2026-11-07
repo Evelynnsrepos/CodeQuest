@@ -7,8 +7,8 @@ PORTS = {
 
 def base_url(runner):
     port = PORTS[runner]
-    return f"http://localhost:{port}/v1"
+    return "http://localhost:" + str(port) + "/v1"
 
 
 for runner in PORTS:
-    print(runner, "→", base_url(runner))
+    print(runner, base_url(runner))

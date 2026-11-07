@@ -2,10 +2,22 @@ import json
 
 
 def build_request(model, messages, temperature, max_tokens):
+    # request = {}
+    # request["model"] = model
+    # request["messages"] = messages
+    # request["temperature"] = temperature
+    # request["max_tokens"] = max_tokens
+    # return request
     return {}
 
 
 def parse_reply(text):
+    # data = json.loads(text)
+    # choice = data["choices"][0]
+    # content = choice["message"]["content"]
+    # reason = choice["finish_reason"]
+    # tokens = data["usage"]["total_tokens"]
+    # return content, reason, tokens
     return None, None, None
 
 

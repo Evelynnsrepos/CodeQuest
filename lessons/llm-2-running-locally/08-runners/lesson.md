@@ -1,8 +1,14 @@
 ---
 title: LM Studio, Ollama, llama.cpp, Lemonade
+minutes: 15
 xp: 25
+hint: The ports are in the table above: LM Studio 1234, Ollama 11434, llama.cpp 8080. Replace each 0.
+hint: base_url, line 1: port = PORTS[runner]
+hint: base_url, line 2: return "http://localhost:" + str(port) + "/v1"
 ---
 # Same engine, different packaging
+
+⏱️ About 15 minutes
 
 > **Warm-up:** you've used LM Studio and Lemonade. What do you think is actually *different* between them, and what is the same?
 
@@ -22,10 +28,35 @@ All of them speak the **OpenAI-compatible API**: the same HTTP requests work aga
 
 On NixOS, nixpkgs has `lmstudio`, `ollama` (plus `services.ollama` with an `acceleration` option) and `llama-cpp`. Version numbers in nixpkgs can lag behind upstream; `nix search nixpkgs llama-cpp` shows what you'd get.
 
-## Your quest
+## 🐍 Python you need
 
-1. Fill in `PORTS` with the default ports of `"lmstudio"`, `"ollama"` and `"llamacpp"`.
-2. Write `base_url(runner)`: return `"http://localhost:PORT/v1"` for that runner. An f-string does it: `f"http://localhost:{port}/v1"`.
+| You write | Say it | What it does |
+|---|---|---|
+| `"lmstudio": 1234,` | | one pair in the dictionary: name → port. Numbers have no quotes. |
+| `PORTS[runner]` | "ports at runner" | the port for that runner |
+| `str(1234)` | "string of 1234" | turns the number into text, so `+` can glue it |
+| `"a" + "b"` | | glues texts |
+
+### 👀 Worked example
+
+```python
+FLOORS = {"kitchen": 0, "office": 3}
+
+def room_sign(room):
+    floor = FLOORS[room]
+    return "Go to floor " + str(floor) + "!"
+
+print(room_sign("office"))   # Go to floor 3!
+```
+
+`FLOORS["office"]` is 3, `str(3)` is `"3"`, and the three pieces are glued together.
+
+## 🎯 Your quest
+
+1. In `PORTS`, replace each `0` with the right default port from the table above.
+2. In `base_url(runner)`, replace `return ""` with:
+   - `port = PORTS[runner]`
+   - `return "http://localhost:" + str(port) + "/v1"`
 
 ## Review
 

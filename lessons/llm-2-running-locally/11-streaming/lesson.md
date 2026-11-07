@@ -1,8 +1,15 @@
 ---
 title: Streaming replies token by token
+minutes: 35
 xp: 30
+hint: Inside the loop, first: if line.startswith("data: ") == False: and under it continue
+hint: Then: payload = line[len("data: "):] and if payload == "[DONE]": break
+hint: Then: delta = json.loads(payload)["choices"][0]["delta"]
+hint: Last line in the loop: text = text + delta.get("content", "")
 ---
 # Server-sent events
+
+⏱️ About 35 minutes
 
 > **Warm-up:** in LM Studio's chat, the reply appears word by word. If the API from the last lesson returns one JSON object at the end, how does the text arrive piece by piece?
 
@@ -24,13 +31,57 @@ Each chunk carries a **delta**: only the new piece of text, usually one token. T
 
 Why bother? The time to the first visible word drops from "the whole reply" to "one token", which is what makes a chat feel responsive. Agents and tools also use streaming to stop early or show progress.
 
-## Python you need
+## 🐍 Python you need
 
-`text.splitlines()` splits text into lines. `line.startswith("data: ")` and `line[len("data: "):]` strip the prefix. `continue` skips to the next loop round, `break` leaves the loop. `delta.get("content", "")` returns `""` if the key is missing.
+| You write | Say it | What it does |
+|---|---|---|
+| `raw.splitlines()` | "split into lines" | a list with one text per line |
+| `line.startswith("data: ")` | | `True` if the line begins with exactly `data: ` |
+| `== False` | "is false" | so `line.startswith("data: ") == False` means "does **not** start with it" |
+| `continue` | | skip the rest of this round, go to the next line |
+| `len("data: ")` | | 6: the number of characters in `data: ` (with the space) |
+| `line[6:]` | "line from 6 on" | everything after the first 6 characters: the JSON part |
+| `break` | | stop the whole loop |
+| `delta.get("content", "")` | "delta get content, else empty" | the content, or `""` if this chunk has none (the first chunk often only has `role`) |
+| `text = text + piece` | | glue the new piece to the end |
 
-## Your quest
+### 👀 Worked example: a radio message
 
-Write `collect_stream(raw)`: go through the lines of a raw SSE stream, ignore lines that don't start with `data: `, stop at `[DONE]`, parse the JSON of every other event and add its `choices[0]["delta"]` content to the result. Return the full text.
+Only lines starting with `MSG ` count, `OVER` ends the message:
+
+```python
+radio = "static\nMSG Hel\nMSG lo\nnoise\nOVER\nMSG never seen"
+text = ""
+for line in radio.splitlines():
+    if line == "OVER":
+        break
+    if line.startswith("MSG ") == False:
+        continue
+    text = text + line[len("MSG "):]
+print(text)   # Hello
+```
+
+| line | what happens |
+|---|---|
+| `static` | doesn't start with `MSG ` → continue |
+| `MSG Hel` | add `Hel` |
+| `MSG lo` | add `lo` → `Hello` |
+| `noise` | continue |
+| `OVER` | break: the loop ends, "never seen" is never read |
+
+## 🎯 Your quest
+
+Write `collect_stream(raw)`. Replace the `pass` line inside the loop with (8 spaces in front, 12 for the indented ones):
+
+1. `if line.startswith("data: ") == False:`
+2. `    continue`
+3. `payload = line[len("data: "):]`
+4. `if payload == "[DONE]":`
+5. `    break`
+6. `delta = json.loads(payload)["choices"][0]["delta"]`
+7. `text = text + delta.get("content", "")`
+
+Line 6 reads left to right: parse the JSON, take `choices`, its first item, then its `delta`.
 
 ## Review
 

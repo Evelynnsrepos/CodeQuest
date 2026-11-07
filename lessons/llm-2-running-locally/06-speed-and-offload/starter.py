@@ -1,8 +1,15 @@
 def tokens_per_second(gpu_gb, cpu_gb, gpu_bw, cpu_bw):
+    # seconds = gpu_gb / gpu_bw + cpu_gb / cpu_bw
+    # return 1 / seconds
     return 0
 
 
 def layers_on_gpu(model_gb, layers, vram_free_gb):
+    # per_layer = model_gb / layers
+    # fit = int(vram_free_gb / per_layer)
+    # if fit > layers:
+    #     fit = layers
+    # return fit
     return 0
 
 

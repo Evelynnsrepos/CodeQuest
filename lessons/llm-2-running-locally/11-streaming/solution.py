@@ -4,13 +4,13 @@ import json
 def collect_stream(raw):
     text = ""
     for line in raw.splitlines():
-        if not line.startswith("data: "):
+        if line.startswith("data: ") == False:
             continue
         payload = line[len("data: "):]
         if payload == "[DONE]":
             break
         delta = json.loads(payload)["choices"][0]["delta"]
-        text += delta.get("content", "")
+        text = text + delta.get("content", "")
     return text
 
 
