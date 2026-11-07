@@ -3,7 +3,7 @@
  "name": "AI beyond LLMs",
  "icon": "🌐",
  "order": 78,
- "blurb": "The rest of the field: classic machine learning (regression, trees, clustering, evaluation), RNNs and LSTMs, CNNs and vision transformers, CLIP, diffusion models for images, speech and Whisper, multimodal LLMs, and reinforcement learning basics.",
+ "blurb": "The rest of the field: classic machine learning (regression, trees, clustering, evaluation), RNNs and LSTMs, CNNs and vision transformers, CLIP, diffusion models for images, speech and Whisper, multimodal LLMs, and reinforcement learning basics. Every lesson shows the Python and maths it uses first, step by step.",
  "track": "AI",
  "level": "Level 2 · Train your own",
  "topic": "Other kinds of AI"

@@ -3,7 +3,7 @@
  "name": "LLMs 7: Capstone, your own model",
  "icon": "🏆",
  "order": 76,
- "blurb": "One real project end to end: pick a goal and base model, build and clean a dataset, fine-tune with QLoRA, evaluate blind, convert to GGUF, give it an MCP tool and publish it on GitHub. Each lesson builds a tool you use on your machine.",
+ "blurb": "One real project end to end: pick a goal and base model, build and clean a dataset, fine-tune with QLoRA, evaluate blind, convert to GGUF, give it an MCP tool and publish it on GitHub. Each lesson builds a tool you use on your machine. Every lesson shows the Python and maths it uses first, step by step.",
  "track": "AI",
  "level": "Level 2 · Train your own",
  "topic": "Project"

@@ -3,7 +3,7 @@
  "name": "LLMs 4: Python and math for AI",
  "icon": "📐",
  "order": 73,
- "blurb": "The gate to training: Python classes, vectors and matrices, derivatives and the chain rule, gradients, probability, information theory and statistics, all in code. Ends with a script that talks to LM Studio.",
+ "blurb": "The gate to training: Python classes, vectors and matrices, derivatives and the chain rule, gradients, probability, information theory and statistics, all in code. Ends with a script that talks to LM Studio. Every lesson shows the Python and maths it uses first, step by step.",
  "track": "AI",
  "level": "Level 2 · Train your own",
  "topic": "Python and math"

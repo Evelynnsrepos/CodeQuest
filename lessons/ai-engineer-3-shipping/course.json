@@ -3,7 +3,7 @@
  "name": "AI engineer 3: Shipping AI apps",
  "icon": "🚀",
  "order": 82,
- "blurb": "Turn AI code into a service people can rely on: settings and secrets, FastAPI, tests with fakes, logging, rate limits, cost and latency tracking, caching, Docker, CI on GitHub, safety, ethics and EU law, and a portfolio project. Runs with Python on your computer.",
+ "blurb": "Turn AI code into a service people can rely on: settings and secrets, FastAPI, tests with fakes, logging, rate limits, cost and latency tracking, caching, Docker, CI on GitHub, safety, ethics and EU law, and a portfolio project. Runs with Python on your computer. Every lesson shows the Python and maths it uses first, step by step.",
  "track": "AI",
  "level": "Level 3 · Advanced and pro",
  "topic": "Production"

@@ -3,7 +3,7 @@
  "name": "AI engineer 2: Real RAG and evals",
  "icon": "🔎",
  "order": 81,
- "blurb": "Retrieval that holds up: chunking, embeddings, a vector store, BM25, hybrid search and reranking, measured with retrieval evals. Then calling real models safely, LLM-as-judge, eval suites in pytest and agent traces. Runs with Python on your computer.",
+ "blurb": "Retrieval that holds up: chunking, embeddings, a vector store, BM25, hybrid search and reranking, measured with retrieval evals. Then calling real models safely, LLM-as-judge, eval suites in pytest and agent traces. Runs with Python on your computer. Every lesson shows the Python and maths it uses first, step by step.",
  "track": "AI",
  "level": "Level 3 · Advanced and pro",
  "topic": "RAG and evals"

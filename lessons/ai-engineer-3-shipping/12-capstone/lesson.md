@@ -38,7 +38,7 @@ This capstone only uses pieces you met in this course and in AI engineer 2:
 
 1. Every note gets a BM25 score. Most have 0 (no shared words) and are left out.
 2. `ollama-models` has "download", "model" and "ollama" → the highest score. It's picked first and removed from the list.
-3. The best of the rest is picked second: `lora`, because it says "model" twice ("base model"). Word search isn't perfect, which is why the real capstone adds embeddings.
+3. The best of the rest is picked second: `lora`, because it has the word "model" ("the base model"). Word search isn't perfect, which is why the real capstone adds embeddings.
 4. Result: `["ollama-models", "lora"]`.
 
 `/ask` then builds the sources like this:
