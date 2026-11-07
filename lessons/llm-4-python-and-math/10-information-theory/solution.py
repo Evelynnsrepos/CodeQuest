@@ -2,11 +2,19 @@ import math
 
 
 def entropy(p):
-    return -sum(pi * math.log(pi) for pi in p if pi > 0)
+    total = 0
+    for pi in p:
+        if pi > 0:
+            total = total + pi * math.log(pi)
+    return -total
 
 
 def cross_entropy(p, q):
-    return -sum(pi * math.log(qi) for pi, qi in zip(p, q) if pi > 0)
+    total = 0
+    for i in range(len(p)):
+        if p[i] > 0:
+            total = total + p[i] * math.log(q[i])
+    return -total
 
 
 def kl(p, q):

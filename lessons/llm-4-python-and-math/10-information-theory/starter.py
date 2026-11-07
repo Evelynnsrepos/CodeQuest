@@ -2,14 +2,25 @@ import math
 
 
 def entropy(p):
+    # total = 0
+    # for pi in p:
+    #     if pi > 0:
+    #         total = total + pi * math.log(pi)
+    # return -total
     return 0
 
 
 def cross_entropy(p, q):
+    # total = 0
+    # for i in range(len(p)):
+    #     if p[i] > 0:
+    #         total = total + p[i] * math.log(q[i])
+    # return -total
     return 0
 
 
 def kl(p, q):
+    # return cross_entropy(p, q) - entropy(p)
     return 0
 
 
