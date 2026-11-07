@@ -23,6 +23,7 @@ def retrieve(question, k=3):
     return ranked
 """
 
+# The test file, with {golden} and {threshold} filled in later by .format().
 TEST = """import pytest
 from retriever import retrieve
 
