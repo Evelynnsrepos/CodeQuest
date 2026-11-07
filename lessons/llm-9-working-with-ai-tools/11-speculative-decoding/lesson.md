@@ -90,7 +90,7 @@ Why this works: it's a short way to write 1 + α + α² + α³ + α⁴ = 1 + 0.8
 
 **Step 6: speed-up** = 3.3616 / 1.2 = **2.80**.
 
-<div class="wrong"><b>α = 1 in the formula</b>: 1 − 1 = 0 on the bottom, and dividing by zero crashes. When every guess is accepted you simply get all k guesses plus the big model's own token: k + 1. That's why your function checks `alpha == 1` first.</div>
+<div class="wrong"><b>α = 1 in the formula</b>: 1 − 1 = 0 on the bottom, and dividing by zero crashes. When every guess is accepted you simply get all k guesses plus the big model's own token: k + 1. That's why your function checks <code>alpha == 1</code> first.</div>
 
 ## 🐍 Python you need
 

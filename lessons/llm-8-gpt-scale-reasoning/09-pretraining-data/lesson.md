@@ -51,7 +51,7 @@ Numbers: a = {1, 2, 3}, b = {2, 3, 4}. Both: {2, 3} → 2. Either: {1, 2, 3, 4} 
 | `words[i:i + n]` | | n words starting at i |
 | `tuple(...)` | | a list turned into a tuple, which a set can hold |
 | `result.add(x)` | | add to a set (repeats are ignored) |
-| `a & b`, `a | b` | | set intersection ∩ and union ∪ |
+| `a & b`, `a \| b` | | set intersection ∩ and union ∪ |
 | `unique = True` … `unique = False` | | a flag (LLMs 7, lesson 4) |
 
 ### 👀 Worked example: shingles of a short text

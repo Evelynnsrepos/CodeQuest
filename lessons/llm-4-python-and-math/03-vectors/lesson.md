@@ -20,8 +20,8 @@ A **vector** is a list of numbers, and you can picture it as an arrow from the o
 |---|---|---|
 | addition `a + b` | `[a₁+b₁, a₂+b₂, …]` | put the arrows tip to tail |
 | scaling `c·a` | `[c·a₁, c·a₂, …]` | stretch (or flip, if c < 0) |
-| dot product `a · b` | `a₁b₁ + a₂b₂ + …` | `|a|·|b|·cos(angle)`: how much they point the same way |
-| length (norm) `|a|` | `√(a · a)` | Pythagoras: `|[3, 4]| = 5` |
+| dot product `a · b` | `a₁b₁ + a₂b₂ + …` | `\|a\|·\|b\|·cos(angle)`: how much they point the same way |
+| length (norm) `\|a\|` | `√(a · a)` | Pythagoras: `\|[3, 4]\| = 5` |
 
 Every one of these is used in an LLM thousands of times per token:
 

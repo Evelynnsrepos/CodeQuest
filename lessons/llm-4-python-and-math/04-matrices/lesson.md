@@ -62,6 +62,7 @@ So C = `[[19, 22], [43, 50]]`.
 
 **The shape rule.** A row of A and a column of B must have the **same length**, or the dot product makes no sense. So:
 <div class="formula"><span class="k1">(m × k)</span> @ <span class="k2">(k × n)</span> → <span class="k3">(m × n)</span></div>
+
 The two inner numbers (both `k`) must match. The outer ones give the result's size.
 
 <div class="wrong">❌ (1 × 2) @ (1 × 2): a row has 2 numbers, a column has 1. Error.</div>

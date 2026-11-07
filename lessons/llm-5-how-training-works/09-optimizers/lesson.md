@@ -71,6 +71,7 @@ With g = 200 you'd get exactly the same step: Adam cares about direction, not si
 A straight ramp: with warmup = 10, step 0 gives 1/10 of max_lr, step 4 gives 5/10, step 9 gives 10/10.
 
 <div class="formula">afterwards: lr = max_lr · <span class="k2">½ · (1 + cos(π · progress))</span></div>
+
 - `progress` goes from 0 (just after warmup) to almost 1 (the end).
 - π ("pi") ≈ 3.14159. `cos` is a wave: cos(0) = 1, cos(π/2) = 0, cos(π) = −1.
 - So 1 + cos goes 2 → 1 → 0, and ½ of that goes **1 → ½ → 0**: a smooth slide down.
