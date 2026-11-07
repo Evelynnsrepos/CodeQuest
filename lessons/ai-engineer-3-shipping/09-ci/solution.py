@@ -2,21 +2,40 @@ import yaml
 
 
 def check_workflow(text):
-    data = yaml.safe_load(text) or {}
+    data = yaml.safe_load(text)
+    if data is None:
+        data = {}
     trigger = data.get("on", data.get(True))
     if isinstance(trigger, str):
         trigger = [trigger]
-    steps = [s for job in (data.get("jobs") or {}).values() for s in job.get("steps", [])]
-    uses = [s.get("uses", "") for s in steps]
-    runs = [s.get("run", "") for s in steps]
+    jobs = data.get("jobs")
+    if jobs is None:
+        jobs = {}
+    uses = []
+    runs = []
+    for name in jobs:
+        for step in jobs[name].get("steps", []):
+            uses.append(step.get("uses", ""))
+            runs.append(step.get("run", ""))
+    checkout = False
+    python = False
+    tests = False
+    for u in uses:
+        if u.startswith("actions/checkout"):
+            checkout = True
+        if u.startswith("actions/setup-python"):
+            python = True
+    for r in runs:
+        if "pytest" in r:
+            tests = True
     problems = []
     if not trigger or "push" not in trigger or "pull_request" not in trigger:
         problems.append("trigger")
-    if not any(u.startswith("actions/checkout") for u in uses):
+    if not checkout:
         problems.append("checkout")
-    if not any(u.startswith("actions/setup-python") for u in uses):
+    if not python:
         problems.append("python")
-    if not any("pytest" in r for r in runs):
+    if not tests:
         problems.append("tests")
     if "sk-" in text:
         problems.append("secret")

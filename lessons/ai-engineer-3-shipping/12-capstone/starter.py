@@ -41,21 +41,36 @@ def tokenize(text):
 
 class BM25:
     def __init__(self, docs, k1=1.5, b=0.75):
-        self.k1, self.b = k1, b
-        self.tokens = [tokenize(d) for d in docs]
-        self.tf = [Counter(t) for t in self.tokens]
+        self.k1 = k1
+        self.b = b
+        self.tokens = []
+        self.tf = []
+        for d in docs:
+            words = tokenize(d)
+            self.tokens.append(words)
+            self.tf.append(Counter(words))
         self.N = len(docs)
-        self.avglen = sum(len(t) for t in self.tokens) / self.N
-        self.df = Counter(w for t in self.tokens for w in set(t))
+        total = 0
+        for words in self.tokens:
+            total = total + len(words)
+        self.avglen = total / self.N
+        self.df = Counter()
+        for words in self.tokens:
+            for w in set(words):
+                self.df[w] = self.df[w] + 1
+
+    def idf(self, t):
+        n = self.df.get(t, 0)
+        return math.log((self.N - n + 0.5) / (n + 0.5) + 1)
 
     def score(self, query, i):
-        length, total = len(self.tokens[i]), 0.0
+        length = len(self.tokens[i])
+        total = 0.0
         for t in tokenize(query):
             f = self.tf[i].get(t, 0)
-            if f:
-                n = self.df[t]
-                idf = math.log((self.N - n + 0.5) / (n + 0.5) + 1)
-                total += idf * f * (self.k1 + 1) / (f + self.k1 * (1 - self.b + self.b * length / self.avglen))
+            if f > 0:
+                norm = 1 - self.b + self.b * length / self.avglen
+                total = total + self.idf(t) * f * (self.k1 + 1) / (f + self.k1 * norm)
         return total
 
 
@@ -68,7 +83,82 @@ def get_llm():
 TRACKER = []
 
 
+# IDS = list(NOTES)
+# TEXTS = []
+# for i in IDS:
+#     TEXTS.append(NOTES[i])
+# BM = BM25(TEXTS)
+
+
+# def search(q, k=3):
+#     scored = []
+#     for i in range(len(IDS)):
+#         s = BM.score(q, i)
+#         if s > 0:
+#             scored.append((s, IDS[i]))
+#     out = []
+#     for step in range(k):
+#         if len(scored) == 0:
+#             break
+#         top = scored[0]
+#         for pair in scored:
+#             if pair[0] > top[0]:
+#                 top = pair
+#         out.append(top[1])
+#         scored.remove(top)
+#     return out
+
+
+# class SearchBody(BaseModel):
+#     q: str = Field(min_length=1)
+#     k: int = Field(default=3, ge=1, le=10)
+
+
+# class AskBody(BaseModel):
+#     question: str = Field(min_length=1, max_length=1000)
+
+
 app = FastAPI()
+
+
+# @app.get("/health")
+# def health():
+#     return {"status": "ok", "notes": len(NOTES)}
+
+
+# @app.post("/search")
+# def search_endpoint(body: SearchBody):
+#     return {"results": search(body.q, body.k)}
+
+
+# @app.post("/ask")
+# def ask(body: AskBody, llm=Depends(get_llm)):
+#     ids = search(body.question, 3)
+#     if not ids:
+#         return {"answer": "I don't know.", "sources": []}
+#     lines = []
+#     n = 1
+#     for i in ids:
+#         lines.append("[" + str(n) + "] (" + i + ") " + NOTES[i])
+#         n = n + 1
+#     sources = "\n".join(lines)
+#     prompt = ("Answer using only the sources. Cite them like [1]. Say \"I don't know\" if they don't help.\n\n"
+#               + sources + "\n\nQuestion: " + body.question)
+#     try:
+#         text, tokens_in, tokens_out = llm(prompt)
+#     except RuntimeError:
+#         raise HTTPException(503, "model unavailable")
+#     TRACKER.append({"tokens_in": tokens_in, "tokens_out": tokens_out})
+#     return {"answer": text, "sources": ids}
+
+
+# @app.get("/eval")
+# def evaluate():
+#     hits = 0
+#     for q, right in GOLDEN:
+#         if right in search(q, 3):
+#             hits = hits + 1
+#     return {"recall@3": hits / len(GOLDEN)}
 
 
 client = TestClient(app)

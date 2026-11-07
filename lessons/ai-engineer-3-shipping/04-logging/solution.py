@@ -12,7 +12,9 @@ log.setLevel(logging.INFO)
 class JsonFormatter(logging.Formatter):
     def format(self, record):
         data = {"level": record.levelname, "msg": record.getMessage()}
-        data.update(getattr(record, "extra_fields", {}))
+        extra = getattr(record, "extra_fields", {})
+        for key in extra:
+            data[key] = extra[key]
         return json.dumps(data)
 
 
@@ -25,8 +27,8 @@ async def log_requests(request: Request, call_next):
     start = time.perf_counter()
     response = await call_next(request)
     ms = round((time.perf_counter() - start) * 1000, 1)
-    log.info("request", extra={"extra_fields": {"request_id": request_id, "method": request.method,
-                                                 "path": request.url.path, "status": response.status_code, "ms": ms}})
+    fields = {"request_id": request_id, "method": request.method, "path": request.url.path, "status": response.status_code, "ms": ms}
+    log.info("request", extra={"extra_fields": fields})
     response.headers["X-Request-ID"] = request_id
     return response
 

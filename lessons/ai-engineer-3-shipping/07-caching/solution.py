@@ -10,28 +10,36 @@ def cache_key(model, messages, temperature):
 
 class TTLCache:
     def __init__(self, ttl, max_items, now=time.monotonic):
-        self.ttl, self.max_items, self.now = ttl, max_items, now
+        self.ttl = ttl
+        self.max_items = max_items
+        self.now = now
         self.data = {}
-        self.hits = self.misses = 0
+        self.hits = 0
+        self.misses = 0
 
     def get(self, key):
         item = self.data.get(key)
-        if item and self.now() - item[0] < self.ttl:
-            self.hits += 1
+        if item is not None and self.now() - item[0] < self.ttl:
+            self.hits = self.hits + 1
             return item[1]
         self.data.pop(key, None)
-        self.misses += 1
+        self.misses = self.misses + 1
         return None
 
     def put(self, key, value):
         if key not in self.data and len(self.data) >= self.max_items:
-            oldest = min(self.data, key=lambda k: self.data[k][0])
+            oldest = None
+            for k in self.data:
+                if oldest is None or self.data[k][0] < self.data[oldest][0]:
+                    oldest = k
             del self.data[oldest]
         self.data[key] = (self.now(), value)
 
     def hit_rate(self):
         total = self.hits + self.misses
-        return self.hits / total if total else 0.0
+        if total == 0:
+            return 0.0
+        return self.hits / total
 
 
 def cached_call(cache, llm, model, messages, temperature):
@@ -46,7 +54,16 @@ def cached_call(cache, llm, model, messages, temperature):
 
 
 calls = []
-llm = lambda msgs: calls.append(1) or f"answer #{len(calls)}"
+
+
+def llm(msgs):
+    calls.append(1)
+    return "answer #" + str(len(calls))
+
+
 cache = TTLCache(ttl=3600, max_items=100)
 msgs = [{"role": "user", "content": "how do I reset my password?"}]
-print([cached_call(cache, llm, "small", msgs, 0) for _ in range(3)], cache.hit_rate())
+answers = []
+for i in range(3):
+    answers.append(cached_call(cache, llm, "small", msgs, 0))
+print(answers, cache.hit_rate())
