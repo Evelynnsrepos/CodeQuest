@@ -1,5 +1,4 @@
 import json
-import math
 
 
 def read_header(data):
@@ -9,9 +8,13 @@ def read_header(data):
 
 def count_params(header):
     total = 0
-    for name, info in header.items():
-        if name != "__metadata__":
-            total += math.prod(info["shape"])
+    for name in header:
+        if name == "__metadata__":
+            continue
+        size = 1
+        for number in header[name]["shape"]:
+            size = size * number
+        total = total + size
     return total
 
 

@@ -1,5 +1,11 @@
 def read_gguf_header(data):
-    # check the magic, then read the three numbers
+    # if data[0:4] != b"GGUF":
+    #     raise ValueError("not a GGUF file")
+    # result = {}
+    # result["version"] = int.from_bytes(data[4:8], "little")
+    # result["tensor_count"] = int.from_bytes(data[8:16], "little")
+    # result["metadata_kv_count"] = int.from_bytes(data[16:24], "little")
+    # return result
     return {}
 
 

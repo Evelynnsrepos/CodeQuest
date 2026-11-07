@@ -1,5 +1,6 @@
 def kv_cache_gb(layers, kv_heads, head_dim, context, bytes_per_value):
-    return 2 * layers * kv_heads * head_dim * bytes_per_value * context / 1_000_000_000
+    per_token = 2 * layers * kv_heads * head_dim * bytes_per_value
+    return per_token * context / 1000000000
 
 
 def total_vram_gb(weights_gb, kv_gb):
@@ -9,7 +10,7 @@ def total_vram_gb(weights_gb, kv_gb):
 def max_context(weights_gb, layers, kv_heads, head_dim, budget_gb):
     context = 0
     while total_vram_gb(weights_gb, kv_cache_gb(layers, kv_heads, head_dim, context + 1024, 2)) <= budget_gb:
-        context += 1024
+        context = context + 1024
     return context
 
 

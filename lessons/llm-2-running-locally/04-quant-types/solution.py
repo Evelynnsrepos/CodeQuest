@@ -15,4 +15,7 @@ def best_quant(params_billion, budget_gb):
 
 for size in [4, 8, 14, 24, 32]:
     q = best_quant(size, 10)
-    print(f"{size}B: {q}", f"({file_size_gb(size, q):.1f} GB)" if q else "")
+    if q is None:
+        print(size, "B: nothing fits")
+    else:
+        print(size, "B:", q, round(file_size_gb(size, q), 1), "GB")
