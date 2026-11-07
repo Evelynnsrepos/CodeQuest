@@ -2,14 +2,32 @@ import math
 
 
 def dot(a, b):
-    return sum(x * y for x, y in zip(a, b))
+    total = 0
+    for i in range(len(a)):
+        total = total + a[i] * b[i]
+    return total
 
 
 def sinusoidal(pos, d):
+    # pe = []
+    # for i in range(d // 2):
+    #     a = pos / 10000 ** (2 * i / d)
+    #     pe.append(math.sin(a))
+    #     pe.append(math.cos(a))
+    # return pe
     return [0.0] * d
 
 
 def rope(x, pos, base=10000):
+    # d = len(x)
+    # out = []
+    # for i in range(d // 2):
+    #     a = pos * base ** (-2 * i / d)
+    #     x0 = x[2 * i]
+    #     x1 = x[2 * i + 1]
+    #     out.append(x0 * math.cos(a) - x1 * math.sin(a))
+    #     out.append(x0 * math.sin(a) + x1 * math.cos(a))
+    # return out
     return list(x)
 
 

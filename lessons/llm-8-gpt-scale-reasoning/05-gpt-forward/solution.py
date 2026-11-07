@@ -3,23 +3,44 @@ import random
 
 
 def dot(a, b):
-    return sum(x * y for x, y in zip(a, b))
+    total = 0
+    for i in range(len(a)):
+        total = total + a[i] * b[i]
+    return total
 
 
 def matvec(W, x):
-    return [dot(row, x) for row in W]
+    """W is a list of rows; returns W·x."""
+    out = []
+    for row in W:
+        total = 0
+        for i in range(len(x)):
+            total = total + row[i] * x[i]
+        out.append(total)
+    return out
 
 
 def softmax(xs):
     m = max(xs)
-    e = [math.exp(v - m) for v in xs]
+    e = []
+    for x in xs:
+        e.append(math.exp(x - m))
     s = sum(e)
-    return [v / s for v in e]
+    out = []
+    for x in e:
+        out.append(x / s)
+    return out
 
 
 def rms_norm(x, eps=1e-5):
-    rms = math.sqrt(sum(v * v for v in x) / len(x) + eps)
-    return [v / rms for v in x]
+    total = 0
+    for v in x:
+        total = total + v * v
+    rms = math.sqrt(total / len(x) + eps)
+    out = []
+    for v in x:
+        out.append(v / rms)
+    return out
 
 
 def gelu(x):
@@ -27,41 +48,85 @@ def gelu(x):
 
 
 def rope(x, pos, base=10000):
+    d = len(x)
     out = []
-    for i in range(len(x) // 2):
-        a = pos * base ** (-2 * i / len(x))
-        out += [x[2 * i] * math.cos(a) - x[2 * i + 1] * math.sin(a), x[2 * i] * math.sin(a) + x[2 * i + 1] * math.cos(a)]
+    for i in range(d // 2):
+        a = pos * base ** (-2 * i / d)
+        x0 = x[2 * i]
+        x1 = x[2 * i + 1]
+        out.append(x0 * math.cos(a) - x1 * math.sin(a))
+        out.append(x0 * math.sin(a) + x1 * math.cos(a))
     return out
 
 
 def causal_attention(Q, K, V):
+    """One head. Q, K, V are lists of rows (one row per position). Position i only sees positions 0..i."""
     out = []
-    for i, q in enumerate(Q):
-        w = softmax([dot(q, K[j]) / math.sqrt(len(q)) for j in range(i + 1)])
-        out.append([sum(w[j] * V[j][c] for j in range(i + 1)) for c in range(len(V[0]))])
+    for i in range(len(Q)):
+        scores = []
+        for j in range(i + 1):
+            scores.append(dot(Q[i], K[j]) / math.sqrt(len(Q[i])))
+        w = softmax(scores)
+        row = []
+        for c in range(len(V[0])):
+            total = 0
+            for j in range(i + 1):
+                total = total + w[j] * V[j][c]
+            row.append(total)
+        out.append(row)
     return out
 
 
 def random_params(vocab, d, layers, seed=0):
     rng = random.Random(seed)
-    m = lambda rows, cols: [[rng.gauss(0, 0.5) for _ in range(cols)] for _ in range(rows)]
-    return {"wte": m(vocab, d),
-            "layers": [{"Wq": m(d, d), "Wk": m(d, d), "Wv": m(d, d), "Wo": m(d, d), "W1": m(4 * d, d), "W2": m(d, 4 * d)}
-                       for _ in range(layers)]}
+
+    def m(rows, cols):
+        grid = []
+        for r in range(rows):
+            row = []
+            for c in range(cols):
+                row.append(rng.gauss(0, 0.5))
+            grid.append(row)
+        return grid
+
+    wte = m(vocab, d)
+    all_layers = []
+    for n in range(layers):
+        all_layers.append({"Wq": m(d, d), "Wk": m(d, d), "Wv": m(d, d), "Wo": m(d, d), "W1": m(4 * d, d), "W2": m(d, 4 * d)})
+    return {"wte": wte, "layers": all_layers}
 
 
 def gpt_forward(tokens, P):
-    x = [list(P["wte"][t]) for t in tokens]
+    x = []
+    for t in tokens:
+        x.append(list(P["wte"][t]))
     for L in P["layers"]:
-        h = [rms_norm(r) for r in x]
-        Q = [rope(matvec(L["Wq"], r), i) for i, r in enumerate(h)]
-        K = [rope(matvec(L["Wk"], r), i) for i, r in enumerate(h)]
-        V = [matvec(L["Wv"], r) for r in h]
+        Q = []
+        K = []
+        V = []
+        for i in range(len(x)):
+            h = rms_norm(x[i])
+            Q.append(rope(matvec(L["Wq"], h), i))
+            K.append(rope(matvec(L["Wk"], h), i))
+            V.append(matvec(L["Wv"], h))
         a = causal_attention(Q, K, V)
-        x = [[u + v for u, v in zip(xi, matvec(L["Wo"], ai))] for xi, ai in zip(x, a)]
-        x = [[u + v for u, v in zip(xi, matvec(L["W2"], [gelu(z) for z in matvec(L["W1"], rms_norm(xi))]))] for xi in x]
+        for i in range(len(x)):
+            o = matvec(L["Wo"], a[i])
+            for c in range(len(x[i])):
+                x[i][c] = x[i][c] + o[c]
+        for i in range(len(x)):
+            hidden = matvec(L["W1"], rms_norm(x[i]))
+            g = []
+            for z in hidden:
+                g.append(gelu(z))
+            m = matvec(L["W2"], g)
+            for c in range(len(x[i])):
+                x[i][c] = x[i][c] + m[c]
     last = rms_norm(x[-1])
-    return softmax([dot(row, last) for row in P["wte"]])
+    logits = []
+    for row in P["wte"]:
+        logits.append(dot(row, last))
+    return softmax(logits)
 
 
 P = random_params(vocab=6, d=4, layers=2)

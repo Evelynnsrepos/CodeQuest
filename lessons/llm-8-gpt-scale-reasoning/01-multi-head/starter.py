@@ -2,31 +2,68 @@ import math
 
 
 def dot(a, b):
-    return sum(x * y for x, y in zip(a, b))
+    total = 0
+    for i in range(len(a)):
+        total = total + a[i] * b[i]
+    return total
 
 
 def softmax(xs):
     m = max(xs)
-    e = [math.exp(x - m) for x in xs]
+    e = []
+    for x in xs:
+        e.append(math.exp(x - m))
     s = sum(e)
-    return [x / s for x in e]
+    out = []
+    for x in e:
+        out.append(x / s)
+    return out
 
 
 def causal_attention(Q, K, V):
     """One head. Q, K, V are lists of rows (one row per position). Position i only sees positions 0..i."""
     out = []
-    for i, q in enumerate(Q):
-        scores = [dot(q, K[j]) / math.sqrt(len(q)) for j in range(i + 1)]
+    for i in range(len(Q)):
+        scores = []
+        for j in range(i + 1):
+            scores.append(dot(Q[i], K[j]) / math.sqrt(len(Q[i])))
         w = softmax(scores)
-        out.append([sum(w[j] * V[j][c] for j in range(i + 1)) for c in range(len(V[0]))])
+        row = []
+        for c in range(len(V[0])):
+            total = 0
+            for j in range(i + 1):
+                total = total + w[j] * V[j][c]
+            row.append(total)
+        out.append(row)
     return out
 
 
 def split_heads(rows, n_heads):
+    # w = len(rows[0]) // n_heads
+    # heads = []
+    # for h in range(n_heads):
+    #     head = []
+    #     for row in rows:
+    #         head.append(row[h * w:(h + 1) * w])
+    #     heads.append(head)
+    # return heads
     return []
 
 
 def multi_head(Q, K, V, n_heads):
+    # Qs = split_heads(Q, n_heads)
+    # Ks = split_heads(K, n_heads)
+    # Vs = split_heads(V, n_heads)
+    # outputs = []
+    # for h in range(n_heads):
+    #     outputs.append(causal_attention(Qs[h], Ks[h], Vs[h]))
+    # result = []
+    # for i in range(len(Q)):
+    #     row = []
+    #     for h in range(n_heads):
+    #         row = row + outputs[h][i]
+    #     result.append(row)
+    # return result
     return []
 
 
