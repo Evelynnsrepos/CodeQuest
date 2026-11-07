@@ -2,15 +2,24 @@ import math
 
 
 def add(a, b):
-    return [x + y for x, y in zip(a, b)]
+    out = []
+    for i in range(len(a)):
+        out.append(a[i] + b[i])
+    return out
 
 
 def scale(c, a):
-    return [c * x for x in a]
+    out = []
+    for x in a:
+        out.append(c * x)
+    return out
 
 
 def dot(a, b):
-    return sum(x * y for x, y in zip(a, b))
+    total = 0
+    for i in range(len(a)):
+        total = total + a[i] * b[i]
+    return total
 
 
 def norm(a):
@@ -19,7 +28,10 @@ def norm(a):
 
 def rms_norm(a):
     rms = math.sqrt(dot(a, a) / len(a))
-    return [x / rms for x in a]
+    out = []
+    for x in a:
+        out.append(x / rms)
+    return out
 
 
 print(add([1, 2], [3, 4]))

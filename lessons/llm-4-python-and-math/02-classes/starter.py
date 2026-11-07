@@ -1,19 +1,37 @@
 class Linear:
     def __init__(self, weights, bias):
+        # self.weights = weights
+        # self.bias = bias
         pass
 
     def __call__(self, x):
+        # out = []
+        # for j in range(len(self.weights)):
+        #     row = self.weights[j]
+        #     total = 0
+        #     for i in range(len(x)):
+        #         total = total + row[i] * x[i]
+        #     out.append(total + self.bias[j])
+        # return out
         return []
 
     def num_params(self):
+        # count = 0
+        # for row in self.weights:
+        #     count = count + len(row)
+        # return count + len(self.bias)
         return 0
 
 
 class Sequential:
     def __init__(self, layers):
+        # self.layers = layers
         pass
 
     def __call__(self, x):
+        # for layer in self.layers:
+        #     x = layer(x)
+        # return x
         return x
 
 

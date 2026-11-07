@@ -4,6 +4,10 @@ ROADMAP = ["Learn Coding Basics", "Learn Linux", "Learn Git", "Build a Bookbot",
 
 
 def next_course(done):
+    # for course in ROADMAP:
+    #     if course not in done:
+    #         return course
+    # return "all done"
     return ""
 
 
