@@ -2,8 +2,14 @@ import math
 
 
 def cosine(a, b):
-    dot = sum(x * y for x, y in zip(a, b))
-    return dot / (math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(y * y for y in b)))
+    dot = 0
+    size_a = 0
+    size_b = 0
+    for i in range(len(a)):
+        dot = dot + a[i] * b[i]
+        size_a = size_a + a[i] * a[i]
+        size_b = size_b + b[i] * b[i]
+    return dot / (math.sqrt(size_a) * math.sqrt(size_b))
 
 
 def patchify(image, p):
@@ -11,13 +17,23 @@ def patchify(image, p):
     patches = []
     for r in range(0, n, p):
         for c in range(0, n, p):
-            patches.append([image[r + i][c + j] for i in range(p) for j in range(p)])
+            patch = []
+            for i in range(p):
+                for j in range(p):
+                    patch.append(image[r + i][c + j])
+            patches.append(patch)
     return patches
 
 
 def zero_shot(image_emb, text_embs, labels):
-    scores = [cosine(image_emb, t) for t in text_embs]
-    return labels[scores.index(max(scores))]
+    best = 0
+    best_s = cosine(image_emb, text_embs[0])
+    for i in range(1, len(text_embs)):
+        s = cosine(image_emb, text_embs[i])
+        if s > best_s:
+            best = i
+            best_s = s
+    return labels[best]
 
 
 image = [[r * 4 + c for c in range(4)] for r in range(4)]

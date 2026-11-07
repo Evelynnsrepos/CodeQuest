@@ -1,23 +1,39 @@
 def counts(y_true, y_pred):
-    tp = sum(t == 1 and p == 1 for t, p in zip(y_true, y_pred))
-    fp = sum(t == 0 and p == 1 for t, p in zip(y_true, y_pred))
-    fn = sum(t == 1 and p == 0 for t, p in zip(y_true, y_pred))
+    tp = 0
+    fp = 0
+    fn = 0
+    for i in range(len(y_true)):
+        t = y_true[i]
+        p = y_pred[i]
+        if t == 1 and p == 1:
+            tp = tp + 1
+        if t == 0 and p == 1:
+            fp = fp + 1
+        if t == 1 and p == 0:
+            fn = fn + 1
     return tp, fp, fn
 
 
 def precision(y_true, y_pred):
     tp, fp, fn = counts(y_true, y_pred)
-    return tp / (tp + fp) if tp + fp else 0.0
+    if tp + fp == 0:
+        return 0.0
+    return tp / (tp + fp)
 
 
 def recall(y_true, y_pred):
     tp, fp, fn = counts(y_true, y_pred)
-    return tp / (tp + fn) if tp + fn else 0.0
+    if tp + fn == 0:
+        return 0.0
+    return tp / (tp + fn)
 
 
 def f1(y_true, y_pred):
-    p, r = precision(y_true, y_pred), recall(y_true, y_pred)
-    return 2 * p * r / (p + r) if p + r else 0.0
+    p = precision(y_true, y_pred)
+    r = recall(y_true, y_pred)
+    if p + r == 0:
+        return 0.0
+    return 2 * p * r / (p + r)
 
 
 truth = [1, 0, 0, 0, 0, 0, 0, 0, 0, 1]
