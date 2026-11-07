@@ -1,8 +1,9 @@
 def to_chatml(messages):
     text = ""
     for message in messages:
-        pass  # add one block per message
-    return text  # don't forget the open assistant turn
+        # text = text + "<|im_start|>" + message["role"] + "\n" + message["content"] + "<|im_end|>\n"
+        pass
+    return text  # change to: return text + "<|im_start|>assistant\n"
 
 
 chat = [

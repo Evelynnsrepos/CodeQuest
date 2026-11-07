@@ -14,7 +14,8 @@ def tokenize(text):
 
 
 def tokens_per_word(text):
-    return 0  # number of tokens / number of words
+    # return len(tokenize(text)) / len(text.split())
+    return 0
 
 
 english = "The cat sat on the mat."

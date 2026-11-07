@@ -1,8 +1,13 @@
 ---
 title: Embeddings, meaning as direction
+minutes: 35
 xp: 30
+hint: dot: total = 0, then for i in range(len(a)): and inside it total = total + a[i] * b[i], then return total
+hint: cosine has one line: return dot(a, b) / (math.sqrt(dot(a, a)) * math.sqrt(dot(b, b)))
 ---
 # From token ID to vector
+
+⏱️ About 35 minutes
 
 > **Warm-up:** token ID 412 and token ID 413 are neighbours in the vocabulary. Does that mean their meanings are similar?
 
@@ -24,19 +29,80 @@ Everything after this step is vector math. Each layer of the model adjusts every
 
 Embeddings are also the core of **RAG** (Module 3): you embed your documents and your question with an embedding model, then fetch the documents whose vectors have the highest cosine similarity to the question.
 
-## Python you need
+## 🔬 Take the formulas apart
 
-`math.sqrt(x)` is the square root.
+**The dot product:** `a · b = a₁b₁ + a₂b₂ + … + a_d·b_d`
 
-## Your quest
+| Piece | Say it | Means | Example a = [3, 4], b = [4, 3] |
+|---|---|---|---|
+| `a₁`, `b₁` | "a one", "b one" | the first number of each vector (the small number is a position label) | 3 and 4 |
+| `a₁b₁` | "a one times b one" | two letters written next to each other mean **multiply** | 3 × 4 = 12 |
+| `+ … +` | "and so on" | do the same for every position | 4 × 3 = 12 |
+| `d` | "d" | how many numbers each vector has | 2 |
+| result | | add all the products | 12 + 12 = **24** |
 
-1. Write `dot(a, b)`.
-2. Write `cosine(a, b)` using `dot` and `math.sqrt`.
+**The length:** `|a| = √(a · a)`
 
-The program then finds the word closest to `"king"` in a tiny 3-dimensional embedding table.
+The two straight lines `|a|` mean "the length of a". `√` is the **square root**: the number that, multiplied by itself, gives what's under it. √25 = 5, because 5 × 5 = 25.
+
+`a · a` = 3 × 3 + 4 × 4 = 9 + 16 = 25. So |a| = √25 = **5**. (The old right-triangle rule: 3 right, 4 up is 5 long.)
+
+**Cosine similarity:**
+
+<div class="formula">cos(a, b) = <span class="k1">(a · b)</span> <span class="k2">/</span> <span class="k3">(|a| · |b|)</span></div>
+
+| Piece | Means | Example |
+|---|---|---|
+| <span class="k1">a · b</span> | how much they point the same way, but also bigger for longer arrows | 24 |
+| <span class="k2">/</span> | divided by | |
+| <span class="k3">\|a\| · \|b\|</span> | both lengths multiplied: removes the "longer arrow" effect | 5 × 5 = 25 |
+
+24 ÷ 25 = **0.96**: almost the same direction. 1 means the same direction, 0 unrelated, −1 opposite.
+
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `a[i]` | "a at i" | the number at position `i` (positions start at 0) |
+| `range(len(a))` | | all positions 0, 1, … of the list |
+| `total = total + a[i] * b[i]` | | running total of the products |
+| `math.sqrt(25)` | "square root of 25" | `5.0` |
+| `dot(a, a)` | | calls your own `dot` with the same vector twice: that's `a · a` |
+
+### 👀 Worked example: a running total over two lists
+
+```python
+def add_matching(a, b):
+    total = 0
+    for i in range(len(a)):
+        total = total + a[i] + b[i]
+    return total
+
+print(add_matching([1, 2], [10, 20]))   # 33
+```
+
+i = 0: 0 + 1 + 10 = 11. i = 1: 11 + 2 + 20 = 33. Your `dot` is the same with `*` between `a[i]` and `b[i]`.
+
+## 🎯 Your quest
+
+**Part 1:** `dot(a, b)`. Replace `return 0` with:
+
+1. `total = 0`
+2. `for i in range(len(a)):`
+3. `    total = total + a[i] * b[i]`
+4. `return total`
+
+**Part 2:** `cosine(a, b)`. Replace `return 0` with one line:
+
+- `return dot(a, b) / (math.sqrt(dot(a, a)) * math.sqrt(dot(b, b)))`
+
+Read it piece by piece: `dot(a, b)` on top, divided by length of a (`math.sqrt(dot(a, a))`) times length of b.
+
+The program then shows how close every word is to `"king"` in a tiny 3-number embedding table.
 
 ## Review
 
 <details><summary>What is a chat template, and who applies it in LM Studio?</summary>The format with special tokens that flattens a conversation into one string, exactly as the model was trained. LM Studio applies the template stored in the GGUF file.</details>
 <details><summary>What is the difference between a base and an instruct model?</summary>A base model only continues text. An instruct model was further trained (SFT, then preference tuning) on conversations to follow requests.</details>
 <details><summary>Write the softmax formula.</summary>softmax(zᵢ) = e^zᵢ / Σⱼ e^zⱼ</details>
+<details><summary>What is √(3 · 3 + 4 · 4)?</summary>√25 = 5: the length of the vector [3, 4].</details>

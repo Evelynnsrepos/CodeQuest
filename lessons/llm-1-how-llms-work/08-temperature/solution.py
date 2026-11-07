@@ -3,9 +3,14 @@ import math
 
 def softmax(logits):
     m = max(logits)
-    exps = [math.exp(z - m) for z in logits]
+    exps = []
+    for z in logits:
+        exps.append(math.exp(z - m))
     total = sum(exps)
-    return [e / total for e in exps]
+    probs = []
+    for e in exps:
+        probs.append(e / total)
+    return probs
 
 
 def softmax_t(logits, T):
@@ -19,6 +24,8 @@ tokens = [" Paris", " Lyon", " a", " the"]
 logits = [9.1, 5.2, 4.0, 3.5]
 for T in [0.2, 1.0, 3.0]:
     probs = softmax_t(logits, T)
-    print(f"T={T}: " + "  ".join(f"{t!r} {p:.2f}" for t, p in zip(tokens, probs)))
+    print("T =", T)
+    for i in range(len(tokens)):
+        print("   ", tokens[i], round(probs[i], 2))
 
-code_temperature = "low"  # "low" or "high"
+code_temperature = "low"

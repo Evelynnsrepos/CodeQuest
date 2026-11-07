@@ -1,6 +1,8 @@
 def count_pairs(tokens):
     counts = {}
-    # count every pair of neighbouring tokens
+    # for i in range(len(tokens) - 1):
+    #     pair = (tokens[i], tokens[i + 1])
+    #     counts[pair] = counts.get(pair, 0) + 1
     return counts
 
 

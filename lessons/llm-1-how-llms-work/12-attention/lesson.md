@@ -1,8 +1,14 @@
 ---
 title: Attention
+minutes: 45
 xp: 40
+hint: Step 1, after scores = []: for k in keys: and inside it scores.append(dot(q, k) / math.sqrt(len(q)))
+hint: Step 3: for j in range(len(values)): then w = weights[j] and v = values[j]
+hint: Inside that loop, a second loop: for i in range(len(v)): and inside it output[i] = output[i] + w * v[i]
 ---
 # How a token looks at other tokens
+
+⏱️ About 45 minutes
 
 > **Warm-up:** in "The animal didn't cross the street because **it** was too tired", how do *you* know what "it" means? What would a model need to do to know it?
 
@@ -37,13 +43,81 @@ output = 0.8·v("animal") + 0.1·v("street") + …
 - **Residual connections and normalization:** each block *adds* its result to the token's vector instead of replacing it, which keeps very deep stacks trainable.
 - **Layers:** the attention + MLP block repeats (32 times in Llama 3 8B). Early layers handle surface patterns, later ones more abstract meaning.
 
-## Your quest
+## 🔬 Take the formulas apart
 
-Write `attend(q, keys, values)` for one query. `dot` and `softmax` are given.
+<div class="formula">score = <span class="k1">(q · k)</span> <span class="k2">/ √d</span></div>
+<div class="formula">output = <span class="k3">w₁·v₁ + w₂·v₂ + … </span></div>
 
-1. Make a list of scores: `dot(q, k) / math.sqrt(len(q))` for every key.
-2. Turn them into `weights` with `softmax`.
-3. Start `output` as a list of zeros the length of a value vector, then for each weight `w` and value `v`, add `w * v[i]` to `output[i]` for every position `i`.
+| Piece | Say it | Means |
+|---|---|---|
+| <span class="k1">q · k</span> | "q dot k" | the dot product from lesson 11: multiply matching numbers, add up. Big when the query and key point the same way. |
+| `d` | "d" | how many numbers the query has. Here 4. |
+| <span class="k2">/ √d</span> | "divided by the square root of d" | √4 = 2. Keeps the scores from getting too big for softmax. |
+| `w₁`, `w₂`, … | "weight one, weight two" | the scores after softmax: they add up to 1 |
+| <span class="k3">w₁·v₁ + w₂·v₂ + …</span> | "weighted sum of the values" | multiply each value **vector** by its weight, then add the vectors **position by position** |
+
+**The quest's numbers, step by step.** The query for "it" is [2, 0.5, 0, 1].
+
+1. **Scores.** q · k for animal = 2·2 + 0.5·1 + 0·0 + 1·1 = 5.5. For street = 0.5, for because = 1.0. Divided by √4 = 2: **2.75, 0.25, 0.5**.
+2. **Softmax** (lesson 5): weights ≈ **0.84, 0.07, 0.09**. Most of the attention goes to "animal".
+3. **Weighted sum** of the values [1, 0], [0, 1] and [0.5, 0.5], one position at a time:
+   - position 0: 0.84·1 + 0.07·0 + 0.09·0.5 ≈ **0.886**
+   - position 1: 0.84·0 + 0.07·1 + 0.09·0.5 ≈ **0.114**
+
+The new vector for "it" is [0.886, 0.114]: mostly "animal".
+
+## 🐍 Python you need
+
+`dot` and `softmax` are given in the starter.
+
+| You write | Say it | What it does |
+|---|---|---|
+| `math.sqrt(len(q))` | "square root of the length of q" | √d |
+| `scores.append(x)` | | adds a score to the list |
+| `[0.0] * 3` | "a list of three zeros" | `[0.0, 0.0, 0.0]`: a list repeated 3 times. The starter makes `output` like this. |
+| `for j in range(len(values)):` | | goes over the positions of the values list, so `weights[j]` and `values[j]` belong together |
+| `output[i] = output[i] + w * v[i]` | | adds to one position of the output list |
+| a loop inside a loop | | for **each** value vector, go over **each** of its positions |
+
+### 👀 Worked example: mixing two paint colours
+
+Each colour is [red, blue]. Mix 75% of colour A and 25% of colour B:
+
+```python
+weights = [0.75, 0.25]
+colours = [[1.0, 0.0], [0.0, 1.0]]
+mix = [0.0] * 2
+for j in range(len(colours)):
+    w = weights[j]
+    c = colours[j]
+    for i in range(len(c)):
+        mix[i] = mix[i] + w * c[i]
+print(mix)   # [0.75, 0.25]
+```
+
+1. `mix` = [0, 0].
+2. j = 0 (w = 0.75, c = [1, 0]): position 0 gets + 0.75, position 1 gets + 0. `mix` = [0.75, 0].
+3. j = 1 (w = 0.25, c = [0, 1]): position 0 gets + 0, position 1 gets + 0.25. `mix` = [0.75, 0.25].
+
+That's exactly step 3 of attention.
+
+## 🎯 Your quest
+
+Write `attend(q, keys, values)` for one query. `dot` and `softmax` are given. Make the function read:
+
+1. `scores = []`
+2. `for k in keys:`
+3. `    scores.append(dot(q, k) / math.sqrt(len(q)))`
+4. `weights = softmax(scores)`
+5. `output = [0.0] * len(values[0])`
+6. `for j in range(len(values)):`
+7. `    w = weights[j]`
+8. `    v = values[j]`
+9. `    for i in range(len(v)):`
+10. `        output[i] = output[i] + w * v[i]`
+11. `return output`
+
+Lines 1, 4, 5 and 11 are already there. It should print `[0.886, 0.114]`.
 
 ## Watch
 
@@ -54,3 +128,4 @@ Write `attend(q, keys, values)` for one query. `dot` and `softmax` are given.
 
 <details><summary>What does cosine similarity measure that the dot product doesn't?</summary>Only the angle (direction) between vectors, not their lengths. It ranges from −1 to 1.</details>
 <details><summary>What is an embedding matrix?</summary>A learned table with one vector per vocabulary token. The model's first step is looking up each token ID's row.</details>
+<details><summary>Scores 4 and 0 with d = 4: what goes into softmax?</summary>4 ÷ √4 = 2 and 0 ÷ 2 = 0.</details>

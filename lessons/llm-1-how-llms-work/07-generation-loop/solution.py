@@ -15,10 +15,15 @@ def generate(prompt, max_tokens):
     tokens = list(prompt)
     for _ in range(max_tokens):
         dist = MODEL[tokens[-1]]
-        next_token = max(dist, key=dist.get)
-        if next_token == "<eos>":
+        best = None
+        best_p = -1
+        for token in dist:
+            if dist[token] > best_p:
+                best = token
+                best_p = dist[token]
+        if best == "<eos>":
             break
-        tokens.append(next_token)
+        tokens.append(best)
     return tokens
 
 

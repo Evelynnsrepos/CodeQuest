@@ -1,8 +1,13 @@
 ---
 title: Base models, instruct models and chat templates
+minutes: 25
 xp: 30
+hint: Inside the loop: text = text + "<|im_start|>" + message["role"] + "\n" + message["content"] + "<|im_end|>\n"
+hint: Last line: return text + "<|im_start|>assistant\n"
 ---
 # From text predictor to assistant
+
+⏱️ About 25 minutes
 
 > **Warm-up:** a model only continues text. So how does it "know" that it should *answer* your question instead of, say, writing three more similar questions?
 
@@ -28,17 +33,57 @@ The string ends with an open assistant turn, so the most likely continuation is 
 
 Reasoning ("thinking") models such as Qwen3 add one more convention: they write their reasoning between `<think>` and `</think>` before the answer. It's still just tokens following a trained format.
 
-## Your quest
+## 🐍 Python you need
 
-Write `to_chatml(messages)`. `messages` is a list of dictionaries like `{"role": "user", "content": "Hi"}`. For each message, add
+| You write | Say it | What it does |
+|---|---|---|
+| `text = ""` | "text becomes empty" | an empty text to build on |
+| `for message in messages:` | | once per message |
+| `message["role"]` | "message at role" | `"system"`, `"user"` or `"assistant"` |
+| `message["content"]` | | what was said |
+| `"\n"` | "newline" | a line break inside a text |
+| `text = text + "..."` | | adds more to the end of the text (a running total, but for text) |
+
+### 👀 Worked example: a shopping list as text
+
+```python
+def as_list(items):
+    text = ""
+    for item in items:
+        text = text + "- " + item["name"] + " x" + item["count"] + "\n"
+    return text + "That's all.\n"
+
+print(as_list([{"name": "milk", "count": "2"}, {"name": "tea", "count": "1"}]))
+```
+
+1. `text` = `""`.
+2. milk: `text` = `"- milk x2\n"`.
+3. tea: `text` = `"- milk x2\n- tea x1\n"`.
+4. After the loop, one more line is added: `"That's all.\n"`.
+
+It prints:
 
 ```
-<|im_start|>ROLE\nCONTENT<|im_end|>\n
+- milk x2
+- tea x1
+That's all.
 ```
 
-to the result, and at the very end add the open assistant turn `<|im_start|>assistant\n`. (`\n` is a newline inside a Python string.)
+Your quest has exactly this shape, with ChatML's markers instead of `- ` and ` x`.
+
+## 🎯 Your quest
+
+Write `to_chatml(messages)`. `messages` is a list of dictionaries like `{"role": "user", "content": "Hi"}`.
+
+1. Replace the `pass` line (inside the loop) with:
+   - `text = text + "<|im_start|>" + message["role"] + "\n" + message["content"] + "<|im_end|>\n"`
+2. Change the last line to add the open assistant turn:
+   - `return text + "<|im_start|>assistant\n"`
+
+Run it: the output should look exactly like the ChatML example above.
 
 ## Review
 
 <details><summary>What does top-p = 0.9 keep?</summary>The smallest set of most-likely tokens whose probabilities add up to at least 0.9, renormalized.</details>
 <details><summary>Why cut off the long tail at all?</summary>Thousands of individually unlikely tokens add up to a real chance of a garbage pick over a long reply.</details>
+<details><summary>Why does a ChatML prompt end with "<|im_start|>assistant" and a line break?</summary>So the most likely continuation is the assistant's reply. The model then ends it with <|im_end|>.</details>

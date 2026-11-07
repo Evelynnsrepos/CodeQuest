@@ -5,13 +5,15 @@ id_to_token = {i: t for t, i in vocab.items()}  # the same list, the other way r
 def encode(tokens):
     ids = []
     for token in tokens:
-        pass  # look up the token's ID and append it to ids
+        pass  # replace this line with: ids.append(vocab[token])
     return ids
 
 
 def decode(ids):
     pieces = []
-    # turn every ID back into its token, then join the pieces
+    # for i in ids:
+    #     pieces.append(id_to_token[i])
+    # return "".join(pieces)
     return ""
 
 
