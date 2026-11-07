@@ -1,16 +1,36 @@
 def dist2(p, q):
-    return sum((a - b) ** 2 for a, b in zip(p, q))
+    total = 0
+    for i in range(len(p)):
+        total = total + (p[i] - q[i]) ** 2
+    return total
 
 
 def kmeans(points, centers, iters):
-    centers = [tuple(c) for c in centers]
     assign = []
-    for _ in range(iters):
-        assign = [min(range(len(centers)), key=lambda i: dist2(p, centers[i])) for p in points]
+    for step in range(iters):
+        assign = []
+        for p in points:
+            best = 0
+            for i in range(len(centers)):
+                if dist2(p, centers[i]) < dist2(p, centers[best]):
+                    best = i
+            assign.append(best)
         new = []
-        for i, c in enumerate(centers):
-            mine = [p for p, a in zip(points, assign) if a == i]
-            new.append(tuple(sum(v) / len(mine) for v in zip(*mine)) if mine else c)
+        for i in range(len(centers)):
+            mine = []
+            for j in range(len(points)):
+                if assign[j] == i:
+                    mine.append(points[j])
+            if len(mine) == 0:
+                new.append(tuple(centers[i]))
+            else:
+                mean = []
+                for dim in range(len(mine[0])):
+                    total = 0
+                    for p in mine:
+                        total = total + p[dim]
+                    mean.append(total / len(mine))
+                new.append(tuple(mean))
         centers = new
     return centers, assign
 
