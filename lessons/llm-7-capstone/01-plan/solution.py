@@ -13,11 +13,14 @@ PROJECT = {
 
 
 def pick_base(candidates, max_params_b):
-    ok = [c for c in candidates
-          if c["instruct"] and c["license"] in OK_LICENSES and c["params_b"] <= max_params_b]
-    if not ok:
+    best = None
+    for c in candidates:
+        if c["instruct"] and c["license"] in OK_LICENSES and c["params_b"] <= max_params_b:
+            if best is None or c["params_b"] > best["params_b"]:
+                best = c
+    if best is None:
         return None
-    return max(ok, key=lambda c: c["params_b"])["name"]
+    return best["name"]
 
 
 candidates = [

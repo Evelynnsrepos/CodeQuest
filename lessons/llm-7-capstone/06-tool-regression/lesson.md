@@ -1,8 +1,14 @@
 ---
 title: Give it a tool and check nothing broke
+minutes: 30
 xp: 50
+hint: accuracy: correct = 0, for i in range(len(cases)): if cases[i]["expect"] == replies[i]["tool"]: correct = correct + 1
+hint: accuracy ends: return correct / len(cases)
+hint: regressed: return base_acc - tuned_acc > tolerance
 ---
 # Fine-tuning can quietly break tool calling
+
+⏱️ About 30 minutes
 
 > **Warm-up:** you fine-tuned on plain question/answer pairs with no tool calls. What might happen to the model's ability to call tools?
 
@@ -17,12 +23,29 @@ A reply counts as **correct** when:
 
 If the tuned model's accuracy drops by more than a small tolerance, fix the data: mix some tool-calling examples (in your model's chat template) back into the training set and train again.
 
-## Your quest
+## 🐍 Python you need
 
-Each case is `{"expect": {"name": ..., "args": {...}}}` or `{"expect": None}`. Each reply is `{"tool": {"name": ..., "args": {...}}}` or `{"tool": None}`.
+| You write | Say it | What it does |
+|---|---|---|
+| `cases[i]["expect"] == replies[i]["tool"]` | | `==` compares whole dictionaries: same keys, same values. `"Berlin"` and `"berlin"` are **different**. `None == None` is true. |
+| `correct / len(cases)` | | the share that was right |
+| `return a - b > t` | | the comparison is already `True`/`False` |
 
-1. `accuracy(cases, replies)`: fraction correct (a float).
-2. `regressed(base_acc, tuned_acc, tolerance=0.05)`: `True` when tuned is worse than base by **more** than the tolerance.
+### 👀 Worked example
+
+base got 3 of 3 → 1.0. tuned wrote `"berlin"` instead of `"Berlin"` → 2 of 3 → 0.667. Drop: 1.0 − 0.667 = 0.333, more than 0.05 → **regressed: True**.
+
+## 🎯 Your quest
+
+`accuracy(cases, replies)`: replace `return 0.0` with:
+
+1. `    correct = 0`
+2. `    for i in range(len(cases)):`
+3. `        if cases[i]["expect"] == replies[i]["tool"]:`
+4. `            correct = correct + 1`
+5. `    return correct / len(cases)`
+
+`regressed(base_acc, tuned_acc, tolerance=0.05)`: replace `return None` with `    return base_acc - tuned_acc > tolerance`
 
 ## Review
 

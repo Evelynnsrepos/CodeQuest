@@ -2,10 +2,28 @@ SECTIONS = ["## Base model", "## Training data", "## Training", "## Evaluation",
 
 
 def make_card(info):
+    # bodies = [
+    #     info["base_model"] + "\n\nLicense: " + info["license"],
+    #     info["data"],
+    #     info["training"],
+    #     info["evaluation"],
+    #     info["limitations"],
+    #     info["how_to_run"],
+    # ]
+    # parts = ["# " + info["name"]]
+    # for i in range(len(SECTIONS)):
+    #     parts.append(SECTIONS[i] + "\n\n" + bodies[i])
+    # return "\n\n".join(parts) + "\n"
     return ""
 
 
 def missing_sections(markdown):
+    # lines = markdown.splitlines()
+    # missing = []
+    # for s in SECTIONS:
+    #     if s not in lines:
+    #         missing.append(s)
+    # return missing
     return []
 
 

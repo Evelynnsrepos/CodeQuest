@@ -10,7 +10,11 @@ def full_ft_gb(params_b):
 
 
 def best_step(log):
-    return min(log, key=lambda pair: pair[1])[0]
+    best = log[0]
+    for pair in log:
+        if pair[1] < best[1]:
+            best = pair
+    return best[0]
 
 
 def win_interval(wins, n):
@@ -20,7 +24,8 @@ def win_interval(wins, n):
 
 
 def clear_win(wins, n):
-    return win_interval(wins, n)[0] > 0.5
+    low, high = win_interval(wins, n)
+    return low > 0.5
 
 
 print(fits(8, 16, 12), fits(8, 4.5, 12), full_ft_gb(8), best_step([(200, 1.9), (400, 1.6), (600, 1.5), (800, 1.7)]))

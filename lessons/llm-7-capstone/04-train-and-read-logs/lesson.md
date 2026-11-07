@@ -1,8 +1,15 @@
 ---
 title: Run the training and read its logs
+minutes: 40
 xp: 50
+hint: best_checkpoint: best_step = None, best_loss = None, then for h in history: if "eval_loss" in h: and the best-so-far check
+hint: The best-so-far check: if best_loss is None or h["eval_loss"] < best_loss: best_loss = h["eval_loss"] and best_step = h["step"]
+hint: diagnose: first collect two lists, train (every h["loss"]) and evals (every h["eval_loss"])
+hint: Then three ifs in order: any math.isnan(x) → "nan loss"; evals[-1] > min(evals) → "overfitting"; train[-1] < 0.05 → "memorizing"
 ---
 # Training is the easy part; reading it is the skill
+
+⏱️ About 40 minutes
 
 > **Warm-up:** your run finished. Which numbers would tell you it went well, and which would tell you it went wrong?
 
@@ -32,15 +39,58 @@ What to look for:
 | `loss` is `nan` or explodes | learning rate too high, bad data, or precision problem |
 | `grad_norm` spikes far above its usual level | unstable step; often a bad example or too-high LR |
 
-## Your quest
+## 🐍 Python you need
 
-`history` is a list like the one above (training entries have `"loss"`, evaluation entries have `"eval_loss"`).
+| You write | Say it | What it does |
+|---|---|---|
+| `"eval_loss" in h` | | true if the dictionary has that key |
+| `best_loss is None or h["eval_loss"] < best_loss` | | the first one always wins; after that only a lower one |
+| `math.isnan(x)` | "is not a number" | true for `nan`, the value a broken training produces |
+| `has_nan = False` … `has_nan = True` | | a **flag**: starts False, flips to True if any is found |
+| `min(evals)` | | the lowest eval loss |
+| `evals[-1]`, `train[-1]` | | the last one |
+| `len(evals) > 0 and …` | | only check when the list isn't empty |
 
-1. `best_checkpoint(history)`: the `step` of the entry with the lowest `eval_loss`.
-2. `diagnose(history)`: a list of problems, in this order:
-   - `"nan loss"` if any training loss is not a number (`math.isnan`)
-   - `"overfitting"` if the **last** `eval_loss` is higher than the lowest one
-   - `"memorizing"` if the last training loss is below `0.05`
+### 👀 Worked example: reading the log
+
+Eval losses: step 20 → 1.60, step 40 → 1.41, step 60 → 1.47.
+
+1. Best: 1.60 first, then 1.41 is lower → best step 40. 1.47 isn't lower → stays **40**.
+2. Last eval 1.47 > lowest 1.41 → **"overfitting"**.
+3. Last train loss 0.44 is not < 0.05 → not memorizing. No nan.
+
+## 🎯 Your quest
+
+`best_checkpoint(history)`: replace `return None` with:
+
+1. `    best_step = None`
+2. `    best_loss = None`
+3. `    for h in history:`
+4. `        if "eval_loss" in h:`
+5. `            if best_loss is None or h["eval_loss"] < best_loss:`
+6. `                best_loss = h["eval_loss"]`
+7. `                best_step = h["step"]`
+8. `    return best_step`
+
+`diagnose(history)`: between `problems = []` and `return problems`, add:
+
+1. `    train = []`
+2. `    evals = []`
+3. `    for h in history:`
+4. `        if "loss" in h:`
+5. `            train.append(h["loss"])`
+6. `        if "eval_loss" in h:`
+7. `            evals.append(h["eval_loss"])`
+8. `    has_nan = False`
+9. `    for x in train:`
+10. `        if math.isnan(x):`
+11. `            has_nan = True`
+12. `    if has_nan:`
+13. `        problems.append("nan loss")`
+14. `    if len(evals) > 0 and evals[-1] > min(evals):`
+15. `        problems.append("overfitting")`
+16. `    if len(train) > 0 and train[-1] < 0.05:`
+17. `        problems.append("memorizing")`
 
 ## Review
 

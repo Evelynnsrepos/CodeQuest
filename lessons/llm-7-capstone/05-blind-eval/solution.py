@@ -5,22 +5,23 @@ import random
 def make_pairs(base, tuned, seed):
     rng = random.Random(seed)
     pairs = []
-    for b, t in zip(base, tuned):
+    for i in range(len(base)):
         if rng.random() < 0.5:
-            pairs.append({"A": t, "B": b, "tuned": "A"})
+            pairs.append({"A": tuned[i], "B": base[i], "tuned": "A"})
         else:
-            pairs.append({"A": b, "B": t, "tuned": "B"})
+            pairs.append({"A": base[i], "B": tuned[i], "tuned": "B"})
     return pairs
 
 
 def score(pairs, judgments):
     n = len(pairs)
     wins = 0
-    for p, j in zip(pairs, judgments):
+    for i in range(n):
+        j = judgments[i]
         if j == "tie":
-            wins += 0.5
-        elif j == p["tuned"]:
-            wins += 1
+            wins = wins + 0.5
+        elif j == pairs[i]["tuned"]:
+            wins = wins + 1
     p = wins / n
     margin = 1.96 * math.sqrt(p * (1 - p) / n)
     return (round(p, 3), round(p - margin, 3), round(p + margin, 3))
