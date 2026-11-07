@@ -1,5 +1,7 @@
 def training_hours(examples, avg_tokens, epochs, tokens_per_second):
-    return examples * avg_tokens * epochs / tokens_per_second / 3600
+    tokens = examples * avg_tokens * epochs
+    seconds = tokens / tokens_per_second
+    return seconds / 3600
 
 
 def cloud_cost(hours, price_per_hour, setup_hours=0.5):

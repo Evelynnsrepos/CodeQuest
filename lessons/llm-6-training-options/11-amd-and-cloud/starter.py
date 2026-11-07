@@ -1,12 +1,21 @@
 def training_hours(examples, avg_tokens, epochs, tokens_per_second):
+    # tokens = examples * avg_tokens * epochs
+    # seconds = tokens / tokens_per_second
+    # return seconds / 3600
     return 0
 
 
 def cloud_cost(hours, price_per_hour, setup_hours=0.5):
+    # return (hours + setup_hours) * price_per_hour
     return 0
 
 
 def diagnose(cuda_available, hip_version):
+    # if hip_version is None:
+    #     return "cpu-only build"
+    # if cuda_available:
+    #     return "ready"
+    # return "check HSA_OVERRIDE_GFX_VERSION and groups"
     return ""
 
 

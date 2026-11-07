@@ -1,8 +1,14 @@
 ---
 title: Checkpoint: RAG or fine-tuning, and why
+minutes: 40
 xp: 70
+hint: Each choice is one of four texts: "prompt", "rag", "finetune" or "both", with quotes
+hint: Knowledge that changes (notes, results) → rag. A behaviour or format that must always hold → finetune. Both kinds → both. Already works when asked → prompt
+hint: Each reason goes between the quotes, one or two full sentences. Use words like knowledge, changes, style, format, behaviour, system prompt
 ---
 # Checkpoint
+
+⏱️ About 40 minutes
 
 The Module 6 checkpoint, from your plan: *explain whether a given goal needs RAG or fine-tuning, and why.* For each goal, choose `"prompt"`, `"rag"`, `"finetune"` or `"both"`, and write **one or two sentences** of reasoning, as if explaining it to a friend.
 
@@ -16,6 +22,24 @@ The Module 6 checkpoint, from your plan: *explain whether a given goal needs RAG
 | `german` | "Summarize articles in German instead of English" (a 14B model that speaks German well) |
 
 The check looks at your choices and that each reason uses at least one fitting idea (for example knowledge that changes, citing sources, style, format, behaviour, a system prompt). Once you pass, compare your reasons with the model answers.
+
+## 🧩 How to answer
+
+Put your answer **between the quotes**, and keep the comma at the end of each line. For a goal that is **not** in the list ("answer questions about my recipe collection, which I add to every week"):
+
+```python
+choices = {
+    "recipes": "rag",
+}
+reasons = {
+    "recipes": "It's knowledge that changes every week, so I'd look it up at question time with RAG instead of training it in.",
+}
+```
+
+Ask yourself two questions for each goal:
+
+1. Is it **knowledge** (facts, documents, results) or **behaviour** (style, format, always doing something)? Knowledge → rag, behaviour → finetune, both → both.
+2. Does simply **asking** (a system prompt) already work? Then → prompt.
 
 <details><summary>Open only after you pass: model answers</summary>
 

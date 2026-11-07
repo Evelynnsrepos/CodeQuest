@@ -1,8 +1,15 @@
 ---
 title: Merging adapters and converting to GGUF
+minutes: 30
 xp: 45
+hint: Build the file names first: f16 = name + "-F16.gguf" and quantized = name + "-" + quant + ".gguf"
+hint: Glue each command with +, and don't forget the spaces inside the quotes: "llama-quantize " + f16 + " " + quantized + " " + quant
+hint: return [convert, shrink, load], a list of the three texts
+hint: merge_dtype: merging into the 4-bit base bakes in quantization error, so use "bf16"
 ---
 # From adapter to LM Studio
+
+⏱️ About 30 minutes
 
 > **Warm-up:** training gave you a folder with a 160 MB adapter. LM Studio wants one GGUF file. List the steps in between.
 
@@ -46,10 +53,37 @@ llama-quantize my-model-F16.gguf my-model-Q4_K_M.gguf Q4_K_M
 
 Alternatives: Unsloth can do merge + convert + quantize in one call (`save_pretrained_gguf`); and llama.cpp can load an **unmerged** adapter converted with `convert_lora_to_gguf.py`, applied at load time with `--lora`. Script names and flags change occasionally; `--help` is your friend.
 
-## Your quest
+## 🐍 Python you need
 
-1. `gguf_commands(merged_dir, name, quant)`: return the list of three shell commands (convert, quantize, import) exactly in the form shown above, using `{name}-F16.gguf` and `{name}-{quant}.gguf`.
-2. `merge_dtype`: set it to `"bf16"` or `"4bit"`: what should the base model be loaded as before merging?
+| You write | Say it | What it does |
+|---|---|---|
+| `name + "-F16.gguf"` | | glues texts: `"my-model" + "-F16.gguf"` → `"my-model-F16.gguf"` |
+| `"lms import " + quantized` | | note the space before the closing quote, so the words don't stick together |
+| `return [a, b, c]` | | a list of three texts |
+
+### 👀 Worked example: the commands for "my-model"
+
+With `merged_dir = "merged"`, `name = "my-model"`, `quant = "Q4_K_M"`:
+
+1. f16 = `"my-model-F16.gguf"`, quantized = `"my-model-Q4_K_M.gguf"`
+2. `python convert_hf_to_gguf.py merged --outfile my-model-F16.gguf --outtype f16`
+3. `llama-quantize my-model-F16.gguf my-model-Q4_K_M.gguf Q4_K_M`
+4. `lms import my-model-Q4_K_M.gguf`
+
+These are exactly the three lines from the text above.
+
+## 🎯 Your quest
+
+**Part 1:** `gguf_commands(merged_dir, name, quant)`. Replace `return []` with:
+
+1. `    f16 = name + "-F16.gguf"`
+2. `    quantized = name + "-" + quant + ".gguf"`
+3. `    convert = "python convert_hf_to_gguf.py " + merged_dir + " --outfile " + f16 + " --outtype f16"`
+4. `    shrink = "llama-quantize " + f16 + " " + quantized + " " + quant`
+5. `    load = "lms import " + quantized`
+6. `    return [convert, shrink, load]`
+
+**Part 2:** set `merge_dtype` to `"bf16"` or `"4bit"`: what should the base model be loaded as before merging? (Reread the paragraph about baking in quantization error.)
 
 ## Review
 

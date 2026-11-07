@@ -2,15 +2,30 @@ import math
 
 
 def effective_batch(per_device, accumulation, gpus=1):
+    # return per_device * accumulation * gpus
     return 0
 
 
 def total_steps(examples, per_device, accumulation, epochs, gpus=1):
+    # batch = effective_batch(per_device, accumulation, gpus)
+    # return math.ceil(examples / batch) * epochs
     return 0
 
 
 def warnings_for(config):
     warnings = []
+    # eb = effective_batch(config["per_device"], config["accumulation"])
+    # steps = total_steps(config["examples"], config["per_device"], config["accumulation"], config["epochs"])
+    # if config["lr"] > 5e-4:
+    #     warnings.append("learning rate too high")
+    # if config["lr"] < 1e-5:
+    #     warnings.append("learning rate too low")
+    # if config["epochs"] > 5:
+    #     warnings.append("too many epochs")
+    # if eb < 8:
+    #     warnings.append("effective batch too small")
+    # if steps < 20:
+    #     warnings.append("very few steps")
     return warnings
 
 

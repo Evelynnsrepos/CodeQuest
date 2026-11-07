@@ -1,8 +1,14 @@
 ---
 title: Training on AMD, or on a rented GPU
+minutes: 30
 xp: 40
+hint: training_hours: tokens = examples * avg_tokens * epochs, seconds = tokens / tokens_per_second, return seconds / 3600
+hint: cloud_cost: return (hours + setup_hours) * price_per_hour
+hint: diagnose: check None first: if hip_version is None: return "cpu-only build". Then if cuda_available: return "ready". Last line: the HSA text
 ---
 # Where your training actually runs
+
+⏱️ About 30 minutes
 
 > **Warm-up:** almost every fine-tuning tutorial says `pip install ...` and assumes an NVIDIA GPU. What breaks on your Radeon?
 
@@ -33,11 +39,49 @@ hours           = training tokens ÷ (tokens per second the setup trains at) ÷ 
 
 Measure tokens/s with a short test run (the trainer logs it), then extrapolate.
 
-## Your quest
+## 🔬 Take the formulas apart
 
-1. `training_hours(examples, avg_tokens, epochs, tokens_per_second)`.
-2. `cloud_cost(hours, price_per_hour, setup_hours=0.5)`: you also pay while setting up and downloading.
-3. `diagnose(cuda_available, hip_version)`: return `"ready"` if `cuda_available` is true and `hip_version` is not `None`; `"cpu-only build"` if `hip_version` is `None`; otherwise `"check HSA_OVERRIDE_GFX_VERSION and groups"`.
+<div class="formula">tokens = <span class="k1">examples</span> × <span class="k2">avg tokens</span> × <span class="k3">epochs</span></div>
+800 × 450 × 3 = **1,080,000** tokens to train on.
+
+<div class="formula">hours = tokens ÷ <span class="k1">tokens per second</span> ÷ <span class="k2">3600</span></div>
+1,080,000 ÷ 1,500 = 720 seconds. An hour has 60 × 60 = <span class="k2">3600</span> seconds: 720 ÷ 3600 = **0.2 hours** (12 minutes).
+
+<div class="formula">cost = (<span class="k1">hours</span> + <span class="k2">setup</span>) × <span class="k3">price per hour</span></div>
+(0.2 + 0.5) × 0.80 € = 0.7 × 0.80 = **0.56 €**. The setup half hour costs more than the training itself.
+
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `(a + b) * c` | | brackets first |
+| `def f(..., setup_hours=0.5):` | | 0.5 unless the caller gives another number |
+| `if hip_version is None:` | | true when there is no ROCm version: a build without GPU support |
+| `if cuda_available:` | | true when PyTorch sees the GPU. (On AMD, PyTorch still calls it "cuda".) |
+
+### 👀 Worked example: the order of the checks
+
+`diagnose(False, None)`: hip_version is None → "cpu-only build". The second `if` never runs.
+`diagnose(False, "6.4.43482")`: not None, not available → falls through to the last line.
+`diagnose(True, "6.4.43482")`: not None, available → "ready".
+
+## 🎯 Your quest
+
+`training_hours`: replace `return 0` with:
+
+1. `    tokens = examples * avg_tokens * epochs`
+2. `    seconds = tokens / tokens_per_second`
+3. `    return seconds / 3600`
+
+`cloud_cost`: replace `return 0` with `    return (hours + setup_hours) * price_per_hour`
+
+`diagnose`: replace `return ""` with:
+
+1. `    if hip_version is None:`
+2. `        return "cpu-only build"`
+3. `    if cuda_available:`
+4. `        return "ready"`
+5. `    return "check HSA_OVERRIDE_GFX_VERSION and groups"`
 
 ## Review
 

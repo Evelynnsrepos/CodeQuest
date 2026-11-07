@@ -1,8 +1,15 @@
 ---
 title: Preference tuning, RLHF and DPO
+minutes: 50
 xp: 55
+hint: implicit_reward: return beta * (logp_policy - logp_ref)
+hint: dpo_loss: chosen = implicit_reward(pc, rc, beta), rejected = implicit_reward(pr, rr, beta), margin = chosen - rejected
+hint: dpo_loss ends: return math.log(1 + math.exp(-margin))
+hint: reward_accuracy: wins = 0, for pc, pr, rc, rr in batch: if implicit_reward(pc, rc, beta) > implicit_reward(pr, rr, beta): wins = wins + 1. Then return wins / len(batch)
 ---
 # Teaching "better", not just "correct"
+
+⏱️ About 50 minutes
 
 > **Warm-up:** for "write a friendly reply to this email" there's no single correct answer to imitate, but you can easily say which of two drafts is better. How could a model learn from that?
 
@@ -27,15 +34,62 @@ In words: raise the chosen answer's probability *relative to where it started*, 
 
 DPO runs as a normal fine-tune, so it works with (Q)LoRA on your card (with LoRA, the reference is just the model with the adapter switched off: no second copy needed). TRL's `DPOTrainer` implements it. Related methods you'll see: **ORPO**, **KTO**, **SimPO**, and **GRPO** (RL with groups of sampled answers, used for reasoning models like DeepSeek-R1).
 
-## Python you need
+## 🔬 Take the formulas apart
 
-`σ(x) = 1 / (1 + e⁻ˣ)`. For numerical safety, `−log σ(x)` can be written as `softplus(−x) = log(1 + e⁻ˣ)`.
+**The letters.** `π` ("pi", here **not** 3.14) is the model being trained. `π_ref` is the frozen copy. `log π(chosen)` is the model's log-probability of the whole chosen answer: a negative number, closer to 0 = more likely. `β` ("beta") is a setting, 0.1.
 
-## Your quest
+**Implicit reward** <div class="formula">reward = <span class="k1">β</span> · (<span class="k2">log π(answer)</span> − <span class="k3">log π_ref(answer)</span>)</div>
+"How much more likely is this answer **now** than at the start?" Positive = got likelier.
 
-1. `implicit_reward(logp_policy, logp_ref, beta)`: `beta · (logp_policy − logp_ref)`.
-2. `dpo_loss(pc, pr, rc, rr, beta)`: policy chosen/rejected and reference chosen/rejected log-probs → the DPO loss.
-3. `reward_accuracy(batch, beta)`: the share of examples in the batch (tuples `(pc, pr, rc, rr)`) where the chosen implicit reward beats the rejected one.
+**Margin** <div class="formula">margin = <span class="k1">reward(chosen)</span> − <span class="k2">reward(rejected)</span></div>
+Big positive margin = the model moved the right way.
+
+**Loss** <div class="formula">loss = −log σ(margin) = log(1 + e<sup>−margin</sup>)</div>
+σ is the sigmoid from LLMs 4 lesson 8. The two forms are equal; the right one is safer to compute. Margin 0 → log(1 + 1) = log 2 ≈ 0.693. Big margin → e^(−margin) ≈ 0 → loss ≈ log 1 = 0.
+
+**Numbers**, β = 0.1, `later = (−38, −47, −42, −40)` meaning (policy chosen, policy rejected, ref chosen, ref rejected):
+1. reward(chosen) = 0.1 × (−38 − (−42)) = 0.1 × 4 = **0.4**
+2. reward(rejected) = 0.1 × (−47 − (−40)) = 0.1 × (−7) = **−0.7**
+3. margin = 0.4 − (−0.7) = **1.1**
+4. loss = log(1 + e⁻¹·¹) = log(1 + 0.333) ≈ **0.287**. Lower than 0.693: it learned.
+
+Watch the minus signs: −38 − (−42) = −38 + 42 = 4.
+
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `beta * (a - b)` | | the brackets subtract first |
+| `math.exp(-margin)` | "e to the minus margin" | e<sup>−margin</sup> |
+| `math.log(...)` | | natural log |
+| `for pc, pr, rc, rr in batch:` | | each example is four numbers; this names them |
+| `dpo_loss(*start, 0.1)` | (given) | the `*` unpacks the four numbers of `start` as four inputs |
+
+### 👀 Worked example: the start
+
+`start = (−42, −40, −42, −40)`: policy and reference are the same.
+1. reward(chosen) = 0.1 × (−42 + 42) = 0. reward(rejected) = 0.1 × (−40 + 40) = 0.
+2. margin = 0, loss = log 2 ≈ 0.693.
+3. For reward accuracy, 0 > 0 is **false**: it doesn't count as a win. Of the three test examples only `later` wins → 1/3.
+
+## 🎯 Your quest
+
+`implicit_reward`: replace `return 0` with `    return beta * (logp_policy - logp_ref)`
+
+`dpo_loss(pc, pr, rc, rr, beta)`: replace `return 0` with:
+
+1. `    chosen = implicit_reward(pc, rc, beta)`
+2. `    rejected = implicit_reward(pr, rr, beta)`
+3. `    margin = chosen - rejected`
+4. `    return math.log(1 + math.exp(-margin))`
+
+`reward_accuracy(batch, beta)`: replace `return 0` with:
+
+1. `    wins = 0`
+2. `    for pc, pr, rc, rr in batch:`
+3. `        if implicit_reward(pc, rc, beta) > implicit_reward(pr, rr, beta):`
+4. `            wins = wins + 1`
+5. `    return wins / len(batch)`
 
 ## Review
 

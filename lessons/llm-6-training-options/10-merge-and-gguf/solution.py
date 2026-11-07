@@ -1,11 +1,10 @@
 def gguf_commands(merged_dir, name, quant):
-    f16 = f"{name}-F16.gguf"
-    quantized = f"{name}-{quant}.gguf"
-    return [
-        f"python convert_hf_to_gguf.py {merged_dir} --outfile {f16} --outtype f16",
-        f"llama-quantize {f16} {quantized} {quant}",
-        f"lms import {quantized}",
-    ]
+    f16 = name + "-F16.gguf"
+    quantized = name + "-" + quant + ".gguf"
+    convert = "python convert_hf_to_gguf.py " + merged_dir + " --outfile " + f16 + " --outtype f16"
+    shrink = "llama-quantize " + f16 + " " + quantized + " " + quant
+    load = "lms import " + quantized
+    return [convert, shrink, load]
 
 
 merge_dtype = "bf16"
