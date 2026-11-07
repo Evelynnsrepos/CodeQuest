@@ -1,12 +1,50 @@
 ---
 title: Checkpoint: write mcp.json from scratch
+minutes: 30
 xp: 60
+hint: MCP_JSON starts with { "mcpServers": { "notes": { and ends with } } }. Only double quotes.
+hint: Inside notes: "command": "npx", then "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/YOU/llm-notes"]
+hint: Commas between items, never after the last one. The folder must start with /, not ~
+hint: stdio servers are started by the client from command and args. A desktop app may not see your terminal's PATH.
 ---
 # Checkpoint
+
+⏱️ About 30 minutes
 
 The Module 3 checkpoint, from your plan: *from a blank mcp.json, add a filesystem MCP server yourself, restrict it to one folder, and get the model to summarize a file in it.*
 
 Do it **without scrolling back** to lesson 7. If you get stuck, that's the signal to reread it, then close it and try again.
+
+## 🧩 How to answer
+
+`MCP_JSON` is **text**: the JSON goes between the `"""` and the `"""`, exactly as it would look in the file. JSON rules (lesson 7):
+
+- Only **double** quotes `"`.
+- A comma between items, but **not** after the last one.
+- Every `{` and `[` needs its closing `}` and `]`.
+
+The other three are plain text answers, like `transport = "stdio"`.
+
+### 👀 Worked example: a different server
+
+This one is **not** the answer (other name, other folder), but it has the right shape:
+
+```python
+MCP_JSON = """
+{
+  "mcpServers": {
+    "photos": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/anna/Pictures/holiday"]
+    }
+  }
+}
+"""
+```
+
+Read it from the outside in: the whole file → `mcpServers` (the list of servers) → one server named `photos` → how to start it. In `args`: `-y` (say yes to installing), then the package, then the **one** folder it may use.
+
+Try first without looking. If you get stuck, change the name and folder in this example.
 
 ## Your quest
 
