@@ -94,15 +94,19 @@ class Value:
 # ---- neural network ----
 class Neuron:
     def __init__(self, n_inputs, activation=True):
-        self.w = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
+        self.w = []
+        for i in range(n_inputs):
+            self.w.append(Value(random.uniform(-1, 1)))
         self.b = Value(0.0)
         self.activation = activation
 
     def __call__(self, x):
         total = self.b
-        for wi, xi in zip(self.w, x):
-            total = total + wi * xi
-        return total.tanh() if self.activation else total
+        for i in range(len(self.w)):
+            total = total + self.w[i] * x[i]
+        if self.activation:
+            return total.tanh()
+        return total
 
     def parameters(self):
         return self.w + [self.b]
@@ -110,20 +114,30 @@ class Neuron:
 
 class Layer:
     def __init__(self, n_inputs, n_outputs, activation=True):
-        self.neurons = [Neuron(n_inputs, activation) for _ in range(n_outputs)]
+        self.neurons = []
+        for i in range(n_outputs):
+            self.neurons.append(Neuron(n_inputs, activation))
 
     def __call__(self, x):
-        return [n(x) for n in self.neurons]
+        outputs = []
+        for n in self.neurons:
+            outputs.append(n(x))
+        return outputs
 
     def parameters(self):
-        return [p for n in self.neurons for p in n.parameters()]
+        params = []
+        for n in self.neurons:
+            params = params + n.parameters()
+        return params
 
 
 class MLP:
     def __init__(self, n_inputs, layer_sizes):
         sizes = [n_inputs] + layer_sizes
-        self.layers = [Layer(sizes[i], sizes[i + 1], activation=(i < len(layer_sizes) - 1))
-                       for i in range(len(layer_sizes))]
+        self.layers = []
+        for i in range(len(layer_sizes)):
+            is_last = i == len(layer_sizes) - 1
+            self.layers.append(Layer(sizes[i], sizes[i + 1], activation=not is_last))
 
     def __call__(self, x):
         for layer in self.layers:
@@ -131,7 +145,10 @@ class MLP:
         return x
 
     def parameters(self):
-        return [p for layer in self.layers for p in layer.parameters()]
+        params = []
+        for layer in self.layers:
+            params = params + layer.parameters()
+        return params
 
 
 random.seed(1)

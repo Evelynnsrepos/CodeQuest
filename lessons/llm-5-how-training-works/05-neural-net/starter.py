@@ -94,38 +94,66 @@ class Value:
 # ---- neural network ----
 class Neuron:
     def __init__(self, n_inputs, activation=True):
-        self.w = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
+        self.w = []
+        for i in range(n_inputs):
+            self.w.append(Value(random.uniform(-1, 1)))
         self.b = Value(0.0)
         self.activation = activation
 
     def __call__(self, x):
-        return None  # weighted sum of x with self.w, plus self.b, then tanh if self.activation
+        # total = self.b
+        # for i in range(len(self.w)):
+        #     total = total + self.w[i] * x[i]
+        # if self.activation:
+        #     return total.tanh()
+        # return total
+        return None
 
     def parameters(self):
+        # return self.w + [self.b]
         return []
 
 
 class Layer:
     def __init__(self, n_inputs, n_outputs, activation=True):
-        self.neurons = [Neuron(n_inputs, activation) for _ in range(n_outputs)]
+        self.neurons = []
+        for i in range(n_outputs):
+            self.neurons.append(Neuron(n_inputs, activation))
 
     def __call__(self, x):
-        return []  # one output per neuron
+        # outputs = []
+        # for n in self.neurons:
+        #     outputs.append(n(x))
+        # return outputs
+        return []
 
     def parameters(self):
+        # params = []
+        # for n in self.neurons:
+        #     params = params + n.parameters()
+        # return params
         return []
 
 
 class MLP:
     def __init__(self, n_inputs, layer_sizes):
         sizes = [n_inputs] + layer_sizes
-        self.layers = [Layer(sizes[i], sizes[i + 1], activation=(i < len(layer_sizes) - 1))
-                       for i in range(len(layer_sizes))]
+        self.layers = []
+        for i in range(len(layer_sizes)):
+            is_last = i == len(layer_sizes) - 1
+            self.layers.append(Layer(sizes[i], sizes[i + 1], activation=not is_last))
 
     def __call__(self, x):
-        return x  # feed x through every layer
+        # for layer in self.layers:
+        #     x = layer(x)
+        # return x
+        return x
 
     def parameters(self):
+        # params = []
+        # for layer in self.layers:
+        #     params = params + layer.parameters()
+        # return params
         return []
 
 
