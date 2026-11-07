@@ -4,21 +4,26 @@ import httpx
 
 def chat(messages, model, base, client, retries=3, sleep=time.sleep):
     wait = 1.0
+    url = base + "/chat/completions"
+    payload = {"model": model, "messages": messages, "temperature": 0}
     for attempt in range(retries + 1):
         try:
-            r = client.post(f"{base}/chat/completions", timeout=60,
-                            json={"model": model, "messages": messages, "temperature": 0})
+            r = client.post(url, timeout=60, json=payload)
         except httpx.TimeoutException:
             r = None
         if r is not None and r.status_code != 429 and r.status_code < 500:
             r.raise_for_status()
             data = r.json()
-            return data["choices"][0]["message"]["content"], data.get("usage", {})
+            content = data["choices"][0]["message"]["content"]
+            return content, data.get("usage", {})
         if attempt == retries:
             break
-        delay = float(r.headers["Retry-After"]) if r is not None and "Retry-After" in r.headers else wait
+        if r is not None and "Retry-After" in r.headers:
+            delay = float(r.headers["Retry-After"])
+        else:
+            delay = wait
         sleep(delay)
-        wait *= 2
+        wait = wait * 2
     raise RuntimeError("model unavailable")
 
 

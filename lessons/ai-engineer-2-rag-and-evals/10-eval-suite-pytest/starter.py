@@ -9,7 +9,18 @@ NOTES = {"nix-gc": "delete old nix generations with nix-collect-garbage",
 
 def retrieve(question, k=3):
     q = set(question.lower().split())
-    return sorted(NOTES, key=lambda i: -len(q & set(NOTES[i].split())))[:k]
+    ranked = []
+    for step in range(min(k, len(NOTES))):
+        best = None
+        best_n = -1
+        for i in NOTES:
+            if i not in ranked:
+                n = len(q & set(NOTES[i].split()))
+                if n > best_n:
+                    best = i
+                    best_n = n
+        ranked.append(best)
+    return ranked
 """
 
 
