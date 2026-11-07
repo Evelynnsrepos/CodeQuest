@@ -1,7 +1,8 @@
 def run_batch(files, handle):
-    results, errors = {}, {}
+    results = {}
+    errors = {}
     for name, text in files.items():
-        if not text.strip():
+        if text.strip() == "":
             continue
         try:
             results[name] = handle(text)

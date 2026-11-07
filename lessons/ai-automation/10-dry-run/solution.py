@@ -1,17 +1,28 @@
 def execute(actions, tools, dry_run=True):
     log = []
-    prefix = "DRY" if dry_run else "RAN"
-    for a in actions:
-        name, args = a["tool"], a["args"]
-        args_text = ", ".join(f"{k}={v!r}" for k, v in args.items())
-        if not dry_run:
+    for action in actions:
+        name = action["tool"]
+        args = action["args"]
+        parts = []
+        for key in args:
+            parts.append(key + "=" + repr(args[key]))
+        if dry_run:
+            prefix = "DRY"
+        else:
+            prefix = "RAN"
             tools[name](**args)
-        log.append(f"{prefix} {name}({args_text})")
+        log.append(prefix + " " + name + "(" + ", ".join(parts) + ")")
     return log
 
 
 renamed = []
-tools = {"rename": lambda old, new: renamed.append((old, new))}
+
+
+def rename(old, new):
+    renamed.append(old + " -> " + new)
+
+
+tools = {"rename": rename}
 actions = [{"tool": "rename", "args": {"old": "IMG_001.jpg", "new": "2026-11-04 beach.jpg"}}]
 for line in execute(actions, tools):
     print(line)

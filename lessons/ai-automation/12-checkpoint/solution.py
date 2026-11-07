@@ -1,17 +1,15 @@
 def inbox_helper(emails, llm, done):
     result = {"run_now": [], "ask_first": [], "skipped": 0}
-    labels = ["spam", "reply", "other"]
     for email in emails:
         if email["id"] in done:
-            result["skipped"] += 1
+            result["skipped"] = result["skipped"] + 1
             continue
-        prompt = f"Answer with one word from: {', '.join(labels)}.\n\n{email['text']}"
+        prompt = "Answer with one word from: spam, reply, other.\n\n" + email["text"]
         label = llm(prompt).strip().lower().strip(".")
-        if label not in labels:
-            label = "other"
-        tool = {"spam": "archive", "reply": "send_reply"}.get(label)
-        if tool:
-            result["run_now" if tool == "archive" else "ask_first"].append({"tool": tool, "id": email["id"]})
+        if label == "spam":
+            result["run_now"].append({"tool": "archive", "id": email["id"]})
+        elif label == "reply":
+            result["ask_first"].append({"tool": "send_reply", "id": email["id"]})
         done.add(email["id"])
     return result
 

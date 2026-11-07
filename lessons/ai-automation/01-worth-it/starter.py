@@ -2,9 +2,10 @@ import math
 
 
 def payback_weeks(minutes_per_run, runs_per_week, build_hours):
-    # Step 1: minutes saved per week
-    # Step 2: build time in minutes
-    # Step 3 and 4: divide and round up
+    # saved = minutes_per_run * runs_per_week
+    # if saved == 0:
+    #     return None
+    # return math.ceil(build_hours * 60 / saved)
     pass
 
 

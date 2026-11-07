@@ -2,7 +2,7 @@ def run_pipeline(value, steps):
     for step in steps:
         value = step(value)
         if value is None:
-            raise RuntimeError(f"step {step.__name__} gave nothing")
+            raise RuntimeError("step " + step.__name__ + " gave nothing")
     return value
 
 

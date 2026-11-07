@@ -1,6 +1,11 @@
 def inbox_helper(emails, llm, done):
     result = {"run_now": [], "ask_first": [], "skipped": 0}
-    # 1. skip done  2. label  3. plan  4. gate  5. mark done
+    # for email in emails:
+    #     1. skip:   if email["id"] in done: count it in result["skipped"], then continue
+    #     2. label:  prompt = "Answer with one word from: spam, reply, other.\n\n" + email["text"]
+    #                label = llm(prompt).strip().lower().strip(".")
+    #     3+4. plan and gate:  if label == "spam": ... run_now   elif label == "reply": ... ask_first
+    #     5. mark:   done.add(email["id"])
     return result
 
 

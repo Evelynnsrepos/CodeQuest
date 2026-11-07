@@ -5,7 +5,7 @@ def process_new(items, done, handle):
             continue
         handle(data)
         done.add(item_id)
-        count += 1
+        count = count + 1
     return count
 
 

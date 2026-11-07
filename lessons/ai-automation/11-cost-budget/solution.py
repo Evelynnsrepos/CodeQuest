@@ -3,17 +3,18 @@ import math
 
 def call_cost(prompt, reply_tokens, price_in, price_out):
     tokens = math.ceil(len(prompt) / 4)
-    return tokens / 1e6 * price_in + reply_tokens / 1e6 * price_out
+    return tokens / 1000000 * price_in + reply_tokens / 1000000 * price_out
 
 
 def how_many_fit(prompts, reply_tokens, price_in, price_out, budget):
-    spent, count = 0, 0
+    spent = 0
+    count = 0
     for prompt in prompts:
         cost = call_cost(prompt, reply_tokens, price_in, price_out)
         if spent + cost > budget:
             break
-        spent += cost
-        count += 1
+        spent = spent + cost
+        count = count + 1
     return count
 
 

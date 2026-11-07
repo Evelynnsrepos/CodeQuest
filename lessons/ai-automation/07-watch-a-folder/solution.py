@@ -1,5 +1,9 @@
 def changed_files(before, now):
-    return sorted(name for name, t in now.items() if before.get(name) != t)
+    found = []
+    for name in now:
+        if before.get(name) != now[name]:
+            found.append(name)
+    return sorted(found)
 
 
 before = {"receipt1.jpg": 100, "receipt2.jpg": 200}
