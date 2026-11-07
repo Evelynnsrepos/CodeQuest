@@ -1,8 +1,14 @@
 ---
 title: The four layers of every AI setup
+minutes: 25
 xp: 35
+hint: layer_of: n = name.lower(), then for layer in LAYERS: and inside it if n in LAYERS[layer]: return layer
+hint: After the loop (4 spaces): return "unknown"
+hint: pick_integration: three ifs, like if need == "know how": and under it return "skill"
 ---
 # Model, runner, harness, integrations
+
+⏱️ About 25 minutes
 
 > **Warm-up:** when Claude Code "edits a file", which program actually writes to your disk: the model, or something else?
 
@@ -35,10 +41,62 @@ The guide's rule of thumb, one question each:
 <div class="wrong"><b>"Never run rm -rf" written in CLAUDE.md</b>: that's advice the model usually follows. A <b>hook</b> or a <b>deny rule</b> is enforced every time.</div>
 <div class="right">speed → runner, behaviour → harness, abilities → integrations, guarantees → hooks/permissions ✓</div>
 
+## 🐍 Python you need
+
+`LAYERS` is **given** in the starter: a dictionary where each layer name points to a list of names.
+
+| You write | Say it | What it does |
+|---|---|---|
+| `name.lower()` | "name lower" | the same text in small letters: `"Ollama".lower()` is `"ollama"` |
+| `for layer in LAYERS:` | "for each layer in layers" | goes through the dictionary's keys: `"model"`, `"runner"`, ... |
+| `LAYERS[layer]` | "layers at layer" | the list stored under that key |
+| `if n in some_list:` | "if n is in the list" | true when the list holds exactly that text |
+| `return layer` | "return layer" | stops the function **right away** and gives back the answer |
+| `if need == "always":` | "if need equals always" | two `=` compare; one `=` would store |
+
+### 👀 Worked example: which shelf?
+
+```python
+SHELVES = {"fruit": ["apple", "pear"], "veg": ["carrot", "leek"]}
+
+def shelf_of(item):
+    n = item.lower()
+    for shelf in SHELVES:
+        if n in SHELVES[shelf]:
+            return shelf
+    return "unknown"
+
+print(shelf_of("Carrot"))
+```
+
+1. `n` = `"carrot"` (small letters, so `"Carrot"` and `"carrot"` both work).
+2. `shelf` = `"fruit"`: is `"carrot"` in `["apple", "pear"]`? No, keep going.
+3. `shelf` = `"veg"`: is it in `["carrot", "leek"]`? Yes → `return "veg"`. The function stops here.
+4. If no shelf had matched, the loop would end and `return "unknown"` would run.
+
 ## 🎯 Your quest
 
 1. `layer_of(name)`: return `"model"`, `"runner"`, `"harness"` or `"integration"` for the names in the table above (case-insensitive). Unknown → `"unknown"`.
 2. `pick_integration(need)`: `need` is `"know how"`, `"be able"` or `"always"`; return `"skill"`, `"mcp"` or `"hook"`.
+
+**Part 1:** in `layer_of`, replace `return "unknown"` with the worked example's shape:
+
+1. `n = name.lower()`
+2. `for layer in LAYERS:`
+3. `    if n in LAYERS[layer]:`
+4. `        return layer`
+5. `return "unknown"`
+
+**Part 2:** in `pick_integration`, replace `return None` with:
+
+1. `if need == "know how":`
+2. `    return "skill"`
+3. `if need == "be able":`
+4. `    return "mcp"`
+5. `if need == "always":`
+6. `    return "hook"`
+
+The starter has these lines as `#` comments. You can delete the `# ` in front of each.
 
 **Remember:** the model writes text; the harness does things.
 

@@ -2,7 +2,8 @@ import re
 
 
 def guard(event):
-    tool, inp = event.get("tool_name"), event.get("tool_input", {})
+    tool = event.get("tool_name")
+    inp = event.get("tool_input", {})
     if tool == "Bash" and "rm -rf" in inp.get("command", ""):
         return (2, "Blocked: rm -rf is not allowed")
     if tool == "Read" and inp.get("file_path", "").endswith(".env"):
@@ -11,10 +12,18 @@ def guard(event):
 
 
 def matcher_hits(matcher, tool_name):
-    if matcher in ("*", ""):
+    if matcher == "*" or matcher == "":
         return True
-    if re.fullmatch(r"[A-Za-z0-9_\- ,|]+", matcher):
-        return tool_name in [m.strip() for m in re.split(r"[|,]", matcher)]
+    simple = True
+    for ch in matcher:
+        if not (ch.isalnum() or ch in "_- ,|"):
+            simple = False
+    if simple:
+        names = matcher.replace(",", "|").split("|")
+        for n in names:
+            if n.strip() == tool_name:
+                return True
+        return False
     return re.search(matcher, tool_name) is not None
 
 

@@ -1,6 +1,3 @@
-import re
-
-
 def parse_skill(text):
     if not text.startswith("---"):
         return {"body": text}
@@ -9,22 +6,36 @@ def parse_skill(text):
     out = {}
     for line in lines[1:end]:
         if ":" in line:
-            k, v = line.split(":", 1)
-            out[k.strip()] = v.strip()
+            pieces = line.split(":", 1)
+            out[pieces[0].strip()] = pieces[1].strip()
     out["body"] = "\n".join(lines[end + 1:])
     return out
 
 
 def words(s):
-    return set(re.findall(r"[a-z]+", s.lower()))
+    out = set()
+    word = ""
+    for ch in s.lower() + " ":
+        if "a" <= ch <= "z":
+            word = word + ch
+        elif word != "":
+            out.add(word)
+            word = ""
+    return out
 
 
 def pick_skill(skills, task):
-    best, best_n = None, 0
-    for name, desc in skills.items():
-        n = len(words(desc) & words(task))
+    best = None
+    best_n = 0
+    task_words = words(task)
+    for name in skills:
+        n = 0
+        for w in words(skills[name]):
+            if w in task_words:
+                n = n + 1
         if n > best_n:
-            best, best_n = name, n
+            best = name
+            best_n = n
     return best
 
 

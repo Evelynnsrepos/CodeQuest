@@ -1,8 +1,14 @@
 ---
 title: The context budget and prompt caching
+minutes: 25
 xp: 45
+hint: tokens: return len(text) // 4
+hint: tokens_left: used = 0, then for part in parts: and inside it used = used + part. Then return window - used - reserve
+hint: request_cost: paid_tokens = cached * cache_factor + new, then return paid_tokens * price_per_million / 1_000_000
 ---
 # Everything is re-sent, every time
+
+⏱️ About 25 minutes
 
 > **Warm-up:** you've chatted with an agent for an hour. On your next message, how much text does the model actually receive?
 
@@ -42,11 +48,63 @@ Cost with caching (price 3 $ per million input tokens, cache reads at 0.1×): a 
 <div class="wrong"><b>40 MCP tools installed "just in case"</b>: each tool description costs tokens on every single request, and small models get confused past 10–20 tools.</div>
 <div class="right">stable things first (cacheable), only the tools you need, a reserve for the answer ✓</div>
 
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `len(text)` | "length of text" | how many characters: `len("hello")` is `5` |
+| `a // b` | "a floor-divided by b" | divides and **throws away** the part after the dot: `27 // 4` is `6` (27 / 4 = 6.75) |
+| `used = 0` then `used = used + part` | "used becomes used plus part" | a **running total**: start at 0, add one number each round |
+| `a * b / c` | | times and divide, done left to right |
+| `1_000_000` | "one million" | Python lets you put `_` in big numbers so you can read them. It's the same as `1000000`. |
+
+### 👀 Worked example: a pocket-money budget
+
+```python
+def money_left(start, spent, savings):
+    used = 0
+    for item in spent:
+        used = used + item
+    return start - used - savings
+
+print(money_left(50, [12, 8, 5], 10))
+```
+
+1. `used` starts at `0`.
+2. Round 1: `used = 0 + 12` → 12. Round 2: `12 + 8` → 20. Round 3: `20 + 5` → 25.
+3. `50 - 25 - 10` = **15**.
+
+`tokens_left` is the same: the window is the start money, the parts are what's spent, `reserve` is what you keep free for the answer.
+
+And the cost with numbers: 160,000 cached tokens, 2,000 new, $3 per million, cache factor 0.1:
+
+1. `160000 * 0.1` = 16,000. Cached tokens cost a tenth, so they count as 16,000 normal ones.
+2. `16000 + 2000` = 18,000 tokens you pay full price for.
+3. `18000 * 3 / 1_000_000` = **0.054** dollars.
+
 ## 🎯 Your quest
 
 1. `tokens(text)`: rough estimate, `len(text) // 4` (about 4 characters per token in English).
 2. `tokens_left(window, parts, reserve)`: `parts` is a list of token counts.
 3. `request_cost(cached, new, price_per_million, cache_factor=0.1)`: in dollars.
+
+Lines to type, one function at a time (each replaces that function's `return` line):
+
+`tokens`:
+
+1. `return len(text) // 4`
+
+`tokens_left`:
+
+1. `used = 0`
+2. `for part in parts:`
+3. `    used = used + part`
+4. `return window - used - reserve`
+
+`request_cost`:
+
+1. `paid_tokens = cached * cache_factor + new`
+2. `return paid_tokens * price_per_million / 1_000_000`
 
 **Remember:** the model sees only what's re-sent; keep the stable part at the top.
 
