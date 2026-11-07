@@ -1,12 +1,20 @@
 def scores(tp, fp, fn, tn):
     accuracy = (tp + tn) / (tp + fp + fn + tn)
-    precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = tp / (tp + fn) if tp + fn else 0.0
+    if tp + fp == 0:
+        precision = 0.0
+    else:
+        precision = tp / (tp + fp)
+    if tp + fn == 0:
+        recall = 0.0
+    else:
+        recall = tp / (tp + fn)
     return (accuracy, precision, recall)
 
 
 def weights(h, w, k):
-    return ((h * w) ** 2, k * k)
+    dense = (h * w) ** 2
+    conv = k * k
+    return (dense, conv)
 
 
 def q_new(q, r, best_next, alpha, gamma):

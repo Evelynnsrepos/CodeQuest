@@ -2,15 +2,22 @@ import math
 
 
 def frames(signal, size, hop):
-    return [signal[s:s + size] for s in range(0, len(signal) - size + 1, hop)]
+    out = []
+    for start in range(0, len(signal) - size + 1, hop):
+        out.append(signal[start:start + size])
+    return out
 
 
 def dft_magnitudes(frame):
     N = len(frame)
     mags = []
     for k in range(N // 2 + 1):
-        re = sum(x * math.cos(2 * math.pi * k * n / N) for n, x in enumerate(frame))
-        im = -sum(x * math.sin(2 * math.pi * k * n / N) for n, x in enumerate(frame))
+        re = 0
+        im = 0
+        for n in range(N):
+            angle = 2 * math.pi * k * n / N
+            re = re + frame[n] * math.cos(angle)
+            im = im - frame[n] * math.sin(angle)
         mags.append(math.sqrt(re * re + im * im))
     return mags
 

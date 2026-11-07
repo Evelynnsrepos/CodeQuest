@@ -1,8 +1,20 @@
 def image_tokens(width, height, patch, merge):
+    # patches = (width // patch) * (height // patch)
+    # return patches // (merge * merge)
     return 0
 
 
 def splice(tokens, images, marker):
+    # out = []
+    # k = 0
+    # for t in tokens:
+    #     if t == marker:
+    #         for piece in images[k]:
+    #             out.append(piece)
+    #         k = k + 1
+    #     else:
+    #         out.append(t)
+    # return out
     return tokens
 
 
