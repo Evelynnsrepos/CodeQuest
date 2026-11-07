@@ -2,15 +2,20 @@ DATA = [(0.0, 1.1), (1.0, 3.9), (2.0, 7.2), (3.0, 9.8), (4.0, 13.1), (5.0, 16.0)
 
 
 def loss(w, b, data):
-    return sum((w * x + b - y) ** 2 for x, y in data) / len(data)
+    total = 0
+    for x, y in data:
+        error = w * x + b - y
+        total = total + error ** 2
+    return total / len(data)
 
 
 def gradients(w, b, data):
-    dw = db = 0.0
+    dw = 0.0
+    db = 0.0
     for x, y in data:
         e = w * x + b - y
-        dw += 2 * e * x
-        db += 2 * e
+        dw = dw + 2 * e * x
+        db = db + 2 * e
     return dw / len(data), db / len(data)
 
 
@@ -20,8 +25,8 @@ def train(data, learning_rate, steps):
         if step % 100 == 0:
             print(f"step {step:4}: loss {loss(w, b, data):.4f}")
         dw, db = gradients(w, b, data)
-        w -= learning_rate * dw
-        b -= learning_rate * db
+        w = w - learning_rate * dw
+        b = b - learning_rate * db
     return w, b
 
 

@@ -1,8 +1,15 @@
 ---
 title: The training loop, by hand
+minutes: 60
 xp: 40
+hint: loss: total = 0, for x, y in data: error = w * x + b - y and total = total + error ** 2. After the loop: return total / len(data)
+hint: gradients: dw = 0.0 and db = 0.0, then for x, y in data: e = w * x + b - y, dw = dw + 2 * e * x, db = db + 2 * e
+hint: gradients ends with: return dw / len(data), db / len(data)
+hint: train: inside the for loop, after the if block (8 spaces): dw, db = gradients(w, b, data), then w = w - learning_rate * dw and b = b - learning_rate * db
 ---
 # Guess, measure, nudge, repeat
+
+⏱️ About 60 minutes
 
 > **Warm-up:** in LLMs 4 you used gradient descent to find the bottom of a bowl. What would the "bowl" be if you wanted a model to fit some data?
 
@@ -34,15 +41,91 @@ This is **linear regression**, and it's already "machine learning": the program 
 
 <svg viewBox="0 0 520 250" width="100%" style="max-width:520px" role="img" aria-label="The training loop: guess with the current weights, measure the loss, backpropagate the gradients, nudge the weights, repeat"><defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs><rect x="190" y="15" width="140" height="50" rx="8" fill="#6c4cf5" fill-opacity=".14" stroke="#6c4cf5" stroke-width="2"/><text x="260.0" y="38.0" font-size="14" fill="currentColor" text-anchor="middle">1. Guess</text><text x="260.0" y="54.0" font-size="11" fill="currentColor" opacity=".75" text-anchor="middle">forward pass</text><rect x="360" y="100" width="140" height="50" rx="8" fill="#d97706" fill-opacity=".14" stroke="#d97706" stroke-width="2"/><text x="430.0" y="123.0" font-size="14" fill="currentColor" text-anchor="middle">2. Measure</text><text x="430.0" y="139.0" font-size="11" fill="currentColor" opacity=".75" text-anchor="middle">loss: how wrong?</text><rect x="190" y="185" width="140" height="50" rx="8" fill="#e5484d" fill-opacity=".14" stroke="#e5484d" stroke-width="2"/><text x="260.0" y="208.0" font-size="14" fill="currentColor" text-anchor="middle">3. Blame</text><text x="260.0" y="224.0" font-size="11" fill="currentColor" opacity=".75" text-anchor="middle">backward: gradients</text><rect x="20" y="100" width="140" height="50" rx="8" fill="#30a46c" fill-opacity=".14" stroke="#30a46c" stroke-width="2"/><text x="90.0" y="123.0" font-size="14" fill="currentColor" text-anchor="middle">4. Nudge</text><text x="90.0" y="139.0" font-size="11" fill="currentColor" opacity=".75" text-anchor="middle">w ← w − lr · grad</text><line x1="332" y1="50" x2="400" y2="98" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah3)"/><line x1="420" y1="152" x2="332" y2="205" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah3)"/><line x1="188" y1="205" x2="110" y2="152" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah3)"/><line x1="100" y1="98" x2="188" y2="50" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah3)"/><text x="260" y="128" font-size="13" fill="currentColor" text-anchor="middle" font-weight="bold">repeat</text><text x="260" y="146" font-size="11" fill="currentColor" text-anchor="middle" font-weight="normal">thousands of times</text></svg>
 
-## Your quest
+## 🔬 Take the formulas apart
+
+**The model** <div class="formula"><span class="k1">ŷ</span> = <span class="k2">w</span>·x + <span class="k3">b</span></div>
+- `ŷ` ("y hat") is the model's **guess**. Plain `y` is the right answer from the data. The hat means "estimated".
+- <span class="k2">w</span> (weight) is the slope of the line, <span class="k3">b</span> (bias) where it crosses the y axis. These two are what training learns.
+
+**The loss** <div class="formula">L = <span class="k1">(1/n)</span> <span class="k2">Σ</span> <span class="k3">(ŷᵢ − yᵢ)²</span></div>
+Inside out:
+1. <span class="k3">ŷᵢ − yᵢ</span>: the **error** on example i, guess minus truth. Squared, so too high and too low both count, and big misses count a lot.
+2. <span class="k2">Σ</span>: add that up over every example (LLMs 4, lesson 9).
+3. <span class="k1">(1/n)</span>: divide by n, the number of examples. That makes it the **mean** (average). "Mean squared error", MSE.
+
+Numbers, data `[(1, 2), (2, 3)]` with w = 1, b = 0:
+1. Example 1: ŷ = 1·1 + 0 = 1. Error 1 − 2 = −1. Squared: 1.
+2. Example 2: ŷ = 1·2 + 0 = 2. Error 2 − 3 = −1. Squared: 1.
+3. L = (1 + 1) / 2 = **1**.
+
+**The gradients** <div class="formula">∂L/∂w = <span class="k1">2</span>·<span class="k2">e</span>·<span class="k3">x</span> &nbsp;&nbsp; ∂L/∂b = <span class="k1">2</span>·<span class="k2">e</span></div>
+Where do they come from? For one example L = e², with e = w·x + b − y.
+- Chain rule (LLMs 4, lesson 8): outer e² gives <span class="k1">2</span>·<span class="k2">e</span>; inner e = w·x + b − y, with only w moving, gives <span class="k3">x</span>. Multiply: 2·e·x.
+- With only b moving, the inner part gives 1. So 2·e·1 = 2·e.
+
+Same data: e = −1 and −1.
+1. ∂L/∂w: 2·(−1)·1 = −2 and 2·(−1)·2 = −4. Average: (−2 − 4) / 2 = **−3**.
+2. ∂L/∂b: −2 and −2. Average: **−2**.
+
+Both negative: "making w and b bigger lowers the loss". The update `w = w − lr · (−3)` does exactly that: it **adds**.
+
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `for x, y in data:` | "for each x and y in data" | each item is a pair like `(1.0, 3.9)`; this takes it apart into `x` and `y` |
+| `error ** 2` | "error squared" | error times error |
+| `total / len(data)` | | divide by how many examples: the average |
+| `return dw / len(data), db / len(data)` | | gives back two numbers as a pair |
+| `dw, db = gradients(w, b, data)` | | takes the pair apart into two names |
+| `w = w - learning_rate * dw` | | one gradient descent step (LLMs 4, lesson 7) |
+
+### 👀 Worked example: averaging two things at once
+
+```python
+def averages(pairs):
+    sum_a = 0.0
+    sum_b = 0.0
+    for a, b in pairs:
+        sum_a = sum_a + a
+        sum_b = sum_b + b
+    return sum_a / len(pairs), sum_b / len(pairs)
+
+avg_a, avg_b = averages([(1, 10), (3, 30)])
+print(avg_a, avg_b)     # 2.0 20.0
+```
+
+`gradients` has the same shape: two running totals in one loop, both divided by the count at the end.
+
+## 🎯 Your quest
 
 The data follows `y = 3x + 1` with a little noise.
 
-1. `loss(w, b, data)`: the mean squared error.
-2. `gradients(w, b, data)`: return `(dw, db)`, the averages of `2·e·x` and `2·e`.
-3. `train(data, learning_rate, steps)`: start at `w = 0, b = 0`, apply the update `steps` times, and return `(w, b)`.
+**Part 1:** `loss(w, b, data)`. Replace `return 0` with:
 
-Watch the loss fall as the program prints it.
+1. `    total = 0`
+2. `    for x, y in data:`
+3. `        error = w * x + b - y`
+4. `        total = total + error ** 2`
+5. `    return total / len(data)`
+
+**Part 2:** `gradients(w, b, data)`. Replace `return 0, 0` with:
+
+1. `    dw = 0.0`
+2. `    db = 0.0`
+3. `    for x, y in data:`
+4. `        e = w * x + b - y`
+5. `        dw = dw + 2 * e * x`
+6. `        db = db + 2 * e`
+7. `    return dw / len(data), db / len(data)`
+
+**Part 3:** `train`. Inside the `for step` loop, **after** the `if` block (8 spaces in), add:
+
+1. `        dw, db = gradients(w, b, data)`
+2. `        w = w - learning_rate * dw`
+3. `        b = b - learning_rate * db`
+
+Watch the loss fall. At the end it should print about `y = 2.99x + 1.04`.
 
 ## Review
 
