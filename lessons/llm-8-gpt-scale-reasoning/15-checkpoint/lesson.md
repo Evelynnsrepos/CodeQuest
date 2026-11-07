@@ -1,25 +1,59 @@
 ---
 title: Checkpoint: from scratch to reasoning
+minutes: 60
 xp: 120
+hint: train_flops: return 6 * n_params * tokens. chinchilla_tokens: return 20 * n_params. start_loss: return math.log(vocab)
+hint: init_ok: return abs(first_loss - start_loss(vocab)) <= 1.0  (abs drops the minus sign)
+hint: advantages: like lesson 13, but if std == 0: return [0.0] * n, and divide by std alone
+hint: ANSWERS: one letter in quotes per question, like 1: "b",
 ---
 # Explain the frontier
+
+⏱️ About 60 minutes
 
 > **Warm-up:** describe, in a few sentences, how a model like DeepSeek-R1 goes from random weights to solving math step by step.
 
 Your answer should have touched: an architecture (transformer blocks with attention, MLPs, residuals, norms, RoPE), pretraining on trillions of filtered tokens with a compute budget guided by scaling laws, spread over many GPUs, then SFT, then RL with verifiable rewards (GRPO), then evaluation with pass@k on uncontaminated benchmarks.
 
-## Your quest
+## 🐍 Python you need
+
+All from earlier lessons. New only:
+
+| You write | Say it | What it does |
+|---|---|---|
+| `abs(x)` | "absolute value of x" | drops the minus: `abs(-3)` is 3. "How far apart", whichever is bigger. |
+| `<= 1.0` | | within 1.0 |
+
+## 🎯 Your quest
 
 ### Part 1: the numbers
 
-1. `train_flops(n_params, tokens)`: about **6 · N · D** floating-point operations (lesson 08).
-2. `chinchilla_tokens(n_params)`: the compute-optimal amount of data, about **20 tokens per parameter**.
-3. `start_loss(vocab)`: the loss of a model that guesses uniformly: **ln(vocab)**. Then `init_ok(first_loss, vocab)`: `True` if the first loss is within 1.0 of that.
-4. `advantages(rewards)`: GRPO's group advantages `(r − mean) / std` (std dividing by n). If every reward is the same, return all zeros (no signal).
+`train_flops(n_params, tokens)`: replace `return 0` with `    return 6 * n_params * tokens`
+
+`chinchilla_tokens(n_params)`: replace `return 0` with `    return 20 * n_params`
+
+`start_loss(vocab)`: replace `return 0` with `    return math.log(vocab)`
+
+`init_ok(first_loss, vocab)`: replace `return False` with `    return abs(first_loss - start_loss(vocab)) <= 1.0`
+
+`advantages(rewards)`: replace `return []` with:
+
+1. `    n = len(rewards)`
+2. `    mean = sum(rewards) / n`
+3. `    total = 0`
+4. `    for r in rewards:`
+5. `        total = total + (r - mean) ** 2`
+6. `    std = math.sqrt(total / n)`
+7. `    if std == 0:`
+8. `        return [0.0] * n`
+9. `    out = []`
+10. `    for r in rewards:`
+11. `        out.append((r - mean) / std)`
+12. `    return out`
 
 ### Part 2: why questions
 
-Fill `ANSWERS` with the letter of the **best** answer. Every option sounds reasonable on purpose: think about *why* each wrong one is wrong.
+Fill `ANSWERS` with the letter of the **best** answer, in quotes: `1: "a",` style. Every option sounds reasonable on purpose: think about *why* each wrong one is wrong.
 
 1. Why does a pre-norm transformer still train with 80+ layers?
    - **a)** RoPE rotates the gradient so it can't vanish.

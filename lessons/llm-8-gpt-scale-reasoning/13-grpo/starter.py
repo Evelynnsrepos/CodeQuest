@@ -2,10 +2,29 @@ import math
 
 
 def verify(text, truth):
+    # last = None
+    # for line in text.splitlines():
+    #     if line.startswith("Answer:"):
+    #         last = line
+    # if last is None:
+    #     return 0.0
+    # if last[len("Answer:"):].strip() == truth:
+    #     return 1.0
+    # return 0.0
     return 0.0
 
 
 def group_advantages(rewards, eps=1e-6):
+    # n = len(rewards)
+    # mean = sum(rewards) / n
+    # total = 0
+    # for r in rewards:
+    #     total = total + (r - mean) ** 2
+    # std = math.sqrt(total / n)
+    # out = []
+    # for r in rewards:
+    #     out.append((r - mean) / (std + eps))
+    # return out
     return [0.0] * len(rewards)
 
 
@@ -15,6 +34,8 @@ group = [
     "Answer: 42",
     "The result is 42 but I won't format it.",
 ]
-rewards = [verify(g, "42") for g in group]
+rewards = []
+for g in group:
+    rewards.append(verify(g, "42"))
 print("rewards:", rewards)
 print("advantages:", [round(a, 3) for a in group_advantages(rewards)])

@@ -5,7 +5,11 @@ def majority_vote(answers):
     counts = {}
     for a in answers:
         counts[a] = counts.get(a, 0) + 1
-    return max(counts, key=counts.get)
+    best = answers[0]
+    for a in answers:
+        if counts[a] > counts[best]:
+            best = a
+    return best
 
 
 def pass_at_k(n, c, k):

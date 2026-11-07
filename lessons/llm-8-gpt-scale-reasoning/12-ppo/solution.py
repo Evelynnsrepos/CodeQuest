@@ -1,10 +1,17 @@
 def ppo_objective(ratio, advantage, eps=0.2):
-    clipped = max(1 - eps, min(ratio, 1 + eps))
+    clipped = ratio
+    if clipped < 1 - eps:
+        clipped = 1 - eps
+    if clipped > 1 + eps:
+        clipped = 1 + eps
     return min(ratio * advantage, clipped * advantage)
 
 
 def kl_penalized_reward(reward, logp, logp_ref, beta):
-    return reward - beta * sum(a - b for a, b in zip(logp, logp_ref))
+    total = 0
+    for i in range(len(logp)):
+        total = total + logp[i] - logp_ref[i]
+    return reward - beta * total
 
 
 for ratio in [0.5, 0.9, 1.0, 1.1, 1.5]:
