@@ -1,19 +1,31 @@
 def shingles(text, n=3):
-    words = "".join(c for c in text.lower() if c.isalnum() or c.isspace()).split()
-    return {tuple(words[i:i + n]) for i in range(len(words) - n + 1)}
+    clean = ""
+    for c in text.lower():
+        if c.isalnum() or c.isspace():
+            clean = clean + c
+    words = clean.split()
+    result = set()
+    for i in range(len(words) - n + 1):
+        result.add(tuple(words[i:i + n]))
+    return result
 
 
 def jaccard(a, b):
-    if not a and not b:
+    if len(a) == 0 and len(b) == 0:
         return 0.0
     return len(a & b) / len(a | b)
 
 
 def dedupe(docs, threshold):
-    kept, kept_sh = [], []
+    kept = []
+    kept_sh = []
     for d in docs:
         s = shingles(d)
-        if all(jaccard(s, k) < threshold for k in kept_sh):
+        unique = True
+        for k in kept_sh:
+            if jaccard(s, k) >= threshold:
+                unique = False
+        if unique:
             kept.append(d)
             kept_sh.append(s)
     return kept

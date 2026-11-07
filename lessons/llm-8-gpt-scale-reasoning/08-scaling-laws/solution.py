@@ -7,7 +7,8 @@ def train_flops(N, D):
 
 def chinchilla_optimal(C):
     N = math.sqrt(C / 120)
-    return (N, 20 * N)
+    D = 20 * N
+    return (N, D)
 
 
 def predicted_loss(N, D):

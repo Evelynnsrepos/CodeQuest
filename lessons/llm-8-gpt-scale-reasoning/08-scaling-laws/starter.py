@@ -2,14 +2,19 @@ import math
 
 
 def train_flops(N, D):
+    # return 6 * N * D
     return 0
 
 
 def chinchilla_optimal(C):
+    # N = math.sqrt(C / 120)
+    # D = 20 * N
+    # return (N, D)
     return (0, 0)
 
 
 def predicted_loss(N, D):
+    # return 1.69 + 406.4 / N ** 0.34 + 410.7 / D ** 0.28
     return 0.0
 
 
