@@ -1,8 +1,14 @@
 ---
 title: RAG or fine-tuning?
+minutes: 30
 xp: 35
+hint: First check: if goal["prompt_works"]: return "prompt"
+hint: Then: if goal["needs_facts"] and goal["needs_behaviour"]: return "both"
+hint: Then if needs_facts → "rag", if needs_behaviour → "finetune", and the last line (no if) return "prompt"
 ---
 # Knowledge vs behaviour
+
+⏱️ About 30 minutes
 
 > **Warm-up:** "I want the model to know my notes." Fine-tune it on the notes, or put the relevant notes in the prompt? Why?
 
@@ -20,13 +26,52 @@ Combinations are normal: a fine-tuned model that's good at *using* retrieved doc
 
 Most people who think they need training actually need RAG or a better prompt.
 
-## Your quest
+## 🐍 Python you need
 
-`decide(goal)` gets a dictionary describing a goal: `"needs_facts"` (it must know specific, changing or private information), `"needs_behaviour"` (a style, format or skill applied everywhere) and `"prompt_works"` (a system prompt with examples already does it). Return:
+| You write | Say it | What it does |
+|---|---|---|
+| `goal["prompt_works"]` | "goal at prompt works" | `True` or `False`, read from the dictionary |
+| `if goal["prompt_works"]:` | | runs the next line when that value is `True` |
+| `a and b` | | true only if **both** are true |
+| `return "prompt"` | | ends the function. The `if`s below it are never reached. |
 
-- `"prompt"` if `prompt_works` is true,
-- otherwise `"both"` if it needs facts and behaviour,
-- otherwise `"rag"` for facts, `"finetune"` for behaviour, and `"prompt"` if it needs neither.
+The **order** of the `if`s matters: the first one that's true wins.
+
+### 👀 Worked example: what to wear
+
+```python
+def outfit(day):
+    if day["raining"]:
+        return "raincoat"
+    if day["cold"] and day["windy"]:
+        return "coat and scarf"
+    if day["cold"]:
+        return "coat"
+    return "t-shirt"
+
+print(outfit({"raining": False, "cold": True, "windy": True}))   # coat and scarf
+```
+
+1. Raining? No, go on.
+2. Cold **and** windy? Yes → `"coat and scarf"`. The function stops here, so the plain "cold" check never runs.
+
+If the "cold" check came first, it would always win and "coat and scarf" could never happen. Same in your quest: "both" must come before "rag".
+
+## 🎯 Your quest
+
+Write `decide(goal)`. Replace `return ""` with:
+
+1. `    if goal["prompt_works"]:`
+2. `        return "prompt"`
+3. `    if goal["needs_facts"] and goal["needs_behaviour"]:`
+4. `        return "both"`
+5. `    if goal["needs_facts"]:`
+6. `        return "rag"`
+7. `    if goal["needs_behaviour"]:`
+8. `        return "finetune"`
+9. `    return "prompt"`
+
+The four goals print `rag`, `prompt`, `finetune` and `both`.
 
 ## Review
 

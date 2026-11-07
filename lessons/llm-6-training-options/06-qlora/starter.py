@@ -1,8 +1,27 @@
 def module_shapes(config):
+    # h = config["hidden_size"]
+    # head_dim = h // config["num_attention_heads"]
+    # kv = config["num_key_value_heads"] * head_dim
+    # i = config["intermediate_size"]
+    # shapes = {}
+    # shapes["q_proj"] = (h, h)
+    # shapes["k_proj"] = (h, kv)
+    # shapes["v_proj"] = (h, kv)
+    # shapes["o_proj"] = (h, h)
+    # shapes["gate_proj"] = (h, i)
+    # shapes["up_proj"] = (h, i)
+    # shapes["down_proj"] = (i, h)
+    # return shapes
     return {}
 
 
 def lora_trainable(config, r, targets):
+    # shapes = module_shapes(config)
+    # per_layer = 0
+    # for t in targets:
+    #     d_in, d_out = shapes[t]
+    #     per_layer = per_layer + r * (d_in + d_out)
+    # return per_layer * config["num_hidden_layers"]
     return 0
 
 

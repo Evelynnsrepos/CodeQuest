@@ -1,8 +1,16 @@
 ---
 title: Dataset formats: JSONL and chat messages
+minutes: 50
 xp: 40
+hint: alpaca_to_chat: if system is not None: messages.append({"role": "system", "content": system})
+hint: Then user = record["instruction"], and if record.get("input", "") != "": user = user + "\n\n" + record["input"]
+hint: Then append the user message and {"role": "assistant", "content": record["output"]}
+hint: to_jsonl: lines = [], for r in records: lines.append(json.dumps(r)), return "\n".join(lines)
+hint: validate_line: try: data = json.loads(line) and except ValueError: return "not valid JSON". Then one if per rule, each returning a short text
 ---
 # What a fine-tuning dataset looks like
+
+⏱️ About 50 minutes
 
 > **Warm-up:** to teach a model your writing style, what would one training example look like? What goes in, and what should come out?
 
@@ -34,15 +42,85 @@ What makes a dataset good matters far more than its size:
 - **Hold out** 10% (or at least 20 prompts) for validation and evaluation before you start (LLMs 5, lesson 8).
 - **Deduplicate**, and keep private data out unless the model will stay private.
 
-## Python you need
+## 🐍 Python you need
 
-`json.dumps(obj)` gives one line of JSON (no `indent`!). `"\n".join(lines)` joins lines. Inside a loop, `continue` skips ahead.
+| You write | Say it | What it does |
+|---|---|---|
+| `if system is not None:` | | true when a system text was given. `None` means "nothing". |
+| `record.get("input", "")` | | the input, or `""` if the record has none |
+| `"\n\n"` | "two newlines" | an empty line between instruction and input |
+| `json.dumps(r)` | | the dictionary as **one line** of JSON text |
+| `"\n".join(lines)` | | glues the lines with a newline between them |
+| `try:` … `except ValueError:` | | try something; if it fails with that error, run the `except` part instead of crashing |
+| `isinstance(x, dict)`, `isinstance(x, list)`, `isinstance(x, str)` | | "is x a dictionary / list / text?" |
+| `x not in ["a", "b"]` | | true when x is none of them |
+| `messages[-1]` | "the last message" | `-1` counts from the end |
 
-## Your quest
+### 👀 Worked example: one record, step by step
 
-1. `alpaca_to_chat(record, system=None)`: return `{"messages": [...]}` with an optional system message, a user message (the instruction, plus `"\n\n"` and the input if the input isn't empty) and an assistant message (the output).
-2. `to_jsonl(records)`: one `json.dumps` line per record, joined with newlines.
-3. `validate_line(line)`: return `None` if the line is a valid chat example, else a short error text. Valid means: it parses as JSON, has a `"messages"` list with at least 2 entries, every role is `"system"`, `"user"` or `"assistant"`, every content is a non-empty string, and the **last** message is from the assistant.
+`{"instruction": "Say hi in German.", "input": "", "output": "Hallo!"}` with system `"You are concise."`:
+
+1. System given → messages = `[{"role": "system", "content": "You are concise."}]`.
+2. user = `"Say hi in German."`. The input is `""`, so nothing is added.
+3. Add `{"role": "user", "content": "Say hi in German."}` and `{"role": "assistant", "content": "Hallo!"}`.
+
+With input `"Hund"` and instruction `"Translate."`, step 2 gives `"Translate.\n\nHund"`.
+
+**Checking a line.** `validate_line` is a list of checks, each one returning a short error the moment something is wrong. Only a line that passes **all** of them reaches the last `return None`:
+
+```python
+def check_age(text):
+    try:
+        age = int(text)
+    except ValueError:
+        return "not a number"
+    if age < 0:
+        return "negative"
+    return None
+
+print(check_age("abc"), check_age("-3"), check_age("12"))   # not a number negative None
+```
+
+## 🎯 Your quest
+
+**Part 1:** `alpaca_to_chat(record, system=None)`. Between `messages = []` and `return {"messages": messages}`, add:
+
+1. `    if system is not None:`
+2. `        messages.append({"role": "system", "content": system})`
+3. `    user = record["instruction"]`
+4. `    if record.get("input", "") != "":`
+5. `        user = user + "\n\n" + record["input"]`
+6. `    messages.append({"role": "user", "content": user})`
+7. `    messages.append({"role": "assistant", "content": record["output"]})`
+
+**Part 2:** `to_jsonl(records)`. Replace `return ""` with:
+
+1. `    lines = []`
+2. `    for r in records:`
+3. `        lines.append(json.dumps(r))`
+4. `    return "\n".join(lines)`
+
+**Part 3:** `validate_line(line)`. Above `return None`, add:
+
+1. `    try:`
+2. `        data = json.loads(line)`
+3. `    except ValueError:`
+4. `        return "not valid JSON"`
+5. `    if not isinstance(data, dict):`
+6. `        return "needs a messages list with at least 2 messages"`
+7. `    messages = data.get("messages")`
+8. `    if not isinstance(messages, list) or len(messages) < 2:`
+9. `        return "needs a messages list with at least 2 messages"`
+10. `    for m in messages:`
+11. `        if m.get("role") not in ["system", "user", "assistant"]:`
+12. `            return "unknown role"`
+13. `        content = m.get("content")`
+14. `        if not isinstance(content, str) or content == "":`
+15. `            return "empty content"`
+16. `    if messages[-1]["role"] != "assistant":`
+17. `        return "last message must be from the assistant"`
+
+The last two test lines print an error each; the two good lines print `None`.
 
 ## Review
 
