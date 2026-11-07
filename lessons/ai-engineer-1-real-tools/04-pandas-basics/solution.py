@@ -18,11 +18,13 @@ def load(text):
 
 
 def per_product(df):
-    return df.groupby("Produkt")["Umsatz"].sum().sort_values(ascending=False)
+    totals = df.groupby("Produkt")["Umsatz"].sum()
+    return totals.sort_values(ascending=False)
 
 
 def best_day(df):
-    return str(df.groupby("Datum")["Umsatz"].sum().idxmax())
+    totals = df.groupby("Datum")["Umsatz"].sum()
+    return str(totals.idxmax())
 
 
 df = load(SALES)

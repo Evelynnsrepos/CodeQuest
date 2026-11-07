@@ -25,8 +25,11 @@ class CausalSelfAttention(nn.Module):
     def forward(self, x):
         B, T, C = x.shape
         q, k, v = self.qkv(x).split(C, dim=2)
-        q, k, v = (t.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) for t in (q, k, v))
-        att = q @ k.transpose(-2, -1) / math.sqrt(C // self.n_head)
+        hs = C // self.n_head
+        q = q.view(B, T, self.n_head, hs).transpose(1, 2)
+        k = k.view(B, T, self.n_head, hs).transpose(1, 2)
+        v = v.view(B, T, self.n_head, hs).transpose(1, 2)
+        att = q @ k.transpose(-2, -1) / math.sqrt(hs)
         att = att.masked_fill(~self.mask[:T, :T], float("-inf"))
         y = att.softmax(dim=-1) @ v
         y = y.transpose(1, 2).contiguous().view(B, T, C)
@@ -68,12 +71,22 @@ class TinyGPT(nn.Module):
 
 def build_vocab(text):
     chars = sorted(set(text))
-    return {c: i for i, c in enumerate(chars)}, {i: c for i, c in enumerate(chars)}
+    stoi = {}
+    itos = {}
+    for i in range(len(chars)):
+        stoi[chars[i]] = i
+        itos[i] = chars[i]
+    return stoi, itos
 
 
 def get_batch(data, block, batch, gen):
     ix = torch.randint(len(data) - block, (batch,), generator=gen)
-    return torch.stack([data[i:i + block] for i in ix]), torch.stack([data[i + 1:i + block + 1] for i in ix])
+    xs = []
+    ys = []
+    for i in ix:
+        xs.append(data[i:i + block])
+        ys.append(data[i + 1:i + block + 1])
+    return torch.stack(xs), torch.stack(ys)
 
 
 def train(model, data, steps, block=32, batch=16, lr=3e-3, seed=0):
@@ -82,9 +95,9 @@ def train(model, data, steps, block=32, batch=16, lr=3e-3, seed=0):
     opt = torch.optim.AdamW(model.parameters(), lr=lr)
     model.train()
     losses = []
-    for _ in range(steps):
+    for step in range(steps):
         x, y = get_batch(data, block, batch, gen)
-        _, loss = model(x, y)
+        logits, loss = model(x, y)
         opt.zero_grad()
         loss.backward()
         opt.step()
@@ -96,10 +109,13 @@ def generate(model, idx, n, seed=0, temperature=1.0):
     gen = torch.Generator().manual_seed(seed)
     model.eval()
     with torch.no_grad():
-        for _ in range(n):
-            logits, _ = model(idx[:, -model.block:])
-            probs = F.softmax(logits[:, -1, :] / temperature, dim=-1)
-            idx = torch.cat([idx, torch.multinomial(probs, 1, generator=gen)], dim=1)
+        for step in range(n):
+            context = idx[:, -model.block:]
+            logits, loss = model(context)
+            last = logits[:, -1, :] / temperature
+            probs = F.softmax(last, dim=-1)
+            next_id = torch.multinomial(probs, 1, generator=gen)
+            idx = torch.cat([idx, next_id], dim=1)
     return idx
 
 

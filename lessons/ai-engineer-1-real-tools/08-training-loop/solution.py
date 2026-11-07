@@ -8,9 +8,10 @@ def fit_line(xs, ys, steps=500, lr=0.05):
     model = torch.nn.Linear(1, 1)
     opt = torch.optim.SGD(model.parameters(), lr=lr)
     loss_fn = torch.nn.MSELoss()
-    for _ in range(steps):
+    for step in range(steps):
         opt.zero_grad()
-        loss = loss_fn(model(X), y)
+        pred = model(X)
+        loss = loss_fn(pred, y)
         loss.backward()
         opt.step()
     return (model.weight.item(), model.bias.item(), loss.item())

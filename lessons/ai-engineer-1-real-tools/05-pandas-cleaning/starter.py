@@ -11,6 +11,21 @@ RAW = """Bestellnr;Kunde;E-Mail;Datum;Betrag;Stadt
 
 
 def clean(text):
+    # df = pd.read_csv(io.StringIO(text), sep=";", dtype=str, na_values=["N/A", "-", "?"])
+    # df = df.rename(columns={"Bestellnr": "id", "E-Mail": "email", "Datum": "date", "Betrag": "amount"})
+    # df["id"] = df["id"].astype(int)
+    # df["email"] = df["email"].str.strip().str.casefold()
+    # d = df["date"].str.strip()
+    # first = pd.to_datetime(d, format="%d.%m.%Y", errors="coerce")
+    # second = pd.to_datetime(d, format="%Y-%m-%d", errors="coerce")
+    # df["date"] = first.fillna(second)
+    # amount = df["amount"].str.replace("€", "").str.strip()
+    # amount = amount.str.replace(".", "").str.replace(",", ".")
+    # df["amount"] = pd.to_numeric(amount, errors="coerce")
+    # df = df.dropna(subset=["email", "date"])
+    # df = df.drop_duplicates(subset=["email", "date", "amount"], keep="first")
+    # df = df[["id", "email", "date", "amount"]]
+    # return df.reset_index(drop=True)
     return pd.DataFrame()
 
 

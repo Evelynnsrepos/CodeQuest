@@ -12,14 +12,21 @@ SALES = """Datum;Produkt;Menge;Preis
 
 
 def load(text):
+    # df = pd.read_csv(io.StringIO(text), sep=";", decimal=",")
+    # df["Umsatz"] = df["Menge"] * df["Preis"]
+    # return df
     return pd.DataFrame()
 
 
 def per_product(df):
+    # totals = df.groupby("Produkt")["Umsatz"].sum()
+    # return totals.sort_values(ascending=False)
     return pd.Series(dtype=float)
 
 
 def best_day(df):
+    # totals = df.groupby("Datum")["Umsatz"].sum()
+    # return str(totals.idxmax())
     return ""
 
 

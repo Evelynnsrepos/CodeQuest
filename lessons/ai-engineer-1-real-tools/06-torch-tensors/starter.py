@@ -4,18 +4,29 @@ import torch
 
 
 def pick_device():
+    # if torch.cuda.is_available():
+    #     return "cuda"
+    # if torch.backends.mps.is_available():
+    #     return "mps"
+    # return "cpu"
     return ""
 
 
 def linear(x, W, b):
+    # return x @ W.T + b
     return x
 
 
 def to_float_tensor(arr):
+    # return torch.from_numpy(arr).float()
     return arr
 
 
 def n_params(shapes):
+    # total = 0
+    # for shape in shapes:
+    #     total = total + math.prod(shape)
+    # return total
     return 0
 
 

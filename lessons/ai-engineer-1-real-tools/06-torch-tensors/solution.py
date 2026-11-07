@@ -20,7 +20,10 @@ def to_float_tensor(arr):
 
 
 def n_params(shapes):
-    return sum(math.prod(s) for s in shapes)
+    total = 0
+    for shape in shapes:
+        total = total + math.prod(shape)
+    return total
 
 
 x = torch.tensor([[1.0, 2.0, 3.0]])
