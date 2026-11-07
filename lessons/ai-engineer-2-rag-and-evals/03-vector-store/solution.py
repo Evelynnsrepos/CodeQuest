@@ -9,17 +9,27 @@ class VectorStore:
 
     def add(self, items, vectors):
         self.items.extend(items)
-        self.vectors = np.vstack([self.vectors, np.asarray(vectors, dtype=float)])
+        new = np.asarray(vectors, dtype=float)
+        self.vectors = np.vstack([self.vectors, new])
 
     def search(self, q, k=3, where=None):
-        idx = np.arange(len(self.items))
-        if where:
-            idx = np.array([i for i in idx if all(self.items[i].get(f) == v for f, v in where.items())], dtype=int)
+        idx = []
+        for i in range(len(self.items)):
+            ok = True
+            if where:
+                for field in where:
+                    if self.items[i].get(field) != where[field]:
+                        ok = False
+            if ok:
+                idx.append(i)
         if len(idx) == 0:
             return []
         scores = self.vectors[idx] @ np.asarray(q, dtype=float)
         order = np.argsort(-scores)[:k]
-        return [(self.items[idx[o]], float(scores[o])) for o in order]
+        out = []
+        for o in order:
+            out.append((self.items[idx[o]], float(scores[o])))
+        return out
 
     def save(self, path):
         np.save(path + ".npy", self.vectors)

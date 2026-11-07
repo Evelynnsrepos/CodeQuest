@@ -5,13 +5,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 def normalize(M):
     M = np.asarray(M, dtype=float)
-    n = np.linalg.norm(M, axis=1, keepdims=True)
-    return np.divide(M, n, out=np.zeros_like(M), where=n > 0)
+    lengths = np.linalg.norm(M, axis=1, keepdims=True)
+    lengths[lengths == 0] = 1
+    return M / lengths
 
 
 def ollama_embed(texts, model="nomic-embed-text", url="http://localhost:11434", client=None):
-    post = client.post if client else httpx.post
-    r = post(f"{url}/api/embed", json={"model": model, "input": list(texts)}, timeout=60)
+    if client is not None:
+        post = client.post
+    else:
+        post = httpx.post
+    payload = {"model": model, "input": list(texts)}
+    r = post(url + "/api/embed", json=payload, timeout=60)
     r.raise_for_status()
     return normalize(r.json()["embeddings"])
 
