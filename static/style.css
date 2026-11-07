@@ -229,6 +229,7 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
 .lesson-body th, .lesson-body td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; overflow-wrap: normal; word-break: normal; min-width: 5.5em; }
 .lesson-body th { background: var(--surface-2); white-space: nowrap; }
 .lesson-body td code { white-space: nowrap; }
+.lesson-body li code { white-space: pre-wrap; } /* keep the indent spaces in quest lines like `    return x` */
 /* colour-coded formulas in math lessons: each piece of a formula has a colour, and the
    breakdown table uses the same colour for that piece. Colours also get an underline so
    they don't rely on colour alone. */

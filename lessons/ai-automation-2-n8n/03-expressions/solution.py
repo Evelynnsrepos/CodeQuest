@@ -7,13 +7,19 @@ def follow(value, path):
     return value
 
 
+def value_of(expr, item, nodes):
+    if expr.startswith("$('"):
+        end = expr.index("')")
+        name = expr[3:end]
+        path = expr[end + len("').item.json."):]
+        return str(follow(nodes[name], path))
+    return str(follow(item, expr[len("$json."):]))
+
+
+# Given: you don't need to change this.
 def render(text, item, nodes):
     def fill(match):
-        expr = match.group(1)
-        m = re.match(r"\$\('(.+?)'\)\.item\.json\.(.+)", expr)
-        if m:
-            return str(follow(nodes[m.group(1)], m.group(2)))
-        return str(follow(item, expr[len("$json."):]))
+        return value_of(match.group(1), item, nodes)
     return re.sub(r"\{\{\s*(.*?)\s*\}\}", fill, text)
 
 

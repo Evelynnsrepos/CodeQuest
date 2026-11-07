@@ -1,10 +1,15 @@
 ---
 title: Error workflows: know when it broke
+minutes: 25
 xp: 25
+hint: First line: name = data["workflow"]["name"]. Then the trigger case: if "execution" not in data:
+hint: Under it: return "❌ " + name + " failed at its trigger: " + data["trigger"]["error"]["message"]
+hint: Then: ex = data["execution"] and text = "❌ " + name + " failed at " + ex["lastNodeExecuted"] + ": " + ex["error"]["message"]
+hint: Last: if "url" in ex: text = text + "\n" + ex["url"], and then return text
 ---
 # A workflow that watches the others
 
-⏱️ About 10 minutes · one function
+⏱️ About 25 minutes · one function, eight lines
 
 > **Warm-up:** your morning-summary workflow stopped working 9 days ago because LM Studio wasn't running. How could you have found out on day 1?
 
@@ -29,17 +34,55 @@ xp: 25
 
 `id` and `url` are only there if the execution was saved. If the **trigger node itself** failed, there's a `trigger` object with `error.message` instead of `execution`.
 
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `data["workflow"]["name"]` | "data's workflow's name" | two lookups: the `workflow` dictionary, then its `name` |
+| `"execution" in data` | "execution is in data" | true when the dictionary has that **key**. Use it before reading something that might be missing. |
+| `"execution" not in data` | "execution is not in data" | the opposite |
+| `"❌ " + name + " failed"` | | glues texts together |
+| `"\n"` | "newline" | a line break inside a text |
+| `text = text + "more"` | | adds more text to the end of what's in the box |
+
+### 👀 Worked example: a parcel message
+
+```python
+def parcel_text(p):
+    who = p["to"]["name"]
+    if "delivery" not in p:
+        return "📦 " + who + ": not sent yet"
+    d = p["delivery"]
+    text = "📦 " + who + ": at " + d["place"]
+    if "photo" in d:
+        text = text + "\n" + d["photo"]
+    return text
+```
+
+- `{"to": {"name": "Ana"}}`: no `"delivery"` key → `"📦 Ana: not sent yet"`.
+- `{"to": {"name": "Ana"}, "delivery": {"place": "door"}}`: `text` = `"📦 Ana: at door"`. No `"photo"`, so that's it.
+- With `"photo": "pic.jpg"` too: a line break and `pic.jpg` are added on a second line.
+
 ## 🎯 Your quest
 
-Write `error_alert(data)` that returns the message text:
+Write `error_alert(data)`. Replace the starter's line with:
 
-- normal error: `"❌ Morning summary failed at Ollama Chat Model: connect ECONNREFUSED"`, plus a new line with the `url` if there is one
-- trigger error (no `execution`, but `trigger`): `"❌ Morning summary failed at its trigger: <trigger error message>"`
+1. `name = data["workflow"]["name"]`
+2. The trigger case (no `execution`):
+   - `if "execution" not in data:`
+   - `    return "❌ " + name + " failed at its trigger: " + data["trigger"]["error"]["message"]`
+3. The normal case:
+   - `ex = data["execution"]`
+   - `text = "❌ " + name + " failed at " + ex["lastNodeExecuted"] + ": " + ex["error"]["message"]`
+   - `if "url" in ex:`
+   - `    text = text + "\n" + ex["url"]`
+   - `return text`
 
-<details><summary>💡 Hint</summary>Use <code>.get()</code> for things that might be missing: <code>ex = data.get("execution")</code>, <code>url = ex.get("url")</code>. Add <code>"\n" + url</code> only <code>if url</code>.</details>
+It gives `"❌ Morning summary failed at Ollama Chat Model: connect ECONNREFUSED"` and, on the next line, the URL.
 
 **Remember:** one error workflow, selected everywhere, tells you on day 1.
 
 ## Review
 
 <details><summary>Lesson 8: what's the first thing to do when a small model won't give clean JSON?</summary>Force the format (Structured Output Parser or a JSON schema), then still extract and validate in code.</details>
+<details><summary>Why check "url" in ex before reading ex["url"]?</summary>The url is only there when the execution was saved. Reading a missing key would crash the error workflow itself.</details>

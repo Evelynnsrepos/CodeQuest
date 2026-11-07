@@ -1,13 +1,17 @@
 import json
-import re
 
 
 def extract_json(reply):
-    m = re.search(r"```(?:json)?\s*(.*?)```", reply, re.S)
-    if m:
-        text = m.group(1)
+    fence = "`" * 3
+    first = reply.find(fence)
+    if first != -1:
+        second = reply.find(fence, first + 3)
+        text = reply[first + 3:second]
+        if text.startswith("json"):
+            text = text[4:]
     else:
-        start, end = reply.find("{"), reply.rfind("}")
+        start = reply.find("{")
+        end = reply.rfind("}")
         if start == -1 or end < start:
             return None
         text = reply[start:end + 1]

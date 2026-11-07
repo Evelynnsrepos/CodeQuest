@@ -3,7 +3,12 @@ import json
 
 def review(workflow):
     problems = []
-    # 1. one trigger  2. real nodes  3. agents have a model  4. error workflow  5. no secrets
+    # setup:   nodes = workflow["nodes"]   and   connections = workflow.get("connections", {})
+    # check 1: names = [], triggers = 0, loop over nodes: collect names, count triggers
+    # check 2: has_model = [], the four loops from lesson 7: unknown nodes, and who gets an ai_languageModel
+    # check 3: loop over nodes: agents not in has_model
+    # check 4: settings = workflow.get("settings", {}), errorWorkflow empty?
+    # check 5: loop over nodes: "sk-" or "Bearer " in json.dumps(node.get("parameters", {}))
     return problems
 
 

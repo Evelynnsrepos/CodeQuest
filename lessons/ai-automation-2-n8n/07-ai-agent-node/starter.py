@@ -1,4 +1,17 @@
 def agent_parts(workflow, agent):
+    # parts = {"model": None, "tools": [], "memory": None}
+    # connections = workflow["connections"]
+    # for source in connections:
+    #     outputs = connections[source]
+    #     for kind in outputs:
+    #         for targets in outputs[kind]:
+    #             for target in targets:
+    #                 if target["node"] == agent:
+    #                     if kind == "ai_languageModel": parts["model"] = source
+    #                     elif kind == "ai_tool": parts["tools"].append(source)
+    #                     elif kind == "ai_memory": parts["memory"] = source
+    # parts["tools"].sort()
+    # return parts
     return {"model": None, "tools": [], "memory": None}
 
 

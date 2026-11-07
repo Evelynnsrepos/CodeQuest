@@ -4,34 +4,40 @@ import json
 def review(workflow):
     problems = []
     nodes = workflow["nodes"]
-    names = {n["name"] for n in nodes}
     connections = workflow.get("connections", {})
 
-    triggers = [n for n in nodes if n["type"].lower().endswith("trigger") or n["type"].endswith(".webhook")]
-    if len(triggers) != 1:
+    names = []
+    triggers = 0
+    for node in nodes:
+        names.append(node["name"])
+        if node["type"].lower().endswith("trigger") or node["type"].endswith(".webhook"):
+            triggers = triggers + 1
+    if triggers != 1:
         problems.append("needs exactly one trigger")
 
-    has_model = set()
-    for source, outputs in connections.items():
-        for kind, lists in outputs.items():
-            for targets in lists:
-                for t in targets:
-                    if t["node"] not in names:
-                        problems.append(f"unknown node: {t['node']}")
+    has_model = []
+    for source in connections:
+        outputs = connections[source]
+        for kind in outputs:
+            for targets in outputs[kind]:
+                for target in targets:
+                    if target["node"] not in names:
+                        problems.append("unknown node: " + target["node"])
                     if kind == "ai_languageModel":
-                        has_model.add(t["node"])
+                        has_model.append(target["node"])
 
-    for n in nodes:
-        if n["type"].endswith(".agent") and n["name"] not in has_model:
-            problems.append(f"{n['name']} has no chat model")
+    for node in nodes:
+        if node["type"].endswith(".agent") and node["name"] not in has_model:
+            problems.append(node["name"] + " has no chat model")
 
-    if not workflow.get("settings", {}).get("errorWorkflow"):
+    settings = workflow.get("settings", {})
+    if settings.get("errorWorkflow", "") == "":
         problems.append("set an error workflow")
 
-    for n in nodes:
-        text = json.dumps(n.get("parameters", {}))
+    for node in nodes:
+        text = json.dumps(node.get("parameters", {}))
         if "sk-" in text or "Bearer " in text:
-            problems.append(f"{n['name']} has a secret in it, use credentials")
+            problems.append(node["name"] + " has a secret in it, use credentials")
     return problems
 
 

@@ -1,4 +1,9 @@
 def mcp_entry(name, url, token):
+    # entry = {}
+    # entry["command"] = "npx"
+    # entry["args"] = ["mcp-remote", url, "--header", "Authorization: Bearer ${AUTH_TOKEN}"]
+    # entry["env"] = {"AUTH_TOKEN": token}
+    # return {"mcpServers": {name: entry}}
     return {}
 
 

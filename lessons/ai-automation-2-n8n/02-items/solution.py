@@ -1,10 +1,21 @@
 def to_items(rows):
-    return [{"json": row} for row in rows]
+    items = []
+    for row in rows:
+        items.append({"json": row})
+    return items
 
 
 def run_node(items, fn):
-    return [{"json": fn(item["json"])} for item in items]
+    new_items = []
+    for item in items:
+        result = fn(item["json"])
+        new_items.append({"json": result})
+    return new_items
+
+
+def shout_subject(j):
+    return {"subject": j["subject"].upper()}
 
 
 emails = to_items([{"subject": "Hi"}, {"subject": "Your order"}])
-print(run_node(emails, lambda j: {"subject": j["subject"].upper()}))
+print(run_node(emails, shout_subject))
