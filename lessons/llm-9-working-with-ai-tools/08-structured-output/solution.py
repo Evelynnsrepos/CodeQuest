@@ -1,29 +1,35 @@
 import json
 
-TYPES = {"object": dict, "string": str, "array": list, "boolean": bool}
-
-
 def type_ok(value, t):
-    if t in ("number", "integer"):
-        if isinstance(value, bool):
-            return False
-        return isinstance(value, int) if t == "integer" else isinstance(value, (int, float))
-    return isinstance(value, TYPES[t])
+    if isinstance(value, bool):
+        return t == "boolean"
+    if t == "integer":
+        return isinstance(value, int)
+    if t == "number":
+        return isinstance(value, int) or isinstance(value, float)
+    if t == "string":
+        return isinstance(value, str)
+    if t == "array":
+        return isinstance(value, list)
+    if t == "object":
+        return isinstance(value, dict)
+    return False
 
 
 def validate(obj, schema, path="$"):
     errors = []
     if "type" in schema and not type_ok(obj, schema["type"]):
-        return [f"{path}: expected {schema['type']}"]
+        return [path + ": expected " + schema["type"]]
     if "enum" in schema and obj not in schema["enum"]:
-        errors.append(f"{path}: not one of {schema['enum']}")
+        errors.append(path + ": not one of " + str(schema["enum"]))
     if isinstance(obj, dict):
         for key in schema.get("required", []):
             if key not in obj:
-                errors.append(f"{path}.{key}: required")
-        for key, sub in schema.get("properties", {}).items():
+                errors.append(path + "." + key + ": required")
+        properties = schema.get("properties", {})
+        for key in properties:
             if key in obj:
-                errors += validate(obj[key], sub, f"{path}.{key}")
+                errors = errors + validate(obj[key], properties[key], path + "." + key)
     return errors
 
 
@@ -33,7 +39,7 @@ def first_valid(replies, schema, max_tries=3):
             obj = json.loads(raw)
         except json.JSONDecodeError:
             continue
-        if not validate(obj, schema):
+        if validate(obj, schema) == []:
             return obj
     return None
 

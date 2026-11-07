@@ -2,7 +2,8 @@ import math
 
 
 def ssm_scan(xs, a, b, c):
-    h, ys = 0.0, []
+    h = 0.0
+    ys = []
     for x in xs:
         h = a * h + b * x
         ys.append(c * h)
