@@ -235,6 +235,8 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
   .lesson-body { padding: 2px 16px 16px; }
   .to-code { display: flex; }
   .editor .cm-editor { height: 46vh; }
+  .pz-code { font-size: 13px; padding: 8px; }
+  .pz-gap, .pz-block { padding: 4px 8px; }
   .symbols { display: flex; }
 }
 
