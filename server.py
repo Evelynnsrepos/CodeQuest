@@ -19,6 +19,7 @@ import datetime as dt
 import json
 import mimetypes
 import os
+import random
 import re
 import shlex
 import shutil
@@ -83,6 +84,8 @@ def parse_front_matter(text):
                     key, value = line.split(":", 1)
                     if key.strip() == "hint":  # repeatable: one "hint:" line per hint, shown in order
                         meta.setdefault("hints", []).append(value.strip())
+                    elif key.strip() == "distractor":  # repeatable: a wrong block for puzzle lessons
+                        meta.setdefault("distractors", []).append(value.strip())
                     else:
                         meta[key.strip()] = value.strip()
             text = text[end + 4:].lstrip("\n")
@@ -106,6 +109,19 @@ def missing_line(solution, code):
         if bare and not bare.startswith(("#", "--", "//")) and bare not in have:
             return number, line.rstrip()
     return None
+
+
+GAP = "___"  # a starter line that is only this (after its indentation) is a gap in a puzzle lesson
+
+
+def puzzle_blocks(starter, solution, distractors):
+    """The blocks a puzzle lesson's gaps need: the solution lines at the gap lines' positions, plus wrong ones."""
+    if solution is None:
+        return None
+    gaps, lines = starter.splitlines(), solution.splitlines()
+    if len(gaps) != len(lines):
+        raise ValueError("a puzzle lesson's starter and solution need the same number of lines")
+    return [line.strip() for gap, line in zip(gaps, lines) if gap.strip() == GAP] + list(distractors)
 
 
 def read_optional(path):
@@ -154,6 +170,8 @@ def load_courses():
                 "setup": read_optional(folder / "setup.sh"),
                 "tests": read_optional(folder / "tests.rs"),
             })
+            if meta.get("puzzle"):
+                lessons[-1]["blocks"] = puzzle_blocks(lessons[-1]["starter"], solution, front.get("distractors", []))
         prelude = meta.get("prelude")
         prelude_code = read_optional(course_dir / prelude) if prelude else None
         for lesson in lessons:
@@ -1119,6 +1137,8 @@ class Handler(BaseHTTPRequestHandler):
             "next": lessons[index + 1]["slug"] if index + 1 < len(lessons) else None,
             "prev": lessons[index - 1]["slug"] if index > 0 else None,
         }
+        if lesson.get("blocks") is not None:
+            payload["blocks"] = random.sample(lesson["blocks"], len(lesson["blocks"]))
         if LANGUAGES[lesson["lang"]]["runs_on"] == "browser":
             payload["expected_output"] = lesson["expected_output"]
             payload["check"] = lesson["check"]

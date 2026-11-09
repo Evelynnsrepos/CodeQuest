@@ -240,6 +240,7 @@ function showPhoneDialog(urls) {
 // ---------------------------------------------------------------- lesson ---
 
 let editor = null;
+let puzzle = null; // set instead of the text editor in block-puzzle lessons
 let saveTimer = null;
 
 async function showLesson(course, slug) {
@@ -256,16 +257,16 @@ async function showLesson(course, slug) {
     </div>
     <div class="tabs" role="tablist">
       <button role="tab" data-tab="read" aria-selected="true">Lesson</button>
-      <button role="tab" data-tab="code" aria-selected="false">Code</button>
+      <button role="tab" data-tab="code" aria-selected="false">${lesson.blocks ? "Puzzle" : "Code"}</button>
     </div>
     <div class="lesson-grid" data-show="read">
       <article class="lesson-body pane-read">${marked.parse(lesson.body)}</article>
       <section class="workbench pane-code">
-        <div class="editor" id="editor"></div>
+        ${lesson.blocks ? `<div class="puzzle" id="puzzle"></div>` : `<div class="editor" id="editor"></div>
         <div class="symbols" aria-label="Insert symbol">
           ${["Tab", "(", ")", ":", '"', "[", "]", "{", "}", "=", ";", "."].map((s) =>
             `<button type="button" data-sym="${s === '"' ? "&quot;" : s}">${s === "Tab" ? "⇥ Tab" : escapeHtml(s)}</button>`).join("")}
-        </div>
+        </div>`}
         <div class="actions">
           <button class="btn" id="run">▶ Run</button>
           <button class="btn primary" id="submit">Submit</button>
@@ -291,13 +292,16 @@ async function showLesson(course, slug) {
   };
   tabs.forEach((t) => (t.onclick = () => selectTab(t.dataset.tab)));
   app.querySelector(".lesson-body").insertAdjacentHTML("beforeend",
-    `<button class="btn primary to-code" type="button">Start coding →</button>`);
+    `<button class="btn primary to-code" type="button">${lesson.blocks ? "Start the puzzle →" : "Start coding →"}</button>`);
   app.querySelector(".to-code").onclick = () => selectTab("code");
 
-  createEditor(lesson.code, lang, (code) => {
+  const save = (code) => {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => api("/api/save", { course, slug, code }).catch(() => {}), 1200);
-  });
+  };
+  editor = puzzle = null;
+  if (lesson.blocks) puzzle = createPuzzle(document.getElementById("puzzle"), lesson, save);
+  else createEditor(lesson.code, lang, save);
 
   app.querySelectorAll("[data-sym]").forEach((b) => {
     b.onmousedown = (e) => e.preventDefault(); // keep the editor focused and the keyboard open
@@ -306,16 +310,16 @@ async function showLesson(course, slug) {
   document.getElementById("run").onclick = () => execute(lesson, "run");
   document.getElementById("submit").onclick = () => execute(lesson, "submit");
   document.getElementById("reset").onclick = () => {
-    if (confirm("Replace your code with the starter code?")) setCode(lesson.starter);
+    if (confirm(puzzle ? "Take every block back out?" : "Replace your code with the starter code?")) setCode(lesson.starter);
   };
   const solBtn = document.getElementById("solution");
   solBtn.onclick = () => {
-    if (confirm("Replace your code with the official solution?")) setCode(lesson.solution);
+    if (confirm(puzzle ? "Put every block where the official solution has it?" : "Replace your code with the official solution?")) setCode(lesson.solution);
   };
   const hintBtn = document.getElementById("hint");
   let hintsUsed = 0;
   if (hintBtn) hintBtn.onclick = async () => {
-    const h = await api("/api/hint", { course, slug, code: editor.state.doc.toString(), n: hintsUsed++ });
+    const h = await api("/api/hint", { course, slug, code: currentCode(), n: hintsUsed++ });
     document.getElementById("hints").insertAdjacentHTML("beforeend", `<div class="hint"><strong>Hint ${hintsUsed}:</strong> ${escapeHtml(h.hint)}
       ${h.line ? `<pre>${escapeHtml(h.line)}</pre>` : ""}</div>`);
     hintBtn.textContent = "💡 Another hint";
@@ -361,16 +365,94 @@ function insertText(text) {
   editor.focus();
 }
 
+function currentCode() {
+  return puzzle ? puzzle.code() : editor.state.doc.toString();
+}
+
 function setCode(code) {
+  if (puzzle) return puzzle.load(code);
   editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: code } });
+}
+
+// Block puzzle: the starter is the program with gap lines ("___"); tap (or drag) a block from the tray into a gap.
+function createPuzzle(root, lesson, onChange) {
+  const GAP = "___";
+  const lines = lesson.starter.replace(/\n$/, "").split("\n");
+  const gaps = lines.map((l, i) => (l.trim() === GAP ? i : -1)).filter((i) => i >= 0);
+  const filled = new Map(); // line number -> block index
+  let selected = gaps[0];
+  root.innerHTML = `<div class="pz-code" aria-label="Your program"></div>
+    <p class="pz-tip muted">Tap a block to put it in the glowing gap. Tap a gap to pick it, or tap a filled gap to take its block back out.</p>
+    <div class="pz-tray" aria-label="Blocks"></div>`;
+  const codeBox = root.querySelector(".pz-code"), tray = root.querySelector(".pz-tray");
+  const indent = (l) => l.length - l.trimStart().length;
+  const code = () => lines.map((l, i) => (filled.has(i) ? " ".repeat(indent(l)) + lesson.blocks[filled.get(i)] : l)).join("\n") + "\n";
+  const used = () => new Set(filled.values());
+  const nextEmpty = (from) => gaps.find((g) => g > from && !filled.has(g)) ?? gaps.find((g) => !filled.has(g));
+  const changed = () => { draw(); onChange(code()); };
+  const place = (block, line = selected) => {
+    if (line === undefined) return;
+    filled.set(line, block);
+    selected = nextEmpty(line);
+    changed();
+  };
+
+  function draw() {
+    const taken = used();
+    codeBox.innerHTML = lines.map((l, i) => {
+      const pad = `style="margin-left:${indent(l)}ch"`;
+      if (l.trim() !== GAP) return `<div class="pz-line${l.trim().startsWith("#") ? " pz-comment" : ""}">${escapeHtml(l) || " "}</div>`;
+      const text = filled.has(i) ? escapeHtml(lesson.blocks[filled.get(i)]) : "?";
+      return `<div class="pz-line"><button type="button" class="pz-gap${filled.has(i) ? " filled" : ""}${i === selected ? " selected" : ""}"
+        data-line="${i}" ${pad} aria-label="${filled.has(i) ? `Gap on line ${i + 1}: ${text}. Tap to take it out.` : `Empty gap on line ${i + 1}`}">${text}</button></div>`;
+    }).join("");
+    tray.innerHTML = lesson.blocks.map((b, i) => taken.has(i) ? ""
+      : `<button type="button" class="pz-block" draggable="true" data-block="${i}">${escapeHtml(b)}</button>`).join("")
+      || `<p class="muted">All blocks placed. Press Submit!</p>`;
+    codeBox.querySelectorAll(".pz-gap").forEach((g) => {
+      const line = Number(g.dataset.line);
+      g.onclick = () => {
+        if (filled.has(line)) filled.delete(line);
+        selected = line;
+        changed();
+      };
+      g.ondragover = (e) => e.preventDefault();
+      g.ondrop = (e) => { e.preventDefault(); filled.delete(line); place(Number(e.dataTransfer.getData("text/plain")), line); };
+    });
+    tray.querySelectorAll(".pz-block").forEach((b) => {
+      b.onclick = () => place(Number(b.dataset.block));
+      b.ondragstart = (e) => e.dataTransfer.setData("text/plain", b.dataset.block);
+    });
+  }
+
+  function load(text) {
+    filled.clear();
+    const saved = text.split("\n");
+    for (const g of gaps) {
+      const want = (saved[g] || "").trim();
+      const taken = used();
+      const i = lesson.blocks.findIndex((b, k) => b === want && !taken.has(k));
+      if (i >= 0) filled.set(g, i);
+    }
+    selected = nextEmpty(-1);
+    changed();
+  }
+
+  load(lesson.code);
+  return { code, load, missing: () => gaps.length - filled.size };
 }
 
 async function execute(lesson, mode) {
   const out = document.getElementById("output");
   const buttons = [document.getElementById("run"), document.getElementById("submit")];
   buttons.forEach((b) => (b.disabled = true));
-  const code = editor.state.doc.toString();
+  const code = currentCode();
   const runner = browserRunners[lesson.lang];
+  if (puzzle?.missing()) {
+    buttons.forEach((b) => (b.disabled = false));
+    out.innerHTML = `<p class="muted">Fill every gap first: ${puzzle.missing()} still empty (the ones with a ?).</p>`;
+    return;
+  }
   out.innerHTML = `<p class="muted">${lesson.lang === "rust" ? "Compiling…" : runner && !runner.isReady ? `Starting ${langName(lesson.lang)} (first time only)…` : "Running…"}</p>`;
 
   let result;

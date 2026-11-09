@@ -1,0 +1,11 @@
+{
+ "lang": "python",
+ "puzzle": true,
+ "name": "AI crash course: puzzle edition",
+ "icon": "🧩",
+ "order": 68.5,
+ "blurb": "No typing at all. The same 12 big AI ideas as the AI crash course, but you build every program like Lego: tap (or drag) ready-made code blocks into the gaps. Watch out for decoy blocks! Each lesson explains every piece of Python and maths step by step first. Great before the normal AI crash course.",
+ "track": "AI",
+ "level": "Start here",
+ "topic": "Overview"
+}
