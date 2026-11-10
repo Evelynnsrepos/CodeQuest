@@ -1,8 +1,15 @@
 ---
 title: Checkpoint: a safe nightly agent
+minutes: 40
 xp: 90
+hint: First: if not cron_due("0 2 * * *", now[0], now[1], now[2], now[3], now[4]): return None
+hint: ran and blocked: for call in calls: if decide(call[0], call[1], rules) == "allow": ran.append(call), else: blocked.append(call)
+hint: labels: the try / except loop from lesson 08, then if validate(obj, schema) == []: labels.append(obj["label"])
+hint: Last line: return {"ran": ran, "blocked": blocked, "labels": labels}
 ---
 # Put the safety pieces together
+
+⏱️ About 40 minutes
 
 > **Warm-up:** an agent should review new GitHub issues every night and suggest labels. List every safety piece from this course that it needs.
 
@@ -32,6 +39,33 @@ Your earlier functions are given: `cron_due`, `decide`, `validate`.
   - `"ran"`: the calls whose decision is `"allow"`,
   - `"blocked"`: all the others (`"ask"` counts as blocked, as in `dontAsk`),
   - `"labels"`: for each reply string in `replies`, `json.loads` it and keep the `"label"` value if `validate` gives no errors; skip broken or invalid replies.
+
+`now` is five numbers in a row. `now[0]` is the minute, `now[1]` the hour, and so on, so you pass them one by one to `cron_due`.
+
+### How to answer
+
+Every piece is something you wrote before: the `if`/`else` sorting from lesson 09 of AI automation 1 and the `try`/`except` loop from lesson 08. Replace `return {}` with:
+
+1. `if not cron_due("0 2 * * *", now[0], now[1], now[2], now[3], now[4]):`
+2. `    return None`
+3. `ran = []`
+4. `blocked = []`
+5. `for call in calls:`
+6. `    if decide(call[0], call[1], rules) == "allow":`
+7. `        ran.append(call)`
+8. `    else:`
+9. `        blocked.append(call)`
+10. `labels = []`
+11. `for raw in replies:`
+12. `    try:`
+13. `        obj = json.loads(raw)`
+14. `    except json.JSONDecodeError:`
+15. `        continue`
+16. `    if validate(obj, schema) == []:`
+17. `        labels.append(obj["label"])`
+18. `return {"ran": ran, "blocked": blocked, "labels": labels}`
+
+`call[0]` is the tool and `call[1]` the command of each `(tool, command)` pair. The `else` in line 8 is why `"ask"` and `"deny"` both end up blocked.
 
 You've finished LLMs 9. Next: try the guide's learning checklist on your own machine.
 

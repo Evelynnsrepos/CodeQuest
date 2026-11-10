@@ -1,16 +1,20 @@
 def build_labels(segments):
     input_ids, labels = [], []
     for role, tokens in segments:
-        input_ids += tokens
+        input_ids = input_ids + tokens
         if role == "assistant":
-            labels += tokens
+            labels = labels + tokens
         else:
-            labels += [-100] * len(tokens)
+            labels = labels + [-100] * len(tokens)
     return input_ids, labels
 
 
 def trained_fraction(labels):
-    return sum(1 for x in labels if x != -100) / len(labels)
+    count = 0
+    for x in labels:
+        if x != -100:
+            count = count + 1
+    return count / len(labels)
 
 
 example = [

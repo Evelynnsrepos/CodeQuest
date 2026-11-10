@@ -1,10 +1,14 @@
 def build_prompt(task, why, documents, examples, fmt):
     parts = ["<documents>"]
-    parts += ['<document index="%d">%s</document>' % (i, d) for i, d in enumerate(documents, 1)]
+    i = 1
+    for doc in documents:
+        parts.append('<document index="' + str(i) + '">' + doc + "</document>")
+        i = i + 1
     parts.append("</documents>")
-    if examples:
+    if len(examples) > 0:
         parts.append("<examples>")
-        parts += ["<example><input>%s</input><output>%s</output></example>" % ex for ex in examples]
+        for inp, out in examples:
+            parts.append("<example><input>" + inp + "</input><output>" + out + "</output></example>")
         parts.append("</examples>")
     parts.append("<instructions>" + task + " " + why + "</instructions>")
     parts.append(fmt)

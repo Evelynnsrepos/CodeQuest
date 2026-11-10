@@ -13,22 +13,36 @@ import torch
 
 def build_vocab(text):
     chars = sorted(set(text))
-    return {c: i for i, c in enumerate(chars)}, {i: c for i, c in enumerate(chars)}
+    stoi = {}
+    itos = {}
+    for i in range(len(chars)):
+        stoi[chars[i]] = i
+        itos[i] = chars[i]
+    return stoi, itos
 
 
 def encode(s, stoi):
-    return [stoi[c] for c in s]
+    ids = []
+    for c in s:
+        ids.append(stoi[c])
+    return ids
 
 
 def decode(ids, itos):
-    return "".join(itos[int(i)] for i in ids)
+    out = ""
+    for i in ids:
+        out = out + itos[int(i)]
+    return out
 
 
 def get_batch(data, block, batch, gen):
     ix = torch.randint(len(data) - block, (batch,), generator=gen)
-    x = torch.stack([data[i:i + block] for i in ix])
-    y = torch.stack([data[i + 1:i + block + 1] for i in ix])
-    return x, y
+    xs = []
+    ys = []
+    for i in ix:
+        xs.append(data[i:i + block])
+        ys.append(data[i + 1:i + block + 1])
+    return torch.stack(xs), torch.stack(ys)
 
 
 stoi, itos = build_vocab(TEXT)

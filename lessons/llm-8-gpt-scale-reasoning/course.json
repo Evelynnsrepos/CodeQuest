@@ -3,7 +3,7 @@
  "name": "LLMs 8: Build a GPT, scale it, make it reason",
  "icon": "🧠",
  "order": 77,
- "blurb": "University-level follow-up: every part of a GPT from scratch (multi-head attention, LayerNorm, residuals, RoPE), parameter counts and LR schedules, scaling laws and pretraining data, multi-GPU training, then RLHF, PPO, GRPO and how reasoning models are trained and evaluated.",
+ "blurb": "University-level follow-up: every part of a GPT from scratch (multi-head attention, LayerNorm, residuals, RoPE), parameter counts and LR schedules, scaling laws and pretraining data, multi-GPU training, then RLHF, PPO, GRPO and how reasoning models are trained and evaluated. Every lesson shows the Python and maths it uses first, step by step.",
  "track": "AI",
  "level": "Level 3 · Advanced and pro",
  "topic": "Frontier models"

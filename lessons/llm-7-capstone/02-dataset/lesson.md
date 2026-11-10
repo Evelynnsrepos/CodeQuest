@@ -1,8 +1,15 @@
 ---
 title: Build and clean your dataset
+minutes: 45
 xp: 50
+hint: clean: seen = set(), for r in records: prompt = r["prompt"].strip() and answer = r["answer"].strip()
+hint: Skip empties: if prompt == "" or answer == "": continue. Then key = prompt.lower(), and if key in seen: continue
+hint: Keep it: seen.add(key) and out.append({"prompt": prompt, "answer": answer})
+hint: split: items = list(records), random.Random(seed).shuffle(items), n = len(items) // 10, then slice with end_train = len(items) - 2 * n and end_val = len(items) - n
 ---
 # 200–1,000 good examples
+
+⏱️ About 45 minutes
 
 > **Warm-up:** where could 300 examples of *your* goal come from? List three sources.
 
@@ -18,16 +25,67 @@ The cleaning pipeline you'll run on your real data:
 4. **Shuffle with a fixed seed** (so the split is reproducible), then split **80 / 10 / 10** into train, validation and test. The **test** set stays untouched until the final evaluation (lesson 5).
 5. **Read every example.** Seriously. Fix or delete anything you wouldn't want the model to copy.
 
-## Python you need
+## 🐍 Python you need
 
-`random.Random(seed).shuffle(items)` shuffles a list in place, the same way every time for the same seed. A `set` remembers what you've seen: `if key in seen: continue`.
+| You write | Say it | What it does |
+|---|---|---|
+| `" hi ".strip()` | | removes spaces at both ends: `"hi"` |
+| `a == "" or b == ""` | | true if **either** is empty |
+| `continue` | | skip the rest of this round, go to the next record |
+| `prompt.lower()` | | all small letters, so "What" and "what" count as the same |
+| `seen = set()`, `seen.add(key)`, `key in seen` | | a set remembers what you already had |
+| `list(records)` | | a copy, so shuffling doesn't mess up the original |
+| `random.Random(42).shuffle(items)` | | shuffles in place, the same way every time with seed 42 |
+| `31 // 10` | | `3`: whole-number division |
+| `items[:25]`, `items[25:28]`, `items[28:]` | | the first 25, the next 3, the rest |
 
-## Your quest
+### 👀 Worked example: two duplicates
 
-Records are simple `{"prompt": ..., "answer": ...}` dictionaries.
+```python
+seen = set()
+for word in ["Cat", "dog", "cat", " "]:
+    w = word.strip()
+    if w == "":
+        continue
+    if w.lower() in seen:
+        continue
+    seen.add(w.lower())
+    print(w)            # Cat, dog
+```
 
-1. `clean(records)`: return a new list with both fields stripped, examples with an empty prompt or answer removed, and later duplicates (same prompt, ignoring case) removed. Keep the first occurrence and the original order.
-2. `split(records, seed)`: copy the list, shuffle the copy with `random.Random(seed)`, and return `(train, val, test)` where `val` and `test` each get `len // 10` items (`val` first, then `test`, taken from the **end** of the shuffled list) and `train` the rest.
+"cat" is skipped because "cat" (from "Cat") is already in `seen`; " " is empty after strip.
+
+**Split numbers:** 31 items, n = 31 // 10 = 3. end_train = 31 − 6 = 25, end_val = 31 − 3 = 28. So train = items 0–24 (25), val = 25–27 (3), test = 28–30 (3).
+
+## 🎯 Your quest
+
+**Part 1:** `clean(records)`. Between `out = []` and `return out`, add:
+
+1. `    seen = set()`
+2. `    for r in records:`
+3. `        prompt = r["prompt"].strip()`
+4. `        answer = r["answer"].strip()`
+5. `        if prompt == "" or answer == "":`
+6. `            continue`
+7. `        key = prompt.lower()`
+8. `        if key in seen:`
+9. `            continue`
+10. `        seen.add(key)`
+11. `        out.append({"prompt": prompt, "answer": answer})`
+
+**Part 2:** `split(records, seed)`. Replace `return records, [], []` with:
+
+1. `    items = list(records)`
+2. `    random.Random(seed).shuffle(items)`
+3. `    n = len(items) // 10`
+4. `    end_train = len(items) - 2 * n`
+5. `    end_val = len(items) - n`
+6. `    train = items[:end_train]`
+7. `    val = items[end_train:end_val]`
+8. `    test = items[end_val:]`
+9. `    return train, val, test`
+
+It prints `34 raw → 31 clean` and `25 train, 3 val, 3 test`.
 
 ## Review
 

@@ -2,18 +2,29 @@ import json
 
 
 def request(id, method, params=None):
+    # message = {"jsonrpc": "2.0", "id": id, "method": method}
+    # if params is not None:
+    #     message["params"] = params
+    # return message
     return {}
 
 
 def notification(method):
+    # return {"jsonrpc": "2.0", "method": method}
     return {}
 
 
 def tool_call_request(id, name, arguments):
+    # return request(id, "tools/call", {"name": name, "arguments": arguments})
     return {}
 
 
 def text_of(response):
+    # texts = []
+    # for item in response["result"]["content"]:
+    #     if item["type"] == "text":
+    #         texts.append(item["text"])
+    # return "\n".join(texts)
     return ""
 
 

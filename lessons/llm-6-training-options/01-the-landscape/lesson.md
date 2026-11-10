@@ -1,8 +1,14 @@
 ---
 title: The training options at a glance
+minutes: 20
 xp: 30
+hint: Read the 'On your PC?' column of the table. 'yes' → True, 'no' or 'only toy models' → False
+hint: Prompting and RAG change no weights: False. Everything that trains (pretraining, fine-tuning, LoRA, QLoRA, DPO) changes some: True
+hint: LoRA changes weights too: the small added matrices are new weights of the model
 ---
 # Same loop, different data and weights
+
+⏱️ About 20 minutes
 
 > **Warm-up:** you want a model that writes like you. List every way you can think of to get there, from cheapest to most expensive.
 
@@ -22,7 +28,16 @@ Two more you'll hear about: **continued pretraining** (plain text from a new dom
 
 Always try them in this order: **prompting → RAG → (Q)LoRA fine-tuning**. Each step costs a lot more than the one before, and many projects are done after step one or two.
 
-## Your quest
+## 🧩 How to answer
+
+Replace each `None` with `True` or `False`. Capital first letter, no quotes. Use the table above:
+
+- `ON_MY_PC`: "yes" or "small models" or "yes, up to ~8B" → `True`. "no" or "only toy models" → `False`.
+- `CHANGES_WEIGHTS`: does the method **train**? Training changes weights → `True`. Prompting and RAG only change what goes **into** the model → `False`.
+
+Example of one filled line (a different method, not in the quest): `"using a calculator": False,`. Keep the comma at the end of each line.
+
+## 🎯 Your quest
 
 Fill in `ON_MY_PC`: for each method, `True` if it's realistic on a 12 GB GPU + 32 GB RAM for a useful model, `False` if not.
 

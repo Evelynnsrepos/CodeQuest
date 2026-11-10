@@ -1,10 +1,15 @@
 def total(msgs):
-    return sum(count for role, count in msgs)
+    count = 0
+    for role, tokens in msgs:
+        count = count + tokens
+    return count
 
 
 def rolling_window(messages, max_tokens):
-    system, rest = messages[0], list(messages[1:])
-    # drop the oldest message from rest while it doesn't fit
+    system = messages[0]
+    rest = list(messages[1:])  # a copy of everything after the system prompt
+    # while len(rest) > 0 and total([system] + rest) > max_tokens:
+    #     rest.pop(0)
     return [system] + rest
 
 

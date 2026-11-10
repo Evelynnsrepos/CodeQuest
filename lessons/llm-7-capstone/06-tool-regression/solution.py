@@ -1,8 +1,8 @@
 def accuracy(cases, replies):
     correct = 0
-    for case, reply in zip(cases, replies):
-        if case["expect"] == reply["tool"]:
-            correct += 1
+    for i in range(len(cases)):
+        if cases[i]["expect"] == replies[i]["tool"]:
+            correct = correct + 1
     return correct / len(cases)
 
 

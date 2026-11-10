@@ -2,11 +2,14 @@ import numpy as np
 
 
 def standardize(X):
-    return (X - X.mean(axis=0)) / X.std(axis=0)
+    means = X.mean(axis=0)
+    stds = X.std(axis=0)
+    return (X - means) / stds
 
 
 def cosine_matrix(A):
-    B = A / np.linalg.norm(A, axis=1, keepdims=True)
+    lengths = np.linalg.norm(A, axis=1, keepdims=True)
+    B = A / lengths
     return B @ B.T
 
 

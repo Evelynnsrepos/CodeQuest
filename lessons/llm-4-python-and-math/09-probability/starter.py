@@ -2,14 +2,29 @@ import random
 
 
 def expected_value(values, probs):
+    # total = 0
+    # for i in range(len(values)):
+    #     total = total + probs[i] * values[i]
+    # return total
     return 0
 
 
 def variance(values, probs):
+    # mean = expected_value(values, probs)
+    # total = 0
+    # for i in range(len(values)):
+    #     total = total + probs[i] * (values[i] - mean) ** 2
+    # return total
     return 0
 
 
 def sample(probs, r):
+    # running = 0
+    # for i in range(len(probs)):
+    #     running = running + probs[i]
+    #     if r < running:
+    #         return i
+    # return len(probs) - 1
     return 0
 
 

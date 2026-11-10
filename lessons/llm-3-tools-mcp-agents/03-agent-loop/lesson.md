@@ -1,8 +1,15 @@
 ---
 title: The agent loop
+minutes: 30
 xp: 40
+hint: for _ in range(max_steps): and inside it reply = model(messages) and messages.append(reply)
+hint: Still inside: if reply.get("tool_calls"): messages.extend(run_tool_calls(reply, tools))
+hint: else: return reply["content"]
+hint: After the loop: return "stopped: too many steps"
 ---
 # Think, act, observe, repeat
+
+⏱️ About 30 minutes
 
 > **Warm-up:** "Summarize the newest file in my notes folder" needs two tool calls, and the second depends on the first one's result. Who decides when to make the second call?
 
@@ -30,16 +37,56 @@ Some things that matter in real agents:
 
 This is exactly what boot.dev's *Build an AI Agent* course builds against a real API; in Module 4 you'll point the same loop at LM Studio.
 
-## Your quest
+## 🐍 Python you need
 
-Write `run_agent(messages, model, tools, max_steps)`:
+`run_tool_calls` is your solution from the last lesson. `scripted_model` and `tool_call` are given helpers: they pretend to be LM Studio by replaying a recorded conversation.
 
-- Call `model(messages)` to get the reply dictionary, and append it to `messages`.
-- If the reply has `"tool_calls"` (use `reply.get("tool_calls")`), extend `messages` with `run_tool_calls(reply, tools)` and go round again.
-- Otherwise return `reply["content"]`.
-- If the loop runs `max_steps` times without a final answer, return `"stopped: too many steps"`.
+| You write | Say it | What it does |
+|---|---|---|
+| `for _ in range(max_steps):` | "repeat max-steps times" | `_` means "I don't need the counter" |
+| `reply = model(messages)` | | asks the (fake) model for its next message |
+| `messages.append(reply)` | | adds one message to the history |
+| `reply.get("tool_calls")` | | the tool calls, or `None` if the reply has none. `if None:` counts as false. |
+| `messages.extend(a_list)` | "messages extend" | adds **every** item of the list to the end (append would add the list as one item) |
+| `return reply["content"]` inside the loop | | ends the whole function with the answer |
+| `return ...` after the loop | | only reached if every round asked for tools |
 
-`model` is a scripted stand-in for LM Studio that replays a recorded conversation. `run_tool_calls` is your solution from the last lesson.
+### 👀 Worked example: asking until someone answers
+
+```python
+def ask_around(people, max_tries):
+    for i in range(max_tries):
+        answer = people[i]
+        if answer == "?":
+            print("they asked a question back, keep going")
+        else:
+            return answer
+    return "nobody knew"
+
+print(ask_around(["?", "?", "Paris"], 5))   # Paris
+print(ask_around(["?", "?", "?"], 2))       # nobody knew
+```
+
+1. Round 0: `"?"`: no answer yet, go round again.
+2. Round 1: `"?"`: again.
+3. Round 2: `"Paris"`: a real answer → `return`, the function ends.
+
+In the second call, the limit of 2 rounds is reached first, so the line after the loop runs. An agent works the same way, with tool calls instead of `"?"`.
+
+## 🎯 Your quest
+
+Write `run_agent(messages, model, tools, max_steps)`. Replace `return ""` with:
+
+1. `for _ in range(max_steps):`
+2. `    reply = model(messages)`
+3. `    messages.append(reply)`
+4. `    if reply.get("tool_calls"):`
+5. `        messages.extend(run_tool_calls(reply, tools))`
+6. `    else:`
+7. `        return reply["content"]`
+8. `return "stopped: too many steps"`
+
+Press **Run** and watch "model sees … messages" grow: every round the model sees the whole history.
 
 ## Review
 

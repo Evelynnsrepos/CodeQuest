@@ -1,9 +1,14 @@
 def tokens_per_second(gpu_gb, cpu_gb, gpu_bw, cpu_bw):
-    return 1 / (gpu_gb / gpu_bw + cpu_gb / cpu_bw)
+    seconds = gpu_gb / gpu_bw + cpu_gb / cpu_bw
+    return 1 / seconds
 
 
 def layers_on_gpu(model_gb, layers, vram_free_gb):
-    return min(layers, int(vram_free_gb / (model_gb / layers)))
+    per_layer = model_gb / layers
+    fit = int(vram_free_gb / per_layer)
+    if fit > layers:
+        fit = layers
+    return fit
 
 
 print("8B Q4 fully on GPU:", round(tokens_per_second(4.9, 0, 384, 51)), "tok/s")

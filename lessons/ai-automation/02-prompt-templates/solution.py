@@ -1,8 +1,8 @@
 def fill(template, fields):
     try:
-        return template.format(**fields)
+        return template.format_map(fields)
     except KeyError as e:
-        raise ValueError(f"missing field: {e.args[0]}")
+        raise ValueError("missing field: " + e.args[0])
 
 
 t = "Summarize this note from {date} in {words} words:\n{note}"

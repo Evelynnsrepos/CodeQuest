@@ -15,6 +15,19 @@ TOOLS = {"add": add, "shout": shout}
 def run_tool_calls(message, tools):
     results = []
     for call in message["tool_calls"]:
+        # name = call["function"]["name"]
+        # if name not in tools:
+        #     content = "error: unknown tool " + name
+        # else:
+        #     try:
+        #         args = json.loads(call["function"]["arguments"])
+        #     except ValueError:
+        #         args = None
+        #     if args is None:
+        #         content = "error: invalid arguments"
+        #     else:
+        #         content = str(tools[name](**args))
+        # results.append({"role": "tool", "tool_call_id": call["id"], "content": content})
         pass
     return results
 

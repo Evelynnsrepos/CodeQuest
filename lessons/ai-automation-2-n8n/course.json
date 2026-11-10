@@ -3,7 +3,7 @@
  "name": "AI automation 2: n8n with local AI",
  "icon": "🔗",
  "order": 72.6,
- "blurb": "Build automations in n8n that run on your own models: install it (Docker, the AI starter kit or NixOS), items and expressions, workflow JSON, the Code node, connecting LM Studio and Ollama, the AI Agent node, JSON from small models, error workflows, batching for one GPU, and n8n as an MCP server. 12 short lessons; you practise each idea in Python here, then build it in n8n. Do AI automation 1 first.",
+ "blurb": "Build automations in n8n that run on your own models: install it (Docker, the AI starter kit or NixOS), items and expressions, workflow JSON, the Code node, connecting LM Studio and Ollama, the AI Agent node, JSON from small models, error workflows, batching for one GPU, and n8n as an MCP server. 12 lessons, 20 to 60 minutes each; you practise each idea in Python here (every lesson shows the Python it uses first), then build it in n8n. Do AI automation 1 first.",
  "track": "AI",
  "level": "Level 1 · Understand and use AI",
  "topic": "Automation"

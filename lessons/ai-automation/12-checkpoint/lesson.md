@@ -1,37 +1,72 @@
 ---
 title: Checkpoint: your inbox helper
+minutes: 40
 xp: 60
+hint: Step 1 inside the loop: if email["id"] in done: then result["skipped"] = result["skipped"] + 1 and continue
+hint: Step 2: prompt = "Answer with one word from: spam, reply, other.\n\n" + email["text"], then label = llm(prompt).strip().lower().strip(".")
+hint: Step 3 and 4: if label == "spam": result["run_now"].append({"tool": "archive", "id": email["id"]}), elif label == "reply": result["ask_first"].append({"tool": "send_reply", "id": email["id"]})
+hint: Step 5, last line in the loop (8 spaces): done.add(email["id"])
 ---
 # Put the pieces together
 
-⏱️ About 20 minutes · one bigger function, built from small steps
+⏱️ About 40 minutes · one bigger function, built from small steps you already know
 
 > **Warm-up:** which lessons do you need for "every 10 minutes, sort my new emails, archive spam by itself, and draft replies I approve"?
 
 **In one sentence:** a real automation is the small pieces from this course in one loop: skip done items, label with the model, gate risky actions, mark done.
 
+## 🐍 Python you need
+
+Everything here is from lessons 3, 8 and 9. One new piece:
+
+| You write | Say it | What it does |
+|---|---|---|
+| `elif label == "reply":` | "else if label is reply" | checked only when the `if` above it was false. You can chain several. If none is true, nothing happens. |
+| `result["run_now"].append(x)` | "result's run-now list, append x" | `result["run_now"]` is a list inside the dictionary. `.append` adds to that list. |
+| `result["skipped"] = result["skipped"] + 1` | | adds one to the number stored under `"skipped"` |
+| `{"tool": "archive", "id": email["id"]}` | | builds a new small dictionary for one action |
+
+### 👀 Worked example: if, elif, and nothing
+
+```python
+def plan(label):
+    if label == "spam":
+        return "archive"
+    elif label == "reply":
+        return "send_reply"
+    return None
+```
+
+- `plan("spam")`: the `if` is true → `"archive"`.
+- `plan("reply")`: the `if` is false, the `elif` is true → `"send_reply"`.
+- `plan("other")`: both false → `None`, no action. Notice that an unknown label like `"maybe spam"` also lands here, so you don't even need a separate `"other"` fallback for it.
+
 ## 🎯 Your quest
 
-Write `inbox_helper(emails, llm, done)`. Each email is a dict `{"id": ..., "text": ...}`. `done` is a set of IDs (change it in place).
+Write `inbox_helper(emails, llm, done)`. Each email is a dict `{"id": ..., "text": ...}`. `done` is a set of IDs (change it in place). The checks test the steps one by one, so tick them off as they work.
 
-Do it in this order for each email. Tick each step off as it works, the checks test them one by one:
+Return a dict `{"run_now": [...], "ask_first": [...], "skipped": n}` with the actions in email order and `n` the number of emails skipped because they were done. The starter already has the `result = ...` line and the `return result` line. Between them, type:
 
-1. **Skip** emails whose ID is in `done` (lesson 8).
-2. **Label** it: ask `llm` with a prompt containing the text and `"spam, reply, other"`, clean the reply, fallback `"other"` (lesson 3).
-3. **Plan** one action: spam → `{"tool": "archive", "id": id}`, reply → `{"tool": "send_reply", "id": id}`, other → no action.
-4. **Gate** (lesson 9): `archive` may run alone, everything else needs approval.
-5. **Mark** the email done (lesson 8).
-
-Return a dict `{"run_now": [...], "ask_first": [...], "skipped": n}` with the actions in email order and `n` the number of emails skipped because they were done.
-
-<details><summary>💡 Hint 1: the shape</summary>
-<pre>result = {"run_now": [], "ask_first": [], "skipped": 0}
+```
 for email in emails:
-    ...
-return result</pre>
-</details>
-<details><summary>💡 Hint 2: label to action</summary><code>tool = {"spam": "archive", "reply": "send_reply"}.get(label)</code>. When <code>tool</code> is <code>None</code> there's no action.</details>
-<details><summary>💡 Hint 3: gate</summary><code>result["run_now" if tool == "archive" else "ask_first"].append({"tool": tool, "id": email["id"]})</code></details>
+```
+
+Then, inside the loop (8 spaces), the five steps:
+
+1. **Skip** (lesson 8):
+   - `if email["id"] in done:`
+   - `    result["skipped"] = result["skipped"] + 1`
+   - `    continue`
+2. **Label** (lesson 3):
+   - `prompt = "Answer with one word from: spam, reply, other.\n\n" + email["text"]`
+   - `label = llm(prompt).strip().lower().strip(".")`
+3. and 4. **Plan and gate** (lesson 9): spam is archived alone, replies wait for you, anything else gets no action:
+   - `if label == "spam":`
+   - `    result["run_now"].append({"tool": "archive", "id": email["id"]})`
+   - `elif label == "reply":`
+   - `    result["ask_first"].append({"tool": "send_reply", "id": email["id"]})`
+5. **Mark** (lesson 8), also for emails with no action:
+   - `done.add(email["id"])`
 
 ## 🖥️ Make it real
 

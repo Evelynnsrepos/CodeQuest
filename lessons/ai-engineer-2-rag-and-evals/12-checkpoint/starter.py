@@ -40,22 +40,51 @@ def tokenize(text):
 
 class BM25:
     def __init__(self, docs, k1=1.5, b=0.75):
-        self.k1, self.b = k1, b
-        self.tokens = [tokenize(d) for d in docs]
-        self.tf = [Counter(t) for t in self.tokens]
+        self.k1 = k1
+        self.b = b
+        self.tokens = []
+        self.tf = []
+        for d in docs:
+            words = tokenize(d)
+            self.tokens.append(words)
+            self.tf.append(Counter(words))
         self.N = len(docs)
-        self.avglen = sum(len(t) for t in self.tokens) / self.N
-        self.df = Counter(w for t in self.tokens for w in set(t))
+        total = 0
+        for words in self.tokens:
+            total = total + len(words)
+        self.avglen = total / self.N
+        self.df = Counter()
+        for words in self.tokens:
+            for w in set(words):
+                self.df[w] = self.df[w] + 1
+
+    def idf(self, t):
+        n = self.df.get(t, 0)
+        return math.log((self.N - n + 0.5) / (n + 0.5) + 1)
 
     def score(self, query, i):
-        length, total = len(self.tokens[i]), 0.0
+        length = len(self.tokens[i])
+        total = 0.0
         for t in tokenize(query):
             f = self.tf[i].get(t, 0)
-            if f:
-                n = self.df[t]
-                idf = math.log((self.N - n + 0.5) / (n + 0.5) + 1)
-                total += idf * f * (self.k1 + 1) / (f + self.k1 * (1 - self.b + self.b * length / self.avglen))
+            if f > 0:
+                norm = 1 - self.b + self.b * length / self.avglen
+                total = total + self.idf(t) * f * (self.k1 + 1) / (f + self.k1 * norm)
         return total
+
+    def rank(self, query):
+        scores = []
+        for i in range(self.N):
+            scores.append(self.score(query, i))
+        order = []
+        for step in range(self.N):
+            best = None
+            for i in range(self.N):
+                if i not in order:
+                    if best is None or scores[i] > scores[best]:
+                        best = i
+            order.append(best)
+        return order
 
 
 class LocalEmbedder:
@@ -64,35 +93,76 @@ class LocalEmbedder:
 
     def embed(self, texts):
         M = self.vec.transform(texts).toarray()
-        n = np.linalg.norm(M, axis=1, keepdims=True)
-        return np.divide(M, n, out=np.zeros_like(M), where=n > 0)
+        lengths = np.linalg.norm(M, axis=1, keepdims=True)
+        lengths[lengths == 0] = 1
+        return M / lengths
 
 
 def rrf(rankings, k=60):
     score = {}
     for ranking in rankings:
-        for rank, doc in enumerate(ranking, 1):
+        rank = 1
+        for doc in ranking:
             score[doc] = score.get(doc, 0) + 1 / (k + rank)
-    return sorted(score, key=lambda d: (-score[d], d))
+            rank = rank + 1
+    ids = sorted(score)
+    out = []
+    for step in range(len(ids)):
+        best = None
+        for doc in ids:
+            if doc not in out:
+                if best is None or score[doc] > score[best]:
+                    best = doc
+        out.append(best)
+    return out
 
 
 IDS = list(NOTES)
-TEXTS = [NOTES[i] for i in IDS]
+TEXTS = []
+for i in IDS:
+    TEXTS.append(NOTES[i])
+
+# BM = BM25(TEXTS)
+# EMB = LocalEmbedder(TEXTS)
+# DOC_VECS = EMB.embed(TEXTS)
 
 
 def rank_bm25(question):
+    # out = []
+    # for i in BM.rank(question):
+    #     out.append(IDS[i])
+    # return out
     return IDS
 
 
 def rank_embed(question):
+    # scores = DOC_VECS @ EMB.embed([question])[0]
+    # out = []
+    # for i in np.argsort(-scores, kind="stable"):
+    #     out.append(IDS[i])
+    # return out
     return IDS
 
 
 def rank_hybrid(question):
+    # return rrf([rank_bm25(question), rank_embed(question)])
     return IDS
 
 
 def report():
+    # out = {}
+    # methods = {"bm25": rank_bm25, "embed": rank_embed, "hybrid": rank_hybrid}
+    # for name in methods:
+    #     rank = methods[name]
+    #     hits = 0
+    #     total = 0.0
+    #     for q, right in GOLDEN:
+    #         ranked = rank(q)
+    #         if right in ranked[:3]:
+    #             hits = hits + 1
+    #         total = total + 1 / (ranked.index(right) + 1)
+    #     out[name] = {"recall@3": hits / len(GOLDEN), "mrr": total / len(GOLDEN)}
+    # return out
     return {}
 
 

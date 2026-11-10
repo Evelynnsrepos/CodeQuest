@@ -1,12 +1,41 @@
 ---
 title: Checkpoint: why does a model forget?
+minutes: 30
 xp: 60
+hint: Question 1: 11,000 tokens is more than 8,192, so the oldest messages were dropped. Can it see the first one?
+hint: Question 5: the window for the input is 4,096 - 512 = 3,584 tokens. Add up the system prompt and messages, and drop from the oldest until it fits.
+hint: Question 6: the text goes between the three quotes, on its own lines. Write at least three sentences with the words token and context.
 ---
 # Checkpoint
+
+⏱️ About 30 minutes
 
 This is the Module 1 checkpoint. It ties together tokens, the generation loop, the chat template and the context window. No new material: if a question stumps you, go back to that lesson before guessing.
 
 **The question:** you've been chatting with a model in LM Studio for two hours. You ask about something you said at the very start, and it has no idea. Why?
+
+## 🐍 How to answer
+
+Each answer is one line in the editor: the name, `=`, then your answer.
+
+| Kind of answer | Write it like | Notes |
+|---|---|---|
+| yes / no | `sees_first_message = False` | `True` or `False`, no quotes |
+| a letter | `why_it_forgets = "b"` | the letter **in quotes** |
+| a number | `dropped = 3` | no quotes |
+| a longer text | between the `"""` and `"""` | three quotes start and end a text that can have many lines |
+
+### 👀 Worked example for question 5 (other numbers)
+
+The context length is 2,000 tokens and 500 are reserved for the reply. The system prompt is 300 tokens, followed by messages of 600, 400, 700 and 200.
+
+1. Room for the input: 2,000 − 500 = **1,500** tokens.
+2. Everything now: 300 + 600 + 400 + 700 + 200 = **2,200**. Too much.
+3. Drop the oldest message (not the system prompt!): 2,200 − 600 = **1,600**. Still more than 1,500.
+4. Drop the next oldest: 1,600 − 400 = **1,200**. Fits.
+5. Two messages were dropped, so the answer would be `2`.
+
+Do the same with the numbers in question 5. Or use your `rolling_window` from lesson 13: copy it into the editor and print `len(chat) - len(rolling_window(chat, 4096 - 512))`.
 
 ## Your quest
 

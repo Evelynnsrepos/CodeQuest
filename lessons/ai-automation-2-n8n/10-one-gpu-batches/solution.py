@@ -2,7 +2,16 @@ import math
 
 
 def batches(items, size):
-    return [items[i:i + size] for i in range(0, len(items), size)]
+    groups = []
+    current = []
+    for item in items:
+        current.append(item)
+        if len(current) == size:
+            groups.append(current)
+            current = []
+    if len(current) > 0:
+        groups.append(current)
+    return groups
 
 
 def run_minutes(n_items, seconds_per_item, parallel):

@@ -1,8 +1,13 @@
 ---
 title: Set up your AI Python
+minutes: 30
 xp: 40
+hint: First run the setup script (or the commands above) so the packages exist. The import line at the top of the starter is given.
+hint: In versions: out = {}, then one line per package like out["numpy"] = numpy.__version__, then return out
 ---
 # Real libraries, on your computer
+
+⏱️ About 30 minutes
 
 > **Warm-up:** why can't the browser Python in the other courses run PyTorch?
 
@@ -53,9 +58,28 @@ The `--index-url …/cpu` line gets the small CPU-only PyTorch (about 200 MB ins
 
 No restart needed: CodeQuest looks for the venv every time you press Run.
 
-## Your quest
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `import numpy, pandas, torch, sklearn, fastapi` | | loads the five packages (given at the top of the starter). If one isn't installed, this line crashes with `ModuleNotFoundError`. |
+| `numpy.__version__` | "numpy dunder version" | the version text of that package, like `"2.1.3"`. "Dunder" means the **d**ouble **under**scores. |
+| `out = {}` | | an empty dictionary |
+| `out["numpy"] = ...` | | stores a value under the key `"numpy"` |
+
+## 🎯 Your quest
 
 Write `versions()` returning a dict with the version strings of `numpy`, `pandas`, `torch`, `sklearn` and `fastapi` (each module has `__version__`). Press **Run**: if one is missing you'll see `ModuleNotFoundError`, so go back to the commands above.
+
+Replace `return {}` with:
+
+1. `out = {}`
+2. `out["numpy"] = numpy.__version__`
+3. `out["pandas"] = pandas.__version__`
+4. `out["torch"] = torch.__version__`
+5. `out["sklearn"] = sklearn.__version__`
+6. `out["fastapi"] = fastapi.__version__`
+7. `return out`
 
 **Remember:** one venv per project; never `pip install` into your system Python.
 

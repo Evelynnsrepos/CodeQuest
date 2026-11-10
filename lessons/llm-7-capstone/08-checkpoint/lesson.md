@@ -1,8 +1,16 @@
 ---
 title: Final checkpoint, explain every why
+minutes: 60
 xp: 120
+hint: fits: return params_b * bits / 8 + overhead_gb <= vram_gb
+hint: full_ft_gb: return params_b * 16
+hint: best_step: best = log[0], for pair in log: if pair[1] < best[1]: best = pair. Then return best[0]
+hint: win_interval: p = wins / n, e = 1.96 * math.sqrt(p * (1 - p) / n), return (p - e, p + e). clear_win: low, high = win_interval(wins, n) and return low > 0.5
+hint: ANSWERS: a letter in quotes for each question, like 1: "b",
 ---
 # The whole pipeline, and why each step is there
+
+⏱️ About 60 minutes
 
 > **Warm-up:** without looking back, say out loud the steps from "I have an idea" to "it runs in LM Studio with a tool".
 
@@ -10,18 +18,55 @@ Your plan's last checkpoint: *can you explain why you made each choice, and can 
 
 **On your machine:** the real checkpoint is your repo. It should contain your plan (lesson 1), data scripts (2–3), training config and logs (4), evaluation results (5–6) and the model card (7). If you can explain every file in it to someone else, you've finished.
 
-## Your quest
+## 🔬 The numbers, taken apart
+
+<div class="formula">GB for weights = <span class="k1">params (billions)</span> × <span class="k2">bits</span> ÷ <span class="k3">8</span></div>
+<span class="k3">8 bits = 1 byte</span>. 8 billion × 16 bits ÷ 8 = 16 GB. 8 billion × 4.5 bits ÷ 8 = 4.5 GB. Add 1.5 GB overhead: 17.5 GB (doesn't fit 12) and 6 GB (fits).
+
+`<=` means "is less than or equal to".
+
+Win interval: 60 of 100 → p = 0.6. √(0.6 × 0.4 / 100) = √0.0024 ≈ 0.049. × 1.96 ≈ 0.096. Interval 0.504 to 0.696. Low > 0.5 → a clear win (barely). 55 of 100 → 0.453 to 0.647 → not clear.
+
+## 🐍 Python you need
+
+Everything here is from earlier lessons. New only:
+
+| You write | Say it | What it does |
+|---|---|---|
+| `pair[1]`, `pair[0]` | | in `(600, 1.5)`: position 1 is the loss, position 0 the step |
+| `best = log[0]` | | start the best-so-far with the first entry |
+| `low, high = win_interval(wins, n)` | | takes the pair apart |
+
+## 🎯 Your quest
 
 ### Part 1: the numbers
 
-1. `fits(params_b, bits, vram_gb, overhead_gb=1.5)`: `True` if the weights (`params_b` billion parameters × `bits` / 8 bytes, in GB) plus `overhead_gb` fit in `vram_gb`. An 8B model at 16 bits needs 16 + 1.5 GB; at Q4_K_M (about 4.5 bits per weight) it needs 4.5 + 1.5.
-2. `full_ft_gb(params_b)`: memory for **full** fine-tuning with Adam, at 16 bytes per parameter (weights, gradients, two Adam states, a float32 master copy). 8B → 128 GB.
-3. `best_step(log)`: `log` is a list of `(step, eval_loss)`. Return the step with the **lowest** eval_loss (the checkpoint you keep).
-4. `win_interval(wins, n)`: the 95% interval `(low, high)` of a blind-eval win rate, `p ± 1.96·√(p(1−p)/n)` (Math 4, lesson 11). Then `clear_win(wins, n)`: `True` only if `low > 0.5`.
+`fits(params_b, bits, vram_gb, overhead_gb=1.5)`: replace `return False` with `    return params_b * bits / 8 + overhead_gb <= vram_gb`
+
+`full_ft_gb(params_b)`: replace `return 0` with `    return params_b * 16`
+
+`best_step(log)`: replace `return None` with:
+
+1. `    best = log[0]`
+2. `    for pair in log:`
+3. `        if pair[1] < best[1]:`
+4. `            best = pair`
+5. `    return best[0]`
+
+`win_interval(wins, n)`: replace `return (0, 0)` with:
+
+1. `    p = wins / n`
+2. `    e = 1.96 * math.sqrt(p * (1 - p) / n)`
+3. `    return (p - e, p + e)`
+
+`clear_win(wins, n)`: replace `return False` with:
+
+1. `    low, high = win_interval(wins, n)`
+2. `    return low > 0.5`
 
 ### Part 2: why questions
 
-Fill `ANSWERS` with the letter of the **best** answer. Every option sounds reasonable on purpose: think about *why* each wrong one is wrong.
+Fill `ANSWERS` with the letter of the **best** answer, in quotes: `1: "a",` style. Every option sounds reasonable on purpose: think about *why* each wrong one is wrong.
 
 1. You picked the learning rate and the checkpoint by watching validation scores. Why do you still need a separate test split you never looked at?
    - **a)** Validation loss is computed with dropout on, so it reads too high.

@@ -1,8 +1,15 @@
 ---
 title: A reply is a loop
+minutes: 35
 xp: 25
+hint: Inside the for loop, first: dist = MODEL[tokens[-1]]
+hint: Best-so-far loop: best = None and best_p = -1, then for token in dist: if dist[token] > best_p: best = token and best_p = dist[token]
+hint: After the inner loop (still inside the outer one): if best == "<eos>": break
+hint: Last line inside the outer loop: tokens.append(best)
 ---
 # Autoregressive generation
+
+⏱️ About 35 minutes
 
 > **Warm-up:** the model only predicts *one* token. So how does LM Studio get a whole paragraph out of it?
 
@@ -26,17 +33,59 @@ A 300-token reply is 300 trips through the whole model. A few consequences:
 
 Picking the most likely token every time is called **greedy decoding**. It's what you get with temperature 0 (next lessons).
 
-## Your quest
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `list(prompt)` | "list of prompt" | a **copy** of the list, so you don't change the caller's prompt |
+| `for _ in range(max_tokens):` | "repeat max-tokens times" | `range(5)` runs 5 times. The `_` means "I don't need the counter". |
+| `tokens[-1]` | "tokens at minus one" | the **last** item of a list. `-1` counts from the end. |
+| `MODEL[" a"]` | | the dictionary of next tokens after `" a"`: `{" time": 0.7, " hill": 0.3}` |
+| `for token in dist:` | | goes through the keys: `" time"`, then `" hill"` |
+| `dist[token]` | | the probability of that token |
+| `>` | "is more than" | |
+| `break` | "break" | stops the loop right now |
+
+### 👀 Worked example: the best so far
+
+Finding the biggest value in a dictionary is the "best so far" loop: remember the best one you've seen, and replace it whenever you find a better one.
+
+```python
+scores = {"Ana": 7, "Ben": 9, "Cleo": 4}
+best = None
+best_score = -1
+for name in scores:
+    if scores[name] > best_score:
+        best = name
+        best_score = scores[name]
+print(best)   # Ben
+```
+
+1. Start: `best` = None, `best_score` = −1 (lower than any real score, so the first one always wins).
+2. Ana: 7 > −1 → best = Ana, 7.
+3. Ben: 9 > 7 → best = Ben, 9.
+4. Cleo: 4 > 9? No. Keep Ben.
+
+Probabilities are never below 0, so −1 works as the starting value here too.
+
+## 🎯 Your quest
 
 `MODEL` is a toy language model: for each last token it gives the probabilities of the next token. (A real model looks at *all* previous tokens, not just the last one; this "bigram" shortcut keeps the table small.)
 
-Write `generate(prompt, max_tokens)`. Start from a copy of the prompt list, then repeat up to `max_tokens` times:
+Write `generate(prompt, max_tokens)`. The first line, the loop line and the `return` are there. Replace the `pass` line with these lines (8 spaces in front, 12 and 16 for the deeper ones):
 
-1. Look up the distribution for the last token: `MODEL[tokens[-1]]`.
-2. Pick the token with the highest probability: `max(dist, key=dist.get)`.
-3. If it is `"<eos>"`, stop. Otherwise append it.
+1. `dist = MODEL[tokens[-1]]`
+2. `best = None`
+3. `best_p = -1`
+4. `for token in dist:`
+5. `    if dist[token] > best_p:`
+6. `        best = token`
+7. `        best_p = dist[token]`
+8. `if best == "<eos>":`
+9. `    break`
+10. `tokens.append(best)`
 
-Return the token list.
+Lines 2 to 7 are worked example's best-so-far loop. Lines 8 and 9 stop the reply at the end token, without adding it.
 
 Expected output:
 
@@ -50,3 +99,4 @@ Expected output:
 
 <details><summary>What is perplexity, in one sentence?</summary>e to the power of the average negative log-prob: how many equally likely choices the model was effectively picking between.</details>
 <details><summary>Why work with log-probabilities instead of probabilities?</summary>Multiplying many small probabilities underflows to 0. Logs turn the product into a sum, which stays in a safe range.</details>
+<details><summary>What does tokens[-1] give?</summary>The last item in the list.</details>

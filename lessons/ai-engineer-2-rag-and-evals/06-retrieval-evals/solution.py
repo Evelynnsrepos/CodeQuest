@@ -38,43 +38,83 @@ def tokenize(text):
 
 class BM25:
     def __init__(self, docs, k1=1.5, b=0.75):
-        self.k1, self.b = k1, b
-        self.tokens = [tokenize(d) for d in docs]
-        self.tf = [Counter(t) for t in self.tokens]
+        self.k1 = k1
+        self.b = b
+        self.tokens = []
+        self.tf = []
+        for d in docs:
+            words = tokenize(d)
+            self.tokens.append(words)
+            self.tf.append(Counter(words))
         self.N = len(docs)
-        self.avglen = sum(len(t) for t in self.tokens) / self.N
-        self.df = Counter(w for t in self.tokens for w in set(t))
+        total = 0
+        for words in self.tokens:
+            total = total + len(words)
+        self.avglen = total / self.N
+        self.df = Counter()
+        for words in self.tokens:
+            for w in set(words):
+                self.df[w] = self.df[w] + 1
+
+    def idf(self, t):
+        n = self.df.get(t, 0)
+        return math.log((self.N - n + 0.5) / (n + 0.5) + 1)
 
     def score(self, query, i):
-        length, total = len(self.tokens[i]), 0.0
+        length = len(self.tokens[i])
+        total = 0.0
         for t in tokenize(query):
             f = self.tf[i].get(t, 0)
-            if f:
-                n = self.df[t]
-                idf = math.log((self.N - n + 0.5) / (n + 0.5) + 1)
-                total += idf * f * (self.k1 + 1) / (f + self.k1 * (1 - self.b + self.b * length / self.avglen))
+            if f > 0:
+                norm = 1 - self.b + self.b * length / self.avglen
+                total = total + self.idf(t) * f * (self.k1 + 1) / (f + self.k1 * norm)
         return total
 
     def rank(self, query):
-        return sorted(range(self.N), key=lambda i: -self.score(query, i))
+        scores = []
+        for i in range(self.N):
+            scores.append(self.score(query, i))
+        order = []
+        for step in range(self.N):
+            best = None
+            for i in range(self.N):
+                if i not in order:
+                    if best is None or scores[i] > scores[best]:
+                        best = i
+            order.append(best)
+        return order
 
 
 def recall_at_k(results, golden, k):
-    return sum(right in results[q][:k] for q, right in golden) / len(golden)
+    hits = 0
+    for q, right in golden:
+        if right in results[q][:k]:
+            hits = hits + 1
+    return hits / len(golden)
 
 
 def mrr(results, golden):
     total = 0.0
     for q, right in golden:
         if right in results[q]:
-            total += 1 / (results[q].index(right) + 1)
+            position = results[q].index(right) + 1
+            total = total + 1 / position
     return total / len(golden)
 
 
 def bm25_results(notes, golden):
     ids = list(notes)
-    bm = BM25([notes[i] for i in ids])
-    return {q: [ids[i] for i in bm.rank(q)] for q, _ in golden}
+    texts = []
+    for i in ids:
+        texts.append(notes[i])
+    bm = BM25(texts)
+    results = {}
+    for q, right in golden:
+        ranked = []
+        for i in bm.rank(q):
+            ranked.append(ids[i])
+        results[q] = ranked
+    return results
 
 
 res = bm25_results(NOTES, GOLDEN)

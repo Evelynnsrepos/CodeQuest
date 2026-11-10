@@ -2,16 +2,19 @@ import math
 
 
 def softmax(logits):
-    m = 0  # the largest logit
+    m = 0  # change 0 to: max(logits)
     exps = []
-    # fill exps with math.exp(z - m) for every z in logits
-    total = 0
+    # for z in logits:
+    #     exps.append(math.exp(z - m))
+    total = 0  # change 0 to: sum(exps)
     probs = []
-    # divide every entry of exps by total
+    # for e in exps:
+    #     probs.append(e / total)
     return probs
 
 
 tokens = [" Paris", " Lyon", " a", " the"]
 logits = [9.1, 5.2, 4.0, 3.5]
-for token, p in zip(tokens, softmax(logits)):
-    print(f"{token!r:10} {p:.3f}")
+probs = softmax(logits)
+for i in range(len(tokens)):
+    print(tokens[i], round(probs[i], 3))

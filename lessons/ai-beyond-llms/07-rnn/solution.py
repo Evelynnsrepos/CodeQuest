@@ -2,11 +2,23 @@ import math
 
 
 def matvec(W, x):
-    return [sum(w * v for w, v in zip(row, x)) for row in W]
+    """W is a list of rows; returns W·x."""
+    out = []
+    for row in W:
+        total = 0
+        for i in range(len(x)):
+            total = total + row[i] * x[i]
+        out.append(total)
+    return out
 
 
 def rnn_step(x, h, Wx, Wh, b):
-    return [math.tanh(a + c + d) for a, c, d in zip(matvec(Wx, x), matvec(Wh, h), b)]
+    a = matvec(Wx, x)
+    c = matvec(Wh, h)
+    new_h = []
+    for i in range(len(b)):
+        new_h.append(math.tanh(a[i] + c[i] + b[i]))
+    return new_h
 
 
 def run_rnn(xs, Wx, Wh, b):

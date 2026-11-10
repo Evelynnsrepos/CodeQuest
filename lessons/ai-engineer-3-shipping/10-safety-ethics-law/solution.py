@@ -5,32 +5,43 @@ TRANSPARENCY = {"chatbot", "generated_media"}
 
 
 def risk_tier(use):
-    if use & PROHIBITED:
+    if len(use & PROHIBITED) > 0:
         return "prohibited"
-    if use & HIGH:
+    if len(use & HIGH) > 0:
         return "high"
-    if use & TRANSPARENCY:
+    if len(use & TRANSPARENCY) > 0:
         return "transparency"
     return "minimal"
 
 
 def disclose(answer):
     tag = "[AI-generated] "
-    return answer if answer.startswith(tag) else tag + answer
+    if answer.startswith(tag):
+        return answer
+    return tag + answer
 
 
 def selection_rates(decisions):
-    totals, accepted = {}, {}
+    totals = {}
+    accepted = {}
     for group, ok in decisions:
         totals[group] = totals.get(group, 0) + 1
-        accepted[group] = accepted.get(group, 0) + bool(ok)
-    return {g: accepted[g] / totals[g] for g in totals}
+        accepted[group] = accepted.get(group, 0)
+        if ok:
+            accepted[group] = accepted[group] + 1
+    rates = {}
+    for group in totals:
+        rates[group] = accepted[group] / totals[group]
+    return rates
 
 
 def four_fifths_ok(decisions):
     rates = selection_rates(decisions)
     top = max(rates.values())
-    return all(r >= 0.8 * top for r in rates.values())
+    for group in rates:
+        if rates[group] < 0.8 * top:
+            return False
+    return True
 
 
 print(risk_tier({"chatbot", "hiring"}), disclose("Hello!"))

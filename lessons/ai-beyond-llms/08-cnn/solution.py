@@ -1,13 +1,34 @@
 def conv2d(image, kernel):
-    k_h, k_w = len(kernel), len(kernel[0])
-    out_h, out_w = len(image) - k_h + 1, len(image[0]) - k_w + 1
-    return [[sum(image[i + a][j + b] * kernel[a][b] for a in range(k_h) for b in range(k_w))
-             for j in range(out_w)] for i in range(out_h)]
+    k_h = len(kernel)
+    k_w = len(kernel[0])
+    out_h = len(image) - k_h + 1
+    out_w = len(image[0]) - k_w + 1
+    out = []
+    for i in range(out_h):
+        row = []
+        for j in range(out_w):
+            total = 0
+            for a in range(k_h):
+                for b in range(k_w):
+                    total = total + image[i + a][j + b] * kernel[a][b]
+            row.append(total)
+        out.append(row)
+    return out
 
 
 def max_pool(image, size):
-    return [[max(image[i + a][j + b] for a in range(size) for b in range(size))
-             for j in range(0, len(image[0]), size)] for i in range(0, len(image), size)]
+    out = []
+    for i in range(0, len(image), size):
+        row = []
+        for j in range(0, len(image[0]), size):
+            biggest = image[i][j]
+            for a in range(size):
+                for b in range(size):
+                    if image[i + a][j + b] > biggest:
+                        biggest = image[i + a][j + b]
+            row.append(biggest)
+        out.append(row)
+    return out
 
 
 image = [

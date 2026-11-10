@@ -4,13 +4,25 @@ import math
 def layer_norm(x, gamma, beta, eps=1e-5):
     d = len(x)
     mean = sum(x) / d
-    var = sum((v - mean) ** 2 for v in x) / d
-    return [(v - mean) / math.sqrt(var + eps) * g + b for v, g, b in zip(x, gamma, beta)]
+    var = 0
+    for v in x:
+        var = var + (v - mean) ** 2
+    var = var / d
+    out = []
+    for i in range(d):
+        out.append((x[i] - mean) / math.sqrt(var + eps) * gamma[i] + beta[i])
+    return out
 
 
 def rms_norm(x, gamma, eps=1e-5):
-    rms = math.sqrt(sum(v * v for v in x) / len(x) + eps)
-    return [v / rms * g for v, g in zip(x, gamma)]
+    total = 0
+    for v in x:
+        total = total + v * v
+    rms = math.sqrt(total / len(x) + eps)
+    out = []
+    for i in range(len(x)):
+        out.append(x[i] / rms * gamma[i])
+    return out
 
 
 x = [2.0, 4.0, 6.0, 8.0]

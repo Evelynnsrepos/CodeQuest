@@ -11,14 +11,18 @@ def make_card(info):
         info["how_to_run"],
     ]
     parts = ["# " + info["name"]]
-    for heading, body in zip(SECTIONS, bodies):
-        parts.append(heading + "\n\n" + body)
+    for i in range(len(SECTIONS)):
+        parts.append(SECTIONS[i] + "\n\n" + bodies[i])
     return "\n\n".join(parts) + "\n"
 
 
 def missing_sections(markdown):
     lines = markdown.splitlines()
-    return [s for s in SECTIONS if s not in lines]
+    missing = []
+    for s in SECTIONS:
+        if s not in lines:
+            missing.append(s)
+    return missing
 
 
 info = {

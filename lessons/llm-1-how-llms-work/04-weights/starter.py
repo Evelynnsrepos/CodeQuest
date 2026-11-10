@@ -1,11 +1,12 @@
 def neuron(inputs, weights, bias):
     total = 0
-    for x, w in zip(inputs, weights):
-        pass  # add x times w to total
-    return total  # don't forget the bias
+    for i in range(len(inputs)):
+        pass  # replace this line with: total = total + inputs[i] * weights[i]
+    return total  # change this to: return total + bias
 
 
 def model_size_gb(params_billion, bits):
+    # return params_billion * bits / 8
     return 0
 
 

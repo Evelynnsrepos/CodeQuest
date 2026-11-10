@@ -7,18 +7,22 @@ def numeric_gradient(f, point):
     h = 1e-5
     grad = []
     for i in range(len(point)):
-        up, down = list(point), list(point)
-        up[i] += h
-        down[i] -= h
+        up = list(point)
+        down = list(point)
+        up[i] = up[i] + h
+        down[i] = down[i] - h
         grad.append((f(up) - f(down)) / (2 * h))
     return grad
 
 
 def gradient_descent(f, start, learning_rate, steps):
     point = list(start)
-    for _ in range(steps):
+    for step in range(steps):
         grad = numeric_gradient(f, point)
-        point = [p - learning_rate * g for p, g in zip(point, grad)]
+        new_point = []
+        for i in range(len(point)):
+            new_point.append(point[i] - learning_rate * grad[i])
+        point = new_point
     return point
 
 

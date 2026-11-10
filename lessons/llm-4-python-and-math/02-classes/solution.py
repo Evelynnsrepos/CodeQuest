@@ -5,12 +5,19 @@ class Linear:
 
     def __call__(self, x):
         out = []
-        for row, b in zip(self.weights, self.bias):
-            out.append(sum(w * xi for w, xi in zip(row, x)) + b)
+        for j in range(len(self.weights)):
+            row = self.weights[j]
+            total = 0
+            for i in range(len(x)):
+                total = total + row[i] * x[i]
+            out.append(total + self.bias[j])
         return out
 
     def num_params(self):
-        return sum(len(row) for row in self.weights) + len(self.bias)
+        count = 0
+        for row in self.weights:
+            count = count + len(row)
+        return count + len(self.bias)
 
 
 class Sequential:

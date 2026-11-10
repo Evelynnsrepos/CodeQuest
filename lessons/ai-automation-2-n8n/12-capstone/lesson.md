@@ -1,30 +1,104 @@
 ---
 title: Capstone: review a workflow before it runs
+minutes: 60
 xp: 60
+hint: Check 1: loop over nodes, append each node["name"] to names, and count triggers with if node["type"].lower().endswith("trigger") or node["type"].endswith(".webhook"):
+hint: Check 2: the four loops from lesson 7. Inside: if target["node"] not in names: problems.append("unknown node: " + target["node"]), and if kind == "ai_languageModel": has_model.append(target["node"])
+hint: Check 3: for node in nodes: if node["type"].endswith(".agent") and node["name"] not in has_model: problems.append(node["name"] + " has no chat model")
+hint: Check 4: settings = workflow.get("settings", {}) and if settings.get("errorWorkflow", "") == "": problems.append("set an error workflow")
+hint: Check 5: for node in nodes: text = json.dumps(node.get("parameters", {})) and if "sk-" in text or "Bearer " in text: problems.append(node["name"] + " has a secret in it, use credentials")
 ---
 # Your own n8n workflow checker
 
-⏱️ About 20 minutes · one function with five checks
+⏱️ About 60 minutes · one function with five checks, one at a time
 
 > **Warm-up:** before you switch a workflow to active, what five things would you check?
 
 **In one sentence:** a good automation person reads a workflow like code before trusting it, so you'll write a checker for the mistakes from this course, then use it on your real exported workflows.
 
+## 🐍 Python you need
+
+You know almost everything already. The new pieces:
+
+| You write | Say it | What it does |
+|---|---|---|
+| `workflow.get("connections", {})` | | the connections, or an empty dictionary if the workflow has none |
+| `s.lower().endswith("trigger")` | | makes the text lowercase **first**, so `Trigger`, `TRIGGER` and `trigger` all match |
+| `triggers != 1` | "triggers is not one" | true for 0, 2, 3, … |
+| `x not in names` | "x is not in names" | true when the list doesn't hold `x` |
+| `json.dumps(d)` | "JSON dump string" | turns a dictionary (with everything inside it) into **one** text, so you can search all of it with `in` at once |
+| `settings.get("errorWorkflow", "")` | | the value, or `""` if the key is missing |
+
+Problems are **added in check order**, because each check runs after the one before. That's why the checks are separate loops.
+
+### 👀 Worked example: one check, the counting pattern
+
+Check 1 is a counter, like this one that counts cats among pets:
+
+```python
+pets = [{"name": "Momo", "kind": "Cat"}, {"name": "Rex", "kind": "dog"}]
+names = []
+cats = 0
+for pet in pets:
+    names.append(pet["name"])
+    if pet["kind"].lower() == "cat":
+        cats = cats + 1
+print(names, cats)
+```
+
+Momo: name added, `"Cat".lower()` is `"cat"` → `cats` = 1. Rex: name added, not a cat. Prints `['Momo', 'Rex'] 1`. One loop collects the names (needed for check 2) **and** counts.
+
 ## 🎯 Your quest
 
-Write `review(workflow)` that returns a list of problem messages (empty = ready). Do the checks in this order. The checks test them one at a time.
+Write `review(workflow)` that returns a list of problem messages (empty = ready). The starter already has `problems = []` and `return problems`. Add the lines between them, check by check. Press **Submit** after each check: the checks are tested one at a time.
 
-1. **One trigger.** Count nodes whose `type` ends with `Trigger` (any case: `.lower().endswith("trigger")`), plus the Webhook node, the one trigger without it in its name (`type` ends with `.webhook`). Not exactly 1 → `"needs exactly one trigger"`.
-2. **Connections point at real nodes.** For every target in `connections` (any connection type) whose node name isn't in `nodes` → `"unknown node: NAME"`.
-3. **Every agent has a model.** For every node whose type ends with `.agent`, if no `ai_languageModel` connection goes to it → `"NAME has no chat model"` (reuse lesson 7's idea).
-4. **An error workflow is set.** `workflow.get("settings", {}).get("errorWorkflow")` is empty → `"set an error workflow"` (lesson 9).
-5. **No secrets in parameters.** If `json.dumps` of a node's `parameters` contains `"sk-"` or `"Bearer "` → `"NAME has a secret in it, use credentials"`.
+**Setup:**
 
-Report problems node by node in the order of the `nodes` list (for checks 3 and 5) and connections in the order they appear (check 2).
+1. `nodes = workflow["nodes"]`
+2. `connections = workflow.get("connections", {})`
 
-<details><summary>💡 Hint 1: names and types</summary><code>names = {n["name"] for n in workflow["nodes"]}</code></details>
-<details><summary>💡 Hint 2: walking connections</summary>Same four loops as lesson 7: <code>for source, outputs in ...items(): for kind, lists in outputs.items(): for targets in lists: for t in targets:</code></details>
-<details><summary>💡 Hint 3: secrets</summary><code>text = json.dumps(node.get("parameters", {}))</code>, then <code>if "sk-" in text or "Bearer " in text:</code></details>
+**Check 1, one trigger** (a node whose type ends in `trigger`, in any case, or the Webhook node, whose type ends in `.webhook`):
+
+3. `names = []`
+4. `triggers = 0`
+5. `for node in nodes:`
+6. `    names.append(node["name"])`
+7. `    if node["type"].lower().endswith("trigger") or node["type"].endswith(".webhook"):`
+8. `        triggers = triggers + 1`
+9. `if triggers != 1:`
+10. `    problems.append("needs exactly one trigger")`
+
+**Check 2, connections point at real nodes** (the four loops from lesson 7; at the same time, remember which nodes get a model):
+
+11. `has_model = []`
+12. `for source in connections:`
+13. `    outputs = connections[source]`
+14. `    for kind in outputs:`
+15. `        for targets in outputs[kind]:`
+16. `            for target in targets:`
+17. `                if target["node"] not in names:`
+18. `                    problems.append("unknown node: " + target["node"])`
+19. `                if kind == "ai_languageModel":`
+20. `                    has_model.append(target["node"])`
+
+**Check 3, every agent has a model:**
+
+21. `for node in nodes:`
+22. `    if node["type"].endswith(".agent") and node["name"] not in has_model:`
+23. `        problems.append(node["name"] + " has no chat model")`
+
+**Check 4, an error workflow is set** (lesson 9):
+
+24. `settings = workflow.get("settings", {})`
+25. `if settings.get("errorWorkflow", "") == "":`
+26. `    problems.append("set an error workflow")`
+
+**Check 5, no secrets in parameters:**
+
+27. `for node in nodes:`
+28. `    text = json.dumps(node.get("parameters", {}))`
+29. `    if "sk-" in text or "Bearer " in text:`
+30. `        problems.append(node["name"] + " has a secret in it, use credentials")`
 
 ## 🖥️ Make it real
 

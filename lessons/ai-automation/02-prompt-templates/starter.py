@@ -1,4 +1,8 @@
 def fill(template, fields):
+    # try:
+    #     return template.format_map(fields)
+    # except KeyError as e:
+    #     raise ValueError("missing field: " + e.args[0])
     return template
 
 

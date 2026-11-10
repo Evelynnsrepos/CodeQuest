@@ -3,9 +3,16 @@ import math
 
 def softmax(z):
     m = max(z)
-    e = [math.exp(v - m) for v in z]
-    s = sum(e)
-    return [v / s for v in e]
+    e = []
+    for v in z:
+        e.append(math.exp(v - m))
+    s = 0
+    for v in e:
+        s = s + v
+    out = []
+    for v in e:
+        out.append(v / s)
+    return out
 
 
 def cross_entropy(logits, target):
@@ -23,7 +30,7 @@ def dsigmoid(z):
 
 def ce_grad(logits, target):
     grad = softmax(logits)
-    grad[target] -= 1
+    grad[target] = grad[target] - 1
     return grad
 
 

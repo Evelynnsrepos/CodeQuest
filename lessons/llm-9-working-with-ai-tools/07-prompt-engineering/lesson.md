@@ -1,8 +1,15 @@
 ---
 title: Prompt engineering that works
+minutes: 30
 xp: 50
+hint: Start with parts = ["<documents>"] and i = 1
+hint: for doc in documents: parts.append('<document index="' + str(i) + '">' + doc + "</document>") and then i = i + 1
+hint: if len(examples) > 0: then for inp, out in examples: and append the <example>... text built with +
+hint: End: append the instructions, then fmt, then return "\n".join(parts)
 ---
 # Write it like a brief for a smart new coworker
+
+⏱️ About 30 minutes
 
 > **Warm-up:** "Summarize this." vs. "Summarize this bug report in 3 bullet points for a beginner, because it'll be a phone notification." Which gets better results, and why?
 
@@ -47,6 +54,50 @@ Answer with only the 3 bullets.
 <div class="wrong"><b>"Don't use bullet points"</b>: "Write in plain sentences" works better.</div>
 <div class="right">documents → examples → instructions with the why → exact format, last ✓</div>
 
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `parts = ["<documents>"]` | | a list that starts with one line |
+| `parts.append(x)` | "parts append x" | adds `x` as the next line |
+| `str(i)` | "string of i" | the number as text: `str(2)` is `"2"`. You can't glue a number to text with `+` without it. |
+| `'<document index="' + str(i) + '">'` | | single quotes `'...'` around text that holds double quotes `"`. Result: `<document index="2">` |
+| `i = i + 1` | | counts up: 1, 2, 3, ... |
+| `if len(examples) > 0:` | "if there is at least one example" | skips the block when the list is empty |
+| `for inp, out in examples:` | "for each input and output" | each item is a pair; Python unpacks it into two names |
+| `"\n".join(parts)` | "new-line join parts" | one text, one part per line |
+
+### 👀 Worked example: a shopping note
+
+```python
+def note(items, pairs):
+    parts = ["<items>"]
+    i = 1
+    for item in items:
+        parts.append('<item n="' + str(i) + '">' + item + "</item>")
+        i = i + 1
+    parts.append("</items>")
+    for a, b in pairs:
+        parts.append(a + " -> " + b)
+    return "\n".join(parts)
+
+print(note(["milk", "eggs"], [("old", "new")]))
+```
+
+1. `parts` = `["<items>"]`, `i` = 1.
+2. `"milk"`: appends `<item n="1">milk</item>`, `i` becomes 2. `"eggs"`: `<item n="2">eggs</item>`, `i` becomes 3.
+3. Appends `</items>`.
+4. The pair `("old", "new")`: `a` = `"old"`, `b` = `"new"` → appends `old -> new`.
+5. Prints four lines:
+
+```
+<items>
+<item n="1">milk</item>
+<item n="2">eggs</item>
+</items>
+old -> new
+```
+
 ## 🎯 Your quest
 
 `build_prompt(task, why, documents, examples, fmt)`:
@@ -57,6 +108,23 @@ Answer with only the 3 bullets.
 - then fmt as the last line.
 
 Join the parts with `"\n"`.
+
+Replace `return task` with:
+
+1. `parts = ["<documents>"]`
+2. `i = 1`
+3. `for doc in documents:`
+4. `    parts.append('<document index="' + str(i) + '">' + doc + "</document>")`
+5. `    i = i + 1`
+6. `parts.append("</documents>")`
+7. `if len(examples) > 0:`
+8. `    parts.append("<examples>")`
+9. `    for inp, out in examples:`
+10. `        parts.append("<example><input>" + inp + "</input><output>" + out + "</output></example>")`
+11. `    parts.append("</examples>")`
+12. `parts.append("<instructions>" + task + " " + why + "</instructions>")`
+13. `parts.append(fmt)`
+14. `return "\n".join(parts)`
 
 **Remember:** data first, instructions with the why, format last.
 

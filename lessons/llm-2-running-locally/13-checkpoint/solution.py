@@ -1,20 +1,30 @@
 def estimate_params(c):
-    hd = c.get("head_dim", c["hidden_size"] // c["num_attention_heads"])
+    """Given: lesson 12's parameter estimate."""
+    if "head_dim" in c:
+        hd = c["head_dim"]
+    else:
+        hd = c["hidden_size"] // c["num_attention_heads"]
     q = c["hidden_size"] * c["num_attention_heads"] * hd
     kv = c["hidden_size"] * c["num_key_value_heads"] * hd
     per_layer = 2 * q + 2 * kv + 3 * c["hidden_size"] * c["intermediate_size"]
     emb = c["vocab_size"] * c["hidden_size"]
-    return c["num_hidden_layers"] * per_layer + (emb if c["tie_word_embeddings"] else 2 * emb)
+    if c["tie_word_embeddings"]:
+        return c["num_hidden_layers"] * per_layer + emb
+    return c["num_hidden_layers"] * per_layer + 2 * emb
 
 
 def kv_bytes_per_token(c):
-    hd = c.get("head_dim", c["hidden_size"] // c["num_attention_heads"])
+    """Given: lesson 12's KV bytes per token."""
+    if "head_dim" in c:
+        hd = c["head_dim"]
+    else:
+        hd = c["hidden_size"] // c["num_attention_heads"]
     return 2 * c["num_hidden_layers"] * c["num_key_value_heads"] * hd * 2
 
 
 def predict(config, bpw, context, budget_gb):
-    weights = estimate_params(config) * bpw / 8 / 1e9
-    kv = kv_bytes_per_token(config) * context / 1e9
+    weights = estimate_params(config) * bpw / 8 / 1000000000
+    kv = kv_bytes_per_token(config) * context / 1000000000
     return weights + kv + 1.0 <= budget_gb
 
 

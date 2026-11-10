@@ -1,8 +1,14 @@
 ---
 title: What the model actually reads
+minutes: 20
 xp: 15
+hint: encode: inside the for loop, replace pass with ids.append(vocab[token])
+hint: decode: for i in ids: and inside it pieces.append(id_to_token[i])
+hint: decode, last line: return "".join(pieces)
 ---
 # Tokens
+
+⏱️ About 20 minutes
 
 > **Warm-up (answer in your head first):** when you type `Hello, how are you?` into LM Studio, what does the model receive: words, letters, or something else?
 
@@ -21,23 +27,63 @@ Two things to notice:
 
 Tokens are the unit of everything: the context window is measured in tokens, speed is measured in **tokens per second** (LM Studio shows it under every reply), and paid APIs charge per million tokens. A rough rule for English is 1 token ≈ ¾ of a word, but it depends on the language and the tokenizer.
 
-## Python you need
+## 🐍 Python you need
 
-A dictionary maps keys to values. You look a value up with square brackets:
+| You write | Say it | What it does |
+|---|---|---|
+| `{"Hello": 0, ",": 1}` | "a dictionary: Hello is 0, comma is 1" | a **dictionary**: pairs of key → value. Here: token → ID. |
+| `vocab["Hello"]` | "vocab at Hello" | looks up the value for that key: `0` |
+| `id_to_token[0]` | "id-to-token at 0" | the other direction: ID → token, `"Hello"` |
+| `ids = []` | "ids becomes an empty list" | a new, empty list |
+| `for token in tokens:` | "for each token in tokens" | runs the lines under it (4 more spaces) once per item in the list |
+| `ids.append(x)` | "ids append x" | adds `x` to the end of the list |
+| `"".join(pieces)` | "empty-string join pieces" | glues a list of texts together with nothing between them: `["Hi", "!"]` → `"Hi!"` |
+
+The line `id_to_token = {...}` at the top of the starter builds the reverse dictionary for you. You don't need to change or understand it yet.
+
+### 👀 Worked example: same shape, a colour code
 
 ```python
-ages = {"Ada": 36, "Linus": 28}
-print(ages["Ada"])      # 36
+code = {"red": 1, "blue": 2}
+name = {1: "red", 2: "blue"}
+
+def to_numbers(colours):
+    numbers = []
+    for c in colours:
+        numbers.append(code[c])
+    return numbers
+
+def to_text(numbers):
+    pieces = []
+    for n in numbers:
+        pieces.append(name[n])
+    return "-".join(pieces)
+
+print(to_numbers(["blue", "red"]))   # [2, 1]
+print(to_text([2, 1]))               # blue-red
 ```
 
-`"".join(pieces)` glues a list of strings together: `"".join(["a", "b"])` is `"ab"`.
+`to_numbers(["blue", "red"])`, round by round:
 
-## Your quest
+1. `numbers` = `[]`.
+2. `c` = `"blue"`: `code["blue"]` is 2 → `numbers` = `[2]`.
+3. `c` = `"red"`: `code["red"]` is 1 → `numbers` = `[2, 1]`.
 
-The starter code has a tiny vocabulary `vocab` (token → ID) and its reverse `id_to_token` (ID → token).
+`to_text` does the reverse and glues with `"-"`. Your `decode` glues with `""` (nothing), because the spaces are already inside the tokens.
 
-1. Finish `encode(tokens)`: return a list with the ID of each token, in order.
-2. Finish `decode(ids)`: turn each ID back into its token, then join them into one string.
+## 🎯 Your quest
+
+The starter has a tiny vocabulary `vocab` (token → ID) and its reverse `id_to_token` (ID → token).
+
+**Part 1:** `encode(tokens)`. In the loop, replace the `pass` line with:
+
+- `ids.append(vocab[token])` (8 spaces in front: it's inside the loop)
+
+**Part 2:** `decode(ids)`. Replace the comment and `return ""` with:
+
+1. `for i in ids:`
+2. `    pieces.append(id_to_token[i])`
+3. `return "".join(pieces)`
 
 Running it should print:
 
@@ -49,3 +95,6 @@ Hello, how are you?
 ## Try it on your machine
 
 Load any model in LM Studio, send a message and look under the reply for the **tokens/s** and token count. Then try the same sentence in German. Does it use more or fewer tokens?
+## Review
+
+<details><summary>What does "".join(["a", "b", "c"]) give?</summary>"abc": the pieces glued together with nothing between them.</details>

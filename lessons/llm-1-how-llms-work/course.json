@@ -3,7 +3,7 @@
  "name": "LLMs 1: How an LLM works",
  "icon": "🧠",
  "order": 70,
- "blurb": "Tokens, weights, next-token prediction, sampling, chat templates, embeddings and attention. You build each piece in small Python steps. Do the Python basics first.",
+ "blurb": "Tokens, weights, next-token prediction, sampling, chat templates, embeddings and attention. You build each piece in small Python steps, and every lesson shows the Python and the maths it uses first, so no coding experience is needed. The AI crash course is a good warm-up.",
  "track": "AI",
  "level": "Level 1 · Understand and use AI",
  "topic": "How LLMs work"

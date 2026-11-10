@@ -1,8 +1,15 @@
 ---
 title: Checkpoint: the whole map
+minutes: 45
 xp: 120
+hint: scores: accuracy = (tp + tn) / (tp + fp + fn + tn). Then precision and recall with an if/else each, so you never divide by 0
+hint: weights: dense = (h * w) ** 2 and conv = k * k, then return (dense, conv)
+hint: q_new: return q + alpha * (r + gamma * best_next - q)
+hint: Part 2: think about why each wrong option is wrong. Look back at lessons 01, 07, 10, 09, 12 and 13.
 ---
 # Pick the right tool
+
+⏱️ About 45 minutes
 
 > **Warm-up:** for each of these, which kind of model would you reach for first: predicting house prices from a spreadsheet, transcribing a podcast, generating a poster image, sorting photos by what's in them without labels?
 
@@ -15,6 +22,35 @@ xp: 120
 1. `scores(tp, fp, fn, tn)`: return `(accuracy, precision, recall)` (lesson 06). A fraud model with tp=2, fp=3, fn=98, tn=19897 has 99.5% accuracy, but what is its recall?
 2. `weights(h, w, k)`: return `(dense, conv)`: the weights to map an h×w grayscale image to an h×w output with a fully connected layer (`(h·w)²`, ignore biases) and with one k×k convolution kernel (`k·k`).
 3. `q_new(q, r, best_next, alpha, gamma)`: one Q-learning update, `q + α · (r + γ · best_next − q)` (lesson 13).
+
+### How to answer Part 1
+
+These are your formulas from lessons 06, 08 and 13. `**` is "to the power", so `** 2` is squared.
+
+`scores`: replace `return (0, 0, 0)` with:
+
+1. `accuracy = (tp + tn) / (tp + fp + fn + tn)`
+2. `if tp + fp == 0:`
+3. `    precision = 0.0`
+4. `else:`
+5. `    precision = tp / (tp + fp)`
+6. `if tp + fn == 0:`
+7. `    recall = 0.0`
+8. `else:`
+9. `    recall = tp / (tp + fn)`
+10. `return (accuracy, precision, recall)`
+
+`weights`: replace `return (0, 0)` with:
+
+1. `dense = (h * w) ** 2`
+2. `conv = k * k`
+3. `return (dense, conv)`
+
+For a 28 × 28 image: 28 · 28 = 784 pixels, and a dense layer connects every pixel to every output: 784 · 784 = 614,656 weights. A 3 × 3 kernel has 9.
+
+`q_new`: replace `return q` with:
+
+1. `return q + alpha * (r + gamma * best_next - q)`
 
 ### Part 2: why questions
 

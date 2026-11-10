@@ -2,14 +2,30 @@ import math
 
 
 def frames(signal, size, hop):
+    # out = []
+    # for start in range(0, len(signal) - size + 1, hop):
+    #     out.append(signal[start:start + size])
+    # return out
     return []
 
 
 def dft_magnitudes(frame):
+    # N = len(frame)
+    # mags = []
+    # for k in range(N // 2 + 1):
+    #     re = 0
+    #     im = 0
+    #     for n in range(N):
+    #         angle = 2 * math.pi * k * n / N
+    #         re = re + frame[n] * math.cos(angle)
+    #         im = im - frame[n] * math.sin(angle)
+    #     mags.append(math.sqrt(re * re + im * im))
+    # return mags
     return []
 
 
 def hz_to_mel(f):
+    # return 2595 * math.log10(1 + f / 700)
     return f
 
 

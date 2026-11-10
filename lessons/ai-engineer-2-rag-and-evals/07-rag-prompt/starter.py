@@ -9,14 +9,40 @@ def tokens(text):
 
 
 def build_prompt(question, chunks, budget):
+    # lines = []
+    # used = []
+    # total = 0
+    # for c in chunks:
+    #     line = "[" + str(len(lines) + 1) + "] (" + c["id"] + ") " + c["text"]
+    #     if total + tokens(line) > budget:
+    #         break
+    #     lines.append(line)
+    #     used.append(c["id"])
+    #     total = total + tokens(line)
+    # prompt = HEADER + "\n\n" + "\n".join(lines) + "\n\nQuestion: " + question
+    # return prompt, used
     return "", []
 
 
 def citations(answer):
+    # found = []
+    # for n in re.findall(r"\[(\d+)\]", answer):
+    #     if int(n) not in found:
+    #         found.append(int(n))
+    # return sorted(found)
     return []
 
 
 def check_answer(answer, n_sources):
+    # cited = citations(answer)
+    # if len(cited) == 0:
+    #     if "i don't know" in answer.lower():
+    #         return "ok"
+    #     return "no citations"
+    # for n in cited:
+    #     if n < 1 or n > n_sources:
+    #         return "bad citation"
+    # return "ok"
     return "ok"
 
 

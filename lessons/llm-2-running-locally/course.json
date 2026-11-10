@@ -3,7 +3,7 @@
  "name": "LLMs 2: Running models locally",
  "icon": "🖥️",
  "order": 71,
- "blurb": "GGUF and safetensors, quantization, VRAM and speed math for your GPU, AMD ROCm vs Vulkan, and LM Studio's local API. Do LLMs 1 first.",
+ "blurb": "GGUF and safetensors, quantization, VRAM and speed math for your GPU, AMD ROCm vs Vulkan, and LM Studio's local API. Every lesson shows the Python and maths it uses first, step by step. Do LLMs 1 first.",
  "track": "AI",
  "level": "Level 1 · Understand and use AI",
  "topic": "Running models"

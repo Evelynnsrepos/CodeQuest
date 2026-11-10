@@ -4,12 +4,13 @@ import math
 def total_log_prob(probs):
     total = 0
     for p in probs:
-        total += math.log(p)
+        total = total + math.log(p)
     return total
 
 
 def perplexity(probs):
-    return math.exp(-total_log_prob(probs) / len(probs))
+    average = total_log_prob(probs) / len(probs)
+    return math.exp(-average)
 
 
 confident = [0.8, 0.8, 0.8, 0.8]

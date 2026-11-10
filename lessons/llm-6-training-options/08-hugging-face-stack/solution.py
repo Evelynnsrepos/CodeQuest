@@ -4,15 +4,27 @@ import json
 def make_lora_config(r, include_mlp=True):
     targets = ["q_proj", "k_proj", "v_proj", "o_proj"]
     if include_mlp:
-        targets += ["gate_proj", "up_proj", "down_proj"]
-    return {"r": r, "lora_alpha": 2 * r, "lora_dropout": 0.05,
-            "target_modules": targets, "task_type": "CAUSAL_LM"}
+        targets = targets + ["gate_proj", "up_proj", "down_proj"]
+    config = {}
+    config["r"] = r
+    config["lora_alpha"] = 2 * r
+    config["lora_dropout"] = 0.05
+    config["target_modules"] = targets
+    config["task_type"] = "CAUSAL_LM"
+    return config
 
 
 def make_sft_config(epochs, lr, per_device, accumulation):
-    return {"output_dir": "out", "num_train_epochs": epochs, "learning_rate": lr,
-            "per_device_train_batch_size": per_device, "gradient_accumulation_steps": accumulation,
-            "lr_scheduler_type": "cosine", "warmup_ratio": 0.05, "bf16": True}
+    config = {}
+    config["output_dir"] = "out"
+    config["num_train_epochs"] = epochs
+    config["learning_rate"] = lr
+    config["per_device_train_batch_size"] = per_device
+    config["gradient_accumulation_steps"] = accumulation
+    config["lr_scheduler_type"] = "cosine"
+    config["warmup_ratio"] = 0.05
+    config["bf16"] = True
+    return config
 
 
 print(json.dumps(make_lora_config(16), indent=2))

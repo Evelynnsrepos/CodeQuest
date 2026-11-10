@@ -14,7 +14,17 @@ MODEL = {
 def generate(prompt, max_tokens):
     tokens = list(prompt)
     for _ in range(max_tokens):
-        pass  # look up, pick the most likely, stop on "<eos>", append
+        # dist = MODEL[tokens[-1]]
+        # best = None
+        # best_p = -1
+        # for token in dist:
+        #     if dist[token] > best_p:
+        #         best = token
+        #         best_p = dist[token]
+        # if best == "<eos>":
+        #     break
+        # tokens.append(best)
+        pass
     return tokens
 
 

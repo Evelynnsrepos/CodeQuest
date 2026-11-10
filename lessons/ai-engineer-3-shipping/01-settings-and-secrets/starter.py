@@ -9,11 +9,40 @@ SPEC = {
 }
 
 
+def convert(kind, text):
+    # if kind is bool:
+    #     return text.strip().lower() in ["1", "true", "yes", "on"]
+    # return kind(text)
+    return text
+
+
 def load_settings(env, spec=SPEC):
+    # missing = []
+    # for name in spec:
+    #     kind, default = spec[name]
+    #     if default is REQUIRED and name not in env:
+    #         missing.append(name)
+    # if len(missing) > 0:
+    #     raise ValueError("missing settings: " + ", ".join(sorted(missing)))
+    # out = {}
+    # for name in spec:
+    #     kind, default = spec[name]
+    #     if name in env:
+    #         out[name] = convert(kind, env[name])
+    #     else:
+    #         out[name] = default
+    # return out
     return {}
 
 
 def safe_view(settings):
+    # out = {}
+    # for k in settings:
+    #     if k.endswith("_KEY") or k.endswith("_TOKEN") or k.endswith("_PASSWORD"):
+    #         out[k] = "****"
+    #     else:
+    #         out[k] = settings[k]
+    # return out
     return settings
 
 

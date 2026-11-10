@@ -1,5 +1,11 @@
 def code_node(items):
-    return [{"json": {**i["json"], "big": True}} for i in items if i["json"]["amount"] > 100]
+    new_items = []
+    for item in items:
+        if item["json"]["amount"] > 100:
+            fields = dict(item["json"])
+            fields["big"] = True
+            new_items.append({"json": fields})
+    return new_items
 
 
 orders = [{"json": {"id": 1, "amount": 40}}, {"json": {"id": 2, "amount": 250}}, {"json": {"id": 3, "amount": 120}}]

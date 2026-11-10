@@ -1,13 +1,18 @@
 import math
 
 
+def do_nothing():
+    """The starting _backward: a leaf value has no children to pass a gradient to."""
+    pass
+
+
 class Value:
     """A number that remembers how it was computed, so it can compute gradients."""
 
     def __init__(self, data, _children=(), _op=""):
         self.data = data
         self.grad = 0.0
-        self._backward = lambda: None
+        self._backward = do_nothing
         self._prev = set(_children)
         self._op = _op
 
@@ -15,7 +20,8 @@ class Value:
         return f"Value(data={self.data:.4f}, grad={self.grad:.4f})"
 
     def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
+        if not isinstance(other, Value):
+            other = Value(other)
         out = Value(self.data + other.data, (self, other), "+")
 
         def _backward():
@@ -25,7 +31,8 @@ class Value:
         return out
 
     def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
+        if not isinstance(other, Value):
+            other = Value(other)
         out = Value(self.data * other.data, (self, other), "*")
 
         def _backward():
@@ -55,7 +62,8 @@ class Value:
         out = Value(max(0.0, self.data), (self,), "relu")
 
         def _backward():
-            self.grad += (1.0 if self.data > 0 else 0.0) * out.grad
+            if self.data > 0:
+                self.grad += out.grad
         out._backward = _backward
         return out
 

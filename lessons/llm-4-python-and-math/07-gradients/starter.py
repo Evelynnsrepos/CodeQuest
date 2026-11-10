@@ -6,11 +6,23 @@ def bowl(p):
 def numeric_gradient(f, point):
     h = 1e-5
     grad = []
+    # for i in range(len(point)):
+    #     up = list(point)
+    #     down = list(point)
+    #     up[i] = up[i] + h
+    #     down[i] = down[i] - h
+    #     grad.append((f(up) - f(down)) / (2 * h))
     return grad
 
 
 def gradient_descent(f, start, learning_rate, steps):
     point = list(start)
+    # for step in range(steps):
+    #     grad = numeric_gradient(f, point)
+    #     new_point = []
+    #     for i in range(len(point)):
+    #         new_point.append(point[i] - learning_rate * grad[i])
+    #     point = new_point
     return point
 
 

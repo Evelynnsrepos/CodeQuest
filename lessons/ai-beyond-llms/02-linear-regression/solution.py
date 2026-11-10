@@ -1,12 +1,28 @@
 def fit_line(xs, ys):
     n = len(xs)
-    mx, my = sum(xs) / n, sum(ys) / n
-    a = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sum((x - mx) ** 2 for x in xs)
-    return (a, my - a * mx)
+    sum_x = 0
+    sum_y = 0
+    for i in range(n):
+        sum_x = sum_x + xs[i]
+        sum_y = sum_y + ys[i]
+    mx = sum_x / n
+    my = sum_y / n
+    top = 0
+    bottom = 0
+    for i in range(n):
+        top = top + (xs[i] - mx) * (ys[i] - my)
+        bottom = bottom + (xs[i] - mx) ** 2
+    a = top / bottom
+    b = my - a * mx
+    return (a, b)
 
 
 def mse(xs, ys, a, b):
-    return sum((y - (a * x + b)) ** 2 for x, y in zip(xs, ys)) / len(xs)
+    total = 0
+    for i in range(len(xs)):
+        error = ys[i] - (a * xs[i] + b)
+        total = total + error ** 2
+    return total / len(xs)
 
 
 sizes = [30, 45, 60, 75, 90]          # square metres

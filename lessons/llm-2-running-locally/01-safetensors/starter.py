@@ -1,14 +1,21 @@
 import json
-import math
 
 
 def read_header(data):
-    n = 0  # the header length from the first 8 bytes
+    n = 0  # change to: int.from_bytes(data[0:8], "little")
+    # return json.loads(data[8:8 + n].decode("utf-8"))
     return {}
 
 
 def count_params(header):
     total = 0
+    # for name in header:
+    #     if name == "__metadata__":
+    #         continue
+    #     size = 1
+    #     for number in header[name]["shape"]:
+    #         size = size * number
+    #     total = total + size
     return total
 
 

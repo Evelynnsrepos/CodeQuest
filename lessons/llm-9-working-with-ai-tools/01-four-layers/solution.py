@@ -8,14 +8,19 @@ LAYERS = {
 
 def layer_of(name):
     n = name.lower()
-    for layer, names in LAYERS.items():
-        if n in names:
+    for layer in LAYERS:
+        if n in LAYERS[layer]:
             return layer
     return "unknown"
 
 
 def pick_integration(need):
-    return {"know how": "skill", "be able": "mcp", "always": "hook"}[need]
+    if need == "know how":
+        return "skill"
+    if need == "be able":
+        return "mcp"
+    if need == "always":
+        return "hook"
 
 
 print(layer_of("Ollama"), layer_of("claude code"), layer_of("hook"), pick_integration("always"))

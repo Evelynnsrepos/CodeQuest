@@ -1,4 +1,13 @@
 def decide(goal):
+    # if goal["prompt_works"]:
+    #     return "prompt"
+    # if goal["needs_facts"] and goal["needs_behaviour"]:
+    #     return "both"
+    # if goal["needs_facts"]:
+    #     return "rag"
+    # if goal["needs_behaviour"]:
+    #     return "finetune"
+    # return "prompt"
     return ""
 
 

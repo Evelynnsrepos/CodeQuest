@@ -1,7 +1,7 @@
 def to_chatml(messages):
     text = ""
     for message in messages:
-        text += "<|im_start|>" + message["role"] + "\n" + message["content"] + "<|im_end|>\n"
+        text = text + "<|im_start|>" + message["role"] + "\n" + message["content"] + "<|im_end|>\n"
     return text + "<|im_start|>assistant\n"
 
 

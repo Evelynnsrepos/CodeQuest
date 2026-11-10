@@ -3,13 +3,18 @@ import random
 
 
 # ---- your micrograd from lessons 2–4 ----
+def do_nothing():
+    """The starting _backward: a leaf value has no children to pass a gradient to."""
+    pass
+
+
 class Value:
     """A number that remembers how it was computed, so it can compute gradients."""
 
     def __init__(self, data, _children=(), _op=""):
         self.data = data
         self.grad = 0.0
-        self._backward = lambda: None
+        self._backward = do_nothing
         self._prev = set(_children)
         self._op = _op
 
@@ -17,7 +22,8 @@ class Value:
         return f"Value(data={self.data:.4f}, grad={self.grad:.4f})"
 
     def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
+        if not isinstance(other, Value):
+            other = Value(other)
         out = Value(self.data + other.data, (self, other), "+")
 
         def _backward():
@@ -27,7 +33,8 @@ class Value:
         return out
 
     def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
+        if not isinstance(other, Value):
+            other = Value(other)
         out = Value(self.data * other.data, (self, other), "*")
 
         def _backward():
@@ -57,7 +64,8 @@ class Value:
         out = Value(max(0.0, self.data), (self,), "relu")
 
         def _backward():
-            self.grad += (1.0 if self.data > 0 else 0.0) * out.grad
+            if self.data > 0:
+                self.grad += out.grad
         out._backward = _backward
         return out
 
@@ -86,38 +94,66 @@ class Value:
 # ---- neural network ----
 class Neuron:
     def __init__(self, n_inputs, activation=True):
-        self.w = [Value(random.uniform(-1, 1)) for _ in range(n_inputs)]
+        self.w = []
+        for i in range(n_inputs):
+            self.w.append(Value(random.uniform(-1, 1)))
         self.b = Value(0.0)
         self.activation = activation
 
     def __call__(self, x):
-        return None  # weighted sum of x with self.w, plus self.b, then tanh if self.activation
+        # total = self.b
+        # for i in range(len(self.w)):
+        #     total = total + self.w[i] * x[i]
+        # if self.activation:
+        #     return total.tanh()
+        # return total
+        return None
 
     def parameters(self):
+        # return self.w + [self.b]
         return []
 
 
 class Layer:
     def __init__(self, n_inputs, n_outputs, activation=True):
-        self.neurons = [Neuron(n_inputs, activation) for _ in range(n_outputs)]
+        self.neurons = []
+        for i in range(n_outputs):
+            self.neurons.append(Neuron(n_inputs, activation))
 
     def __call__(self, x):
-        return []  # one output per neuron
+        # outputs = []
+        # for n in self.neurons:
+        #     outputs.append(n(x))
+        # return outputs
+        return []
 
     def parameters(self):
+        # params = []
+        # for n in self.neurons:
+        #     params = params + n.parameters()
+        # return params
         return []
 
 
 class MLP:
     def __init__(self, n_inputs, layer_sizes):
         sizes = [n_inputs] + layer_sizes
-        self.layers = [Layer(sizes[i], sizes[i + 1], activation=(i < len(layer_sizes) - 1))
-                       for i in range(len(layer_sizes))]
+        self.layers = []
+        for i in range(len(layer_sizes)):
+            is_last = i == len(layer_sizes) - 1
+            self.layers.append(Layer(sizes[i], sizes[i + 1], activation=not is_last))
 
     def __call__(self, x):
-        return x  # feed x through every layer
+        # for layer in self.layers:
+        #     x = layer(x)
+        # return x
+        return x
 
     def parameters(self):
+        # params = []
+        # for layer in self.layers:
+        #     params = params + layer.parameters()
+        # return params
         return []
 
 

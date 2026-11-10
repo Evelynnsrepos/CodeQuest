@@ -1,7 +1,7 @@
 def neuron(inputs, weights, bias):
     total = 0
-    for x, w in zip(inputs, weights):
-        total += x * w
+    for i in range(len(inputs)):
+        total = total + inputs[i] * weights[i]
     return total + bias
 
 

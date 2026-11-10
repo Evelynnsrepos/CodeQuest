@@ -20,10 +20,16 @@ def init_ok(first_loss, vocab):
 def advantages(rewards):
     n = len(rewards)
     mean = sum(rewards) / n
-    std = math.sqrt(sum((r - mean) ** 2 for r in rewards) / n)
+    total = 0
+    for r in rewards:
+        total = total + (r - mean) ** 2
+    std = math.sqrt(total / n)
     if std == 0:
         return [0.0] * n
-    return [(r - mean) / std for r in rewards]
+    out = []
+    for r in rewards:
+        out.append((r - mean) / std)
+    return out
 
 
 print(train_flops(7e9, 2e12), chinchilla_tokens(7e9), start_loss(32000), init_ok(31.5, 32000))

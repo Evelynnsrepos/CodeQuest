@@ -5,7 +5,10 @@ PRICES = {"small": (0.25, 1.25), "big": (3.0, 15.0)}
 
 def percentile(values, p):
     s = sorted(values)
-    return s[max(1, math.ceil(p / 100 * len(s))) - 1]
+    rank = math.ceil(p / 100 * len(s))
+    if rank < 1:
+        rank = 1
+    return s[rank - 1]
 
 
 class Tracker:
@@ -14,11 +17,15 @@ class Tracker:
         self.calls = []
 
     def record(self, model, tokens_in, tokens_out, ms):
-        pin, pout = self.prices[model]
-        self.calls.append({"model": model, "ms": ms, "cost": (tokens_in * pin + tokens_out * pout) / 1_000_000})
+        price_in, price_out = self.prices[model]
+        cost = (tokens_in * price_in + tokens_out * price_out) / 1_000_000
+        self.calls.append({"model": model, "ms": ms, "cost": cost})
 
     def cost(self):
-        return sum(c["cost"] for c in self.calls)
+        total = 0.0
+        for c in self.calls:
+            total = total + c["cost"]
+        return total
 
     def cost_by_model(self):
         out = {}
@@ -27,8 +34,10 @@ class Tracker:
         return out
 
     def latency(self):
-        ms = [c["ms"] for c in self.calls]
-        return {f"p{p}": percentile(ms, p) for p in (50, 95, 99)}
+        ms = []
+        for c in self.calls:
+            ms.append(c["ms"])
+        return {"p50": percentile(ms, 50), "p95": percentile(ms, 95), "p99": percentile(ms, 99)}
 
     def over_budget(self, limit):
         return self.cost() > limit

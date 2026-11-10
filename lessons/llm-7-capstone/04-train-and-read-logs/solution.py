@@ -2,19 +2,34 @@ import math
 
 
 def best_checkpoint(history):
-    evals = [h for h in history if "eval_loss" in h]
-    return min(evals, key=lambda h: h["eval_loss"])["step"]
+    best_step = None
+    best_loss = None
+    for h in history:
+        if "eval_loss" in h:
+            if best_loss is None or h["eval_loss"] < best_loss:
+                best_loss = h["eval_loss"]
+                best_step = h["step"]
+    return best_step
 
 
 def diagnose(history):
     problems = []
-    train = [h["loss"] for h in history if "loss" in h]
-    evals = [h["eval_loss"] for h in history if "eval_loss" in h]
-    if any(math.isnan(x) for x in train):
+    train = []
+    evals = []
+    for h in history:
+        if "loss" in h:
+            train.append(h["loss"])
+        if "eval_loss" in h:
+            evals.append(h["eval_loss"])
+    has_nan = False
+    for x in train:
+        if math.isnan(x):
+            has_nan = True
+    if has_nan:
         problems.append("nan loss")
-    if evals and evals[-1] > min(evals):
+    if len(evals) > 0 and evals[-1] > min(evals):
         problems.append("overfitting")
-    if train and train[-1] < 0.05:
+    if len(train) > 0 and train[-1] < 0.05:
         problems.append("memorizing")
     return problems
 

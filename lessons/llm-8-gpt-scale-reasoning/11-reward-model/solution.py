@@ -2,7 +2,10 @@ import math
 
 
 def reward(w, features):
-    return sum(a * b for a, b in zip(w, features))
+    total = 0
+    for i in range(len(w)):
+        total = total + w[i] * features[i]
+    return total
 
 
 def sigmoid(x):
@@ -18,11 +21,12 @@ def pair_loss(r_chosen, r_rejected):
 
 def train_reward(pairs, lr, epochs):
     w = [0.0] * len(pairs[0][0])
-    for _ in range(epochs):
+    for epoch in range(epochs):
         for c, r in pairs:
             diff = reward(w, c) - reward(w, r)
             scale = -(1 - sigmoid(diff))
-            w = [wi - lr * scale * (ci - ri) for wi, ci, ri in zip(w, c, r)]
+            for i in range(len(w)):
+                w[i] = w[i] - lr * scale * (c[i] - r[i])
     return w
 
 

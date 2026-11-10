@@ -1,8 +1,15 @@
 ---
 title: Fine-tuning hyperparameters
+minutes: 40
 xp: 40
+hint: effective_batch: return per_device * accumulation * gpus
+hint: total_steps: batch = effective_batch(per_device, accumulation, gpus), then return math.ceil(examples / batch) * epochs
+hint: warnings_for: eb = effective_batch(...) and steps = total_steps(...) from the config's values first
+hint: Then five separate ifs (not elif), each with warnings.append("..."), in the order of the list
 ---
 # Settings that make or break a run
+
+⏱️ About 40 minutes
 
 > **Warm-up:** LLMs 5 showed what a bad learning rate does. For LoRA on 500 examples, would you guess a larger or smaller learning rate than for pretraining? More or fewer epochs?
 
@@ -30,16 +37,65 @@ optimizer steps = ⌈examples ÷ effective batch⌉ × epochs
 
 With 500 examples, effective batch 16 and 3 epochs, that's only 96 optimizer steps. Small datasets mean few steps, so each one matters. Watch the training and validation loss (logged every few steps) and stop when validation stops improving. A training loss that drops to near 0 almost always means memorizing.
 
-## Your quest
+## 🔬 Take the formulas apart
 
-1. `effective_batch(per_device, accumulation, gpus=1)`.
-2. `total_steps(examples, per_device, accumulation, epochs, gpus=1)`.
-3. `warnings_for(config)`: return a list of warning strings for a LoRA config dictionary. Add each warning whose condition holds, in this order:
-   - `"learning rate too high"` if `lr > 5e-4`
-   - `"learning rate too low"` if `lr < 1e-5`
-   - `"too many epochs"` if `epochs > 5`
-   - `"effective batch too small"` if the effective batch is below 8
-   - `"very few steps"` if the total steps are below 20
+<div class="formula">effective batch = <span class="k1">per-device</span> × <span class="k2">accumulation</span> × <span class="k3">GPUs</span></div>
+- <span class="k1">per-device</span>: examples the GPU processes at once (small, so it fits in memory).
+- <span class="k2">accumulation</span>: how many of those small batches are added up before **one** update.
+- <span class="k3">GPUs</span>: you have 1.
+
+2 × 8 × 1 = **16** examples per optimizer step.
+
+<div class="formula">steps = <span class="k1">⌈examples ÷ effective batch⌉</span> × <span class="k2">epochs</span></div>
+⌈ ⌉ means round **up** (LLMs 5, lesson 7). 600 ÷ 16 = 37.5 → 38 steps per epoch, × 3 epochs = **114**.
+
+**Small numbers.** `5e-4` = 5 × 10⁻⁴ = 0.0005. The minus in the power means "divide": 10⁻⁴ = 1 / 10,000. `1e-5` = 0.00001.
+
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `def f(a, b, gpus=1):` | | `gpus` is 1 unless the caller says otherwise |
+| `math.ceil(x)` | | round up |
+| `config["lr"]` | | read a value from the dictionary |
+| `if config["lr"] > 5e-4:` | | compare with 0.0005 |
+| five `if`s in a row | | each one is checked. Several warnings can be added. (`elif` would stop at the first.) |
+| `warnings.append("...")` | | add one text to the list |
+
+### 👀 Worked example: the risky config
+
+`{"lr": 1e-3, "epochs": 10, "examples": 40, "per_device": 1, "accumulation": 2}`:
+
+1. effective batch 1 × 2 = 2. Steps = ⌈40 ÷ 2⌉ × 10 = 20 × 10 = 200.
+2. lr 0.001 > 0.0005 → "learning rate too high".
+3. lr < 0.00001? No.
+4. epochs 10 > 5 → "too many epochs".
+5. effective batch 2 < 8 → "effective batch too small".
+6. steps 200 < 20? No.
+
+## 🎯 Your quest
+
+`effective_batch`: replace `return 0` with `    return per_device * accumulation * gpus`
+
+`total_steps`: replace `return 0` with:
+
+1. `    batch = effective_batch(per_device, accumulation, gpus)`
+2. `    return math.ceil(examples / batch) * epochs`
+
+`warnings_for(config)`: between `warnings = []` and `return warnings`, add:
+
+1. `    eb = effective_batch(config["per_device"], config["accumulation"])`
+2. `    steps = total_steps(config["examples"], config["per_device"], config["accumulation"], config["epochs"])`
+3. `    if config["lr"] > 5e-4:`
+4. `        warnings.append("learning rate too high")`
+5. `    if config["lr"] < 1e-5:`
+6. `        warnings.append("learning rate too low")`
+7. `    if config["epochs"] > 5:`
+8. `        warnings.append("too many epochs")`
+9. `    if eb < 8:`
+10. `        warnings.append("effective batch too small")`
+11. `    if steps < 20:`
+12. `        warnings.append("very few steps")`
 
 ## Review
 

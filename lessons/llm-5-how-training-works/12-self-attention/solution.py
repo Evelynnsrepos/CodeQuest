@@ -2,29 +2,53 @@ import math
 
 
 def matmul(A, B):
-    cols = list(zip(*B))
-    return [[sum(a * b for a, b in zip(row, col)) for col in cols] for row in A]
+    C = []
+    for row in A:
+        new_row = []
+        for j in range(len(B[0])):
+            total = 0
+            for k in range(len(row)):
+                total = total + row[k] * B[k][j]
+            new_row.append(total)
+        C.append(new_row)
+    return C
 
 
 def dot(a, b):
-    return sum(x * y for x, y in zip(a, b))
+    total = 0
+    for i in range(len(a)):
+        total = total + a[i] * b[i]
+    return total
 
 
 def softmax(xs):
     m = max(xs)
-    e = [math.exp(x - m) for x in xs]
+    e = []
+    for x in xs:
+        e.append(math.exp(x - m))
     s = sum(e)
-    return [v / s for v in e]
+    out = []
+    for x in e:
+        out.append(x / s)
+    return out
 
 
 def causal_attention(X, Wq, Wk, Wv):
     Q, K, V = matmul(X, Wq), matmul(X, Wk), matmul(X, Wv)
-    H = len(Q[0])
     out = []
+    H = len(Q[0])
     for t in range(len(X)):
-        scores = [dot(Q[t], K[s]) / math.sqrt(H) for s in range(t + 1)]
+        scores = []
+        for s in range(t + 1):
+            scores.append(dot(Q[t], K[s]) / math.sqrt(H))
         weights = softmax(scores)
-        out.append([sum(weights[s] * V[s][h] for s in range(t + 1)) for h in range(len(V[0]))])
+        vec = []
+        for h in range(len(V[0])):
+            total = 0
+            for s in range(t + 1):
+                total = total + weights[s] * V[s][h]
+            vec.append(total)
+        out.append(vec)
     return out
 
 

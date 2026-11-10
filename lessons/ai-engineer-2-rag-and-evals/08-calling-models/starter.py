@@ -3,6 +3,28 @@ import httpx
 
 
 def chat(messages, model, base, client, retries=3, sleep=time.sleep):
+    # wait = 1.0
+    # url = base + "/chat/completions"
+    # payload = {"model": model, "messages": messages, "temperature": 0}
+    # for attempt in range(retries + 1):
+    #     try:
+    #         r = client.post(url, timeout=60, json=payload)
+    #     except httpx.TimeoutException:
+    #         r = None
+    #     if r is not None and r.status_code != 429 and r.status_code < 500:
+    #         r.raise_for_status()
+    #         data = r.json()
+    #         content = data["choices"][0]["message"]["content"]
+    #         return content, data.get("usage", {})
+    #     if attempt == retries:
+    #         break
+    #     if r is not None and "Retry-After" in r.headers:
+    #         delay = float(r.headers["Retry-After"])
+    #     else:
+    #         delay = wait
+    #     sleep(delay)
+    #     wait = wait * 2
+    # raise RuntimeError("model unavailable")
     return "", {}
 
 

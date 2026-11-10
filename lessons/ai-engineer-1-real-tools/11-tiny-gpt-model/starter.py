@@ -13,6 +13,17 @@ class CausalSelfAttention(nn.Module):
         self.register_buffer("mask", torch.tril(torch.ones(block, block, dtype=torch.bool)))
 
     def forward(self, x):
+        # B, T, C = x.shape
+        # q, k, v = self.qkv(x).split(C, dim=2)
+        # hs = C // self.n_head
+        # q = q.view(B, T, self.n_head, hs).transpose(1, 2)
+        # k = k.view(B, T, self.n_head, hs).transpose(1, 2)
+        # v = v.view(B, T, self.n_head, hs).transpose(1, 2)
+        # att = q @ k.transpose(-2, -1) / math.sqrt(hs)
+        # att = att.masked_fill(~self.mask[:T, :T], float("-inf"))
+        # y = att.softmax(dim=-1) @ v
+        # y = y.transpose(1, 2).contiguous().view(B, T, C)
+        # return self.proj(y)
         return x
 
 
@@ -40,6 +51,15 @@ class TinyGPT(nn.Module):
         self.head = nn.Linear(n_embd, vocab)
 
     def forward(self, idx, targets=None):
+        # B, T = idx.shape
+        # positions = torch.arange(T, device=idx.device)
+        # x = self.tok(idx) + self.pos(positions)
+        # x = self.blocks(x)
+        # logits = self.head(self.ln_f(x))
+        # loss = None
+        # if targets is not None:
+        #     loss = F.cross_entropy(logits.view(B * T, -1), targets.view(B * T))
+        # return logits, loss
         return None, None
 
 

@@ -1,15 +1,33 @@
 def trifecta(tools):
-    return all(any(t[k] for t in tools) for k in ("reads_untrusted", "private_data", "sends_out"))
+    untrusted = False
+    private = False
+    sends = False
+    for t in tools:
+        if t["reads_untrusted"]:
+            untrusted = True
+        if t["private_data"]:
+            private = True
+        if t["sends_out"]:
+            sends = True
+    return untrusted and private and sends
 
 
 def least_privilege(tools, needed):
-    return [t for t in tools if t["name"] in needed]
+    kept = []
+    for t in tools:
+        if t["name"] in needed:
+            kept.append(t)
+    return kept
 
 
 def safe_plan(tools, needed):
     kept = least_privilege(tools, needed)
     if trifecta(kept):
-        return [t for t in kept if not t["sends_out"]]
+        safe = []
+        for t in kept:
+            if not t["sends_out"]:
+                safe.append(t)
+        return safe
     return kept
 
 

@@ -14,20 +14,27 @@ def chunk_words(text, size, overlap):
 
 
 def chunk_sentences(text, max_words):
-    chunks, current = [], []
+    chunks = []
+    current = []
+    count = 0
     for sentence in re.split(r"(?<=[.!?])\s+", text.strip()):
         n = len(sentence.split())
-        if current and len(" ".join(current).split()) + n > max_words:
+        if len(current) > 0 and count + n > max_words:
             chunks.append(" ".join(current))
             current = []
+            count = 0
         current.append(sentence)
-    if current:
+        count = count + n
+    if len(current) > 0:
         chunks.append(" ".join(current))
     return chunks
 
 
 def with_meta(doc_id, chunks):
-    return [{"id": f"{doc_id}#{i}", "doc": doc_id, "text": c} for i, c in enumerate(chunks)]
+    out = []
+    for i in range(len(chunks)):
+        out.append({"id": str(doc_id) + "#" + str(i), "doc": doc_id, "text": chunks[i]})
+    return out
 
 
 text = "One two three four five six seven eight nine ten"

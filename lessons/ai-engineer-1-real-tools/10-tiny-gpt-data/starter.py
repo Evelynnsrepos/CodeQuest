@@ -12,18 +12,40 @@ import torch
 
 
 def build_vocab(text):
+    # chars = sorted(set(text))
+    # stoi = {}
+    # itos = {}
+    # for i in range(len(chars)):
+    #     stoi[chars[i]] = i
+    #     itos[i] = chars[i]
+    # return stoi, itos
     return {}, {}
 
 
 def encode(s, stoi):
+    # ids = []
+    # for c in s:
+    #     ids.append(stoi[c])
+    # return ids
     return []
 
 
 def decode(ids, itos):
+    # out = ""
+    # for i in ids:
+    #     out = out + itos[int(i)]
+    # return out
     return ""
 
 
 def get_batch(data, block, batch, gen):
+    # ix = torch.randint(len(data) - block, (batch,), generator=gen)
+    # xs = []
+    # ys = []
+    # for i in ix:
+    #     xs.append(data[i:i + block])
+    #     ys.append(data[i + 1:i + block + 1])
+    # return torch.stack(xs), torch.stack(ys)
     return None, None
 
 

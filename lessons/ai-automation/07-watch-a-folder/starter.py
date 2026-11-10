@@ -1,4 +1,9 @@
 def changed_files(before, now):
+    # found = []
+    # for name in now:
+    #     if before.get(name) != now[name]:
+    #         found.append(name)
+    # return sorted(found)
     return list(now)
 
 

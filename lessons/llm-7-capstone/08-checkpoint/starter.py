@@ -2,22 +2,34 @@ import math
 
 
 def fits(params_b, bits, vram_gb, overhead_gb=1.5):
+    # return params_b * bits / 8 + overhead_gb <= vram_gb
     return False
 
 
 def full_ft_gb(params_b):
+    # return params_b * 16
     return 0
 
 
 def best_step(log):
+    # best = log[0]
+    # for pair in log:
+    #     if pair[1] < best[1]:
+    #         best = pair
+    # return best[0]
     return None
 
 
 def win_interval(wins, n):
+    # p = wins / n
+    # e = 1.96 * math.sqrt(p * (1 - p) / n)
+    # return (p - e, p + e)
     return (0, 0)
 
 
 def clear_win(wins, n):
+    # low, high = win_interval(wins, n)
+    # return low > 0.5
     return False
 
 

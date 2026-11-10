@@ -6,11 +6,14 @@ def field_matches(field, value):
         if part == "*":
             return True
         if part.startswith("*/"):
-            if value % int(part[2:]) == 0:
+            step = int(part[2:])
+            if value % step == 0:
                 return True
         elif "-" in part:
-            a, b = map(int, part.split("-"))
-            if a <= value <= b:
+            ends = part.split("-")
+            low = int(ends[0])
+            high = int(ends[1])
+            if low <= value and value <= high:
                 return True
         elif int(part) == value:
             return True
@@ -18,42 +21,72 @@ def field_matches(field, value):
 
 
 def cron_due(expr, minute, hour, day, month, weekday):
-    return all(field_matches(f, v) for f, v in zip(expr.split(), (minute, hour, day, month, weekday)))
+    fields = expr.split()
+    values = [minute, hour, day, month, weekday]
+    for i in range(5):
+        if not field_matches(fields[i], values[i]):
+            return False
+    return True
 
 
 def matches(rule, tool, command):
     if "(" not in rule:
         return rule == tool
-    name, pattern = rule[:-1].split("(", 1)
+    i = rule.index("(")
+    name = rule[:i]
+    pattern = rule[i + 1:-1]
     if name != tool:
         return False
-    for tail in (" *", ":*"):
-        if pattern.endswith(tail):
-            prefix = pattern[: -len(tail)]
-            return command == prefix or command.startswith(prefix + " ")
+    if pattern.endswith(" *") or pattern.endswith(":*"):
+        prefix = pattern[:-2]
+        return command == prefix or command.startswith(prefix + " ")
     if pattern.endswith("*"):
         return command.startswith(pattern[:-1])
     return command == pattern
 
 
 def decide(tool, command, rules):
-    for outcome in ("deny", "ask", "allow"):
-        if any(matches(r, tool, command) for r in rules.get(outcome, [])):
-            return outcome
+    for outcome in ["deny", "ask", "allow"]:
+        for rule in rules.get(outcome, []):
+            if matches(rule, tool, command):
+                return outcome
     return "ask"
 
 
 def validate(obj, schema):
     if not isinstance(obj, dict):
         return ["not an object"]
-    errs = [k + ": required" for k in schema.get("required", []) if k not in obj]
-    for k, sub in schema.get("properties", {}).items():
+    errs = []
+    for k in schema.get("required", []):
+        if k not in obj:
+            errs.append(k + ": required")
+    properties = schema.get("properties", {})
+    for k in properties:
+        sub = properties[k]
         if k in obj and "enum" in sub and obj[k] not in sub["enum"]:
             errs.append(k + ": not allowed")
     return errs
 
 
 def nightly(now, calls, replies, rules, schema):
+    # if not cron_due("0 2 * * *", now[0], now[1], now[2], now[3], now[4]):
+    #     return None
+    # ran = []
+    # blocked = []
+    # for call in calls:
+    #     if decide(call[0], call[1], rules) == "allow":
+    #         ran.append(call)
+    #     else:
+    #         blocked.append(call)
+    # labels = []
+    # for raw in replies:
+    #     try:
+    #         obj = json.loads(raw)
+    #     except json.JSONDecodeError:
+    #         continue
+    #     if validate(obj, schema) == []:
+    #         labels.append(obj["label"])
+    # return {"ran": ran, "blocked": blocked, "labels": labels}
     return {}
 
 

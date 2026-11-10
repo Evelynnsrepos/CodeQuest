@@ -2,18 +2,33 @@ import math
 
 
 def goodness(h):
+    # total = 0
+    # for x in h:
+    #     total = total + x * x
+    # return total
     return 0
 
 
 def softplus(x):
+    # if x > 30:
+    #     return x
+    # return math.log(1 + math.exp(x))
     return 0
 
 
 def ff_loss(h_pos, h_neg, theta):
+    # return softplus(theta - goodness(h_pos)) + softplus(goodness(h_neg) - theta)
     return 0
 
 
 def normalize(h):
+    # length = math.sqrt(goodness(h))
+    # if length == 0:
+    #     return h
+    # out = []
+    # for x in h:
+    #     out.append(x / length)
+    # return out
     return h
 
 

@@ -22,6 +22,8 @@ def run_tool_calls(message, tools):
             try:
                 args = json.loads(call["function"]["arguments"])
             except ValueError:
+                args = None
+            if args is None:
                 content = "error: invalid arguments"
             else:
                 content = str(tools[name](**args))

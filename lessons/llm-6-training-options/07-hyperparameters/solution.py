@@ -6,7 +6,8 @@ def effective_batch(per_device, accumulation, gpus=1):
 
 
 def total_steps(examples, per_device, accumulation, epochs, gpus=1):
-    return math.ceil(examples / effective_batch(per_device, accumulation, gpus)) * epochs
+    batch = effective_batch(per_device, accumulation, gpus)
+    return math.ceil(examples / batch) * epochs
 
 
 def warnings_for(config):

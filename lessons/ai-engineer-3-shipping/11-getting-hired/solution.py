@@ -3,21 +3,41 @@ import re
 
 def readme_report(text):
     lines = text.splitlines()
-    first = next((l for l in lines if l.strip()), "")
-    heads = [l.lower() for l in lines if l.startswith("#")]
+    first = ""
+    for l in lines:
+        if l.strip() != "":
+            first = l
+            break
+    heads = []
+    for l in lines:
+        if l.startswith("#"):
+            heads.append(l.lower())
     low = text.lower()
-    return {
+    report = {
         "title": first.startswith("# "),
-        "run": any(w in h for h in heads for w in ("run", "install", "usage")),
+        "run": False,
         "docker": "docker run" in low or "docker compose" in low,
-        "eval": any("eval" in h or "results" in h for h in heads),
+        "eval": False,
         "numbers": re.search(r"\d+%|\d\.\d+", text) is not None,
-        "license": any("license" in h for h in heads),
+        "license": False,
     }
+    for h in heads:
+        if "run" in h or "install" in h or "usage" in h:
+            report["run"] = True
+        if "eval" in h or "results" in h:
+            report["eval"] = True
+        if "license" in h:
+            report["license"] = True
+    return report
 
 
 def score(text):
-    return sum(readme_report(text).values())
+    report = readme_report(text)
+    total = 0
+    for key in report:
+        if report[key]:
+            total = total + 1
+    return total
 
 
 MY_README = """# Notes RAG

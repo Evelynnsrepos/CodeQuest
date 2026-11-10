@@ -1,8 +1,14 @@
 ---
 title: Reading quant names (Q4_K_M and friends)
+minutes: 25
 xp: 30
+hint: file_size_gb: return params_billion * BPW[quant] / 8
+hint: best_quant: for quant in BPW: and inside it if file_size_gb(params_billion, quant) <= budget_gb: return quant
+hint: After the loop: return None
 ---
 # Choosing a quantization
+
+⏱️ About 25 minutes
 
 > **Warm-up:** on a model's download page in LM Studio you see `Q3_K_L`, `Q4_K_M`, `Q5_K_M`, `Q6_K`, `Q8_0`. Which would you pick, and why?
 
@@ -31,14 +37,59 @@ Rules of thumb that hold up well:
 - **A bigger model at Q4 usually beats a smaller model at Q8** of the same file size.
 - **Leave room for the context** (next lesson). A 12 GB card can't use a 12 GB file.
 
-## Your quest
+## 🔬 The size formula, with numbers
+
+`GB = billions of parameters × bits per weight ÷ 8`
+
+An 8B model at Q4_K_M (4.8 bits): 8 × 4.8 = 38.4, ÷ 8 (8 bits make one byte) = **4.8 GB**. The same model at Q8_0 (8.5 bits): 8 × 8.5 ÷ 8 = **8.5 GB**.
+
+`≤` (in Python `<=`) means "is less than **or equal to**": 4.8 ≤ 10 is true, and 10 ≤ 10 is true too.
+
+## 🐍 Python you need
+
+| You write | Say it | What it does |
+|---|---|---|
+| `BPW["Q4_K_M"]` | "BPW at Q4 K M" | looks up the bits per weight: `4.8` |
+| `for quant in BPW:` | | goes through the keys **in the order they were written**: best quality first |
+| `<=` | "is at most" | less than or equal to |
+| `return quant` inside the loop | | gives back the first one that fits and **stops** the function right there, so the loop doesn't go on |
+| `return None` after the loop | | only reached if nothing fitted |
+
+### 👀 Worked example: the best jacket you can afford
+
+Jackets from best to cheapest. Return the first one within budget:
+
+```python
+PRICES = {"wool": 120, "cotton": 60, "plastic": 20}
+
+def best_jacket(budget):
+    for jacket in PRICES:
+        if PRICES[jacket] <= budget:
+            return jacket
+    return None
+
+print(best_jacket(70))   # cotton
+```
+
+1. wool: 120 ≤ 70? No.
+2. cotton: 60 ≤ 70? Yes → `return "cotton"`. The function ends; plastic is never looked at.
+
+`best_jacket(10)`: nothing fits, the loop ends, and it returns `None`.
+
+## 🎯 Your quest
 
 `BPW` holds the table above, ordered from best quality to smallest.
 
-1. `file_size_gb(params_billion, quant)`: billions of parameters × bits per weight ÷ 8.
-2. `best_quant(params_billion, budget_gb)`: walk `BPW` in order and return the **first** (best) quant whose file size is at most `budget_gb`. Return `None` if none fits.
+**Part 1:** `file_size_gb(params_billion, quant)`. Replace `return 0` with:
 
-Dictionaries keep their order, so `for quant in BPW:` walks from best to smallest.
+- `return params_billion * BPW[quant] / 8`
+
+**Part 2:** `best_quant(params_billion, budget_gb)`. Replace `return None` with:
+
+1. `for quant in BPW:`
+2. `    if file_size_gb(params_billion, quant) <= budget_gb:`
+3. `        return quant`
+4. `return None`
 
 ## Review
 

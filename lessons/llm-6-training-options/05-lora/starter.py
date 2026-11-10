@@ -1,21 +1,52 @@
 def matmul(A, B):
-    cols = list(zip(*B))
-    return [[sum(a * b for a, b in zip(row, col)) for col in cols] for row in A]
+    C = []
+    for row in A:
+        new_row = []
+        for j in range(len(B[0])):
+            total = 0
+            for k in range(len(row)):
+                total = total + row[k] * B[k][j]
+            new_row.append(total)
+        C.append(new_row)
+    return C
 
 
 def matvec(M, x):
-    return [sum(m * xi for m, xi in zip(row, x)) for row in M]
+    out = []
+    for row in M:
+        total = 0
+        for k in range(len(row)):
+            total = total + row[k] * x[k]
+        out.append(total)
+    return out
 
 
 def lora_params(d_in, d_out, r):
+    # return r * (d_in + d_out)
     return 0
 
 
 def lora_forward(W, A, B, x, alpha, r):
+    # base = matvec(W, x)
+    # delta = matvec(B, matvec(A, x))
+    # scale = alpha / r
+    # out = []
+    # for i in range(len(base)):
+    #     out.append(base[i] + scale * delta[i])
+    # return out
     return []
 
 
 def merge(W, A, B, alpha, r):
+    # BA = matmul(B, A)
+    # scale = alpha / r
+    # merged = []
+    # for i in range(len(W)):
+    #     row = []
+    #     for j in range(len(W[0])):
+    #         row.append(W[i][j] + scale * BA[i][j])
+    #     merged.append(row)
+    # return merged
     return W
 
 

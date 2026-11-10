@@ -6,21 +6,35 @@ def sigmoid(z):
 
 
 def predict(w, b, x):
-    return sigmoid(sum(wi * xi for wi, xi in zip(w, x)) + b)
+    z = 0
+    for j in range(len(w)):
+        z = z + w[j] * x[j]
+    return sigmoid(z + b)
 
 
 def train_logistic(X, y, lr, epochs):
-    w, b = [0.0] * len(X[0]), 0.0
-    for _ in range(epochs):
-        for x, t in zip(X, y):
-            err = predict(w, b, x) - t
-            w = [wi - lr * err * xi for wi, xi in zip(w, x)]
-            b -= lr * err
+    w = [0.0] * len(X[0])
+    b = 0.0
+    for epoch in range(epochs):
+        for i in range(len(X)):
+            x = X[i]
+            err = predict(w, b, x) - y[i]
+            for j in range(len(w)):
+                w[j] = w[j] - lr * err * x[j]
+            b = b - lr * err
     return w, b
 
 
 def accuracy(w, b, X, y):
-    return sum((predict(w, b, x) >= 0.5) == bool(t) for x, t in zip(X, y)) / len(X)
+    correct = 0
+    for i in range(len(X)):
+        if predict(w, b, X[i]) >= 0.5:
+            guess = 1
+        else:
+            guess = 0
+        if guess == y[i]:
+            correct = correct + 1
+    return correct / len(X)
 
 
 hours = [[0.5], [1.0], [1.5], [2.0], [3.0], [3.5], [4.0], [5.0]]

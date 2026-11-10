@@ -10,9 +10,19 @@ def embed(text):
 
 
 def cosine(a, b):
-    dot = sum(a[w] * b.get(w, 0) for w in a)
-    norm = math.sqrt(sum(v * v for v in a.values())) * math.sqrt(sum(v * v for v in b.values()))
-    return dot / norm if norm else 0.0
+    dot = 0
+    for w in a:
+        dot = dot + a[w] * b.get(w, 0)
+    sum_a = 0
+    for w in a:
+        sum_a = sum_a + a[w] * a[w]
+    sum_b = 0
+    for w in b:
+        sum_b = sum_b + b[w] * b[w]
+    norm = math.sqrt(sum_a) * math.sqrt(sum_b)
+    if norm == 0:
+        return 0.0
+    return dot / norm
 
 
 def chunk(text, size, overlap):
@@ -27,8 +37,21 @@ def chunk(text, size, overlap):
 
 def retrieve(question, chunks, k):
     q = embed(question)
-    ranked = sorted(chunks, key=lambda c: cosine(q, embed(c)), reverse=True)
-    return ranked[:k]
+    left = list(chunks)
+    picked = []
+    for turn in range(k):
+        if len(left) == 0:
+            break
+        best = None
+        best_score = -1
+        for c in left:
+            score = cosine(q, embed(c))
+            if score > best_score:
+                best = c
+                best_score = score
+        picked.append(best)
+        left.remove(best)
+    return picked
 
 
 notes = ("The KV cache stores keys and values for every token. It grows with the context length. "

@@ -6,7 +6,9 @@ def implicit_reward(logp_policy, logp_ref, beta):
 
 
 def dpo_loss(pc, pr, rc, rr, beta):
-    margin = implicit_reward(pc, rc, beta) - implicit_reward(pr, rr, beta)
+    chosen = implicit_reward(pc, rc, beta)
+    rejected = implicit_reward(pr, rr, beta)
+    margin = chosen - rejected
     return math.log(1 + math.exp(-margin))
 
 
@@ -14,7 +16,7 @@ def reward_accuracy(batch, beta):
     wins = 0
     for pc, pr, rc, rr in batch:
         if implicit_reward(pc, rc, beta) > implicit_reward(pr, rr, beta):
-            wins += 1
+            wins = wins + 1
     return wins / len(batch)
 
 

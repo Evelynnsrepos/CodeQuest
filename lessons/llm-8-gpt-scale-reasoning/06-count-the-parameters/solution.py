@@ -1,11 +1,18 @@
 def gpt2_params(vocab, ctx, d, layers):
-    per_layer = 2 * d + (3 * d * d + 3 * d) + (d * d + d) + 2 * d + (4 * d * d + 4 * d) + (4 * d * d + d)
+    ln1 = 2 * d
+    qkv = 3 * d * d + 3 * d
+    proj = d * d + d
+    ln2 = 2 * d
+    up = 4 * d * d + 4 * d
+    down = 4 * d * d + d
+    per_layer = ln1 + qkv + proj + ln2 + up + down
     return vocab * d + ctx * d + layers * per_layer + 2 * d
 
 
 def mlp_share(d):
     mlp = (4 * d * d + 4 * d) + (4 * d * d + d)
-    return mlp / (12 * d * d + 13 * d)
+    layer = 12 * d * d + 13 * d
+    return mlp / layer
 
 
 print("GPT-2 small:", f"{gpt2_params(50257, 1024, 768, 12):,}")

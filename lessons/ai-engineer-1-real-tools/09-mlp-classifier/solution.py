@@ -6,8 +6,10 @@ class Net(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.layers = torch.nn.Sequential(
-            torch.nn.Linear(2, 32), torch.nn.ReLU(),
-            torch.nn.Linear(32, 32), torch.nn.ReLU(),
+            torch.nn.Linear(2, 32),
+            torch.nn.ReLU(),
+            torch.nn.Linear(32, 32),
+            torch.nn.ReLU(),
             torch.nn.Linear(32, 1),
         )
 
@@ -19,7 +21,7 @@ def train(model, X, y, epochs=200, lr=0.01, batch=64):
     torch.manual_seed(0)
     opt = torch.optim.AdamW(model.parameters(), lr=lr)
     loss_fn = torch.nn.BCEWithLogitsLoss()
-    for _ in range(epochs):
+    for epoch in range(epochs):
         order = torch.randperm(len(X))
         for i in range(0, len(X), batch):
             idx = order[i:i + batch]
@@ -32,7 +34,9 @@ def train(model, X, y, epochs=200, lr=0.01, batch=64):
 
 def accuracy(model, X, y):
     with torch.no_grad():
-        return ((model(X) > 0).float() == y).float().mean().item()
+        guesses = (model(X) > 0).float()
+        right = (guesses == y).float()
+        return right.mean().item()
 
 
 Xn, yn = make_moons(600, noise=0.15, random_state=0)

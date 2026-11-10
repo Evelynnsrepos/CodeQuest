@@ -3,12 +3,24 @@ import math
 
 def matvec(W, x):
     """W is a list of rows; returns W·x."""
-    return [sum(w * v for w, v in zip(row, x)) for row in W]
+    out = []
+    for row in W:
+        total = 0
+        for i in range(len(x)):
+            total = total + row[i] * x[i]
+        out.append(total)
+    return out
 
 
 def rms_norm(x, eps=1e-5):
-    rms = math.sqrt(sum(v * v for v in x) / len(x) + eps)
-    return [v / rms for v in x]
+    total = 0
+    for v in x:
+        total = total + v * v
+    rms = math.sqrt(total / len(x) + eps)
+    out = []
+    for v in x:
+        out.append(v / rms)
+    return out
 
 
 def gelu(x):
@@ -16,8 +28,15 @@ def gelu(x):
 
 
 def mlp_block(x, W1, W2):
-    h = [gelu(v) for v in matvec(W1, rms_norm(x))]
-    return [a + b for a, b in zip(x, matvec(W2, h))]
+    hidden = matvec(W1, rms_norm(x))
+    h = []
+    for v in hidden:
+        h.append(gelu(v))
+    y = matvec(W2, h)
+    out = []
+    for i in range(len(x)):
+        out.append(x[i] + y[i])
+    return out
 
 
 W1 = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, -1.0]]   # 2 -> 4 (4x wider)

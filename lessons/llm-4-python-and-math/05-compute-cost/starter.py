@@ -1,12 +1,16 @@
 def matmul_flops(m, k, n):
+    # return 2 * m * k * n
     return 0
 
 
 def training_flops(params, tokens):
+    # return 6 * params * tokens
     return 0
 
 
 def training_days(flops, tflops, utilization):
+    # seconds = flops / (tflops * 1e12 * utilization)
+    # return seconds / 86400
     return 0
 
 

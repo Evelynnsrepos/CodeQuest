@@ -1,4 +1,12 @@
 def error_alert(data):
+    # name = data["workflow"]["name"]
+    # if "execution" not in data:
+    #     return "❌ " + name + " failed at its trigger: " + data["trigger"]["error"]["message"]
+    # ex = data["execution"]
+    # text = "❌ " + name + " failed at " + ex["lastNodeExecuted"] + ": " + ex["error"]["message"]
+    # if "url" in ex:
+    #     text = text + "\n" + ex["url"]
+    # return text
     return "❌ something failed"
 
 

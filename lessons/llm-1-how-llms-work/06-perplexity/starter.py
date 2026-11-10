@@ -2,10 +2,16 @@ import math
 
 
 def total_log_prob(probs):
+    # total = 0
+    # for p in probs:
+    #     total = total + math.log(p)
+    # return total
     return 0
 
 
 def perplexity(probs):
+    # average = total_log_prob(probs) / len(probs)
+    # return math.exp(-average)
     return 0
 
 

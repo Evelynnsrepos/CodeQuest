@@ -34,6 +34,26 @@ def text_result(text, is_error=False):
 
 
 def handle(message):
+    # if "id" not in message:
+    #     return None
+    # id = message["id"]
+    # method = message["method"]
+    # params = message.get("params", {})
+    # if method == "initialize":
+    #     info = {"name": "codequest-notes", "version": "1.0"}
+    #     return ok(id, {"protocolVersion": params["protocolVersion"], "capabilities": {"tools": {}}, "serverInfo": info})
+    # if method == "tools/list":
+    #     return ok(id, {"tools": TOOLS})
+    # if method == "tools/call":
+    #     name = params["name"]
+    #     if name not in IMPLEMENTATIONS:
+    #         return ok(id, text_result("unknown tool " + name, True))
+    #     try:
+    #         text = str(IMPLEMENTATIONS[name](**params.get("arguments", {})))
+    #         return ok(id, text_result(text))
+    #     except Exception as e:
+    #         return ok(id, text_result("error: " + repr(e), True))
+    # return fail(id, -32601, "Method not found")
     return None
 
 

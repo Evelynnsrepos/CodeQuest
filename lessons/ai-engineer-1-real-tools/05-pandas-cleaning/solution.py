@@ -16,11 +16,16 @@ def clean(text):
     df["id"] = df["id"].astype(int)
     df["email"] = df["email"].str.strip().str.casefold()
     d = df["date"].str.strip()
-    df["date"] = pd.to_datetime(d, format="%d.%m.%Y", errors="coerce").fillna(pd.to_datetime(d, format="%Y-%m-%d", errors="coerce"))
-    amount = df["amount"].str.replace("€", "").str.strip().str.replace(".", "").str.replace(",", ".")
+    first = pd.to_datetime(d, format="%d.%m.%Y", errors="coerce")
+    second = pd.to_datetime(d, format="%Y-%m-%d", errors="coerce")
+    df["date"] = first.fillna(second)
+    amount = df["amount"].str.replace("€", "").str.strip()
+    amount = amount.str.replace(".", "").str.replace(",", ".")
     df["amount"] = pd.to_numeric(amount, errors="coerce")
-    df = df.dropna(subset=["email", "date"]).drop_duplicates(subset=["email", "date", "amount"], keep="first")
-    return df[["id", "email", "date", "amount"]].reset_index(drop=True)
+    df = df.dropna(subset=["email", "date"])
+    df = df.drop_duplicates(subset=["email", "date", "amount"], keep="first")
+    df = df[["id", "email", "date", "amount"]]
+    return df.reset_index(drop=True)
 
 
 print(clean(RAW))
