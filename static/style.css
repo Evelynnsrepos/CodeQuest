@@ -148,6 +148,29 @@ main { max-width: 1280px; margin: 0 auto; padding: 16px; }
 .editor .cm-editor.cm-focused { outline: none; }
 .editor .cm-scroller { font-family: var(--mono); }
 
+.puzzle { display: flex; flex-direction: column; gap: 10px; }
+.pz-code {
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);
+  padding: 10px 12px; overflow-x: auto; font: 15px/1.5 var(--mono);
+}
+.pz-line { white-space: pre; min-height: 1.5em; }
+.pz-comment { color: var(--muted); }
+.pz-gap, .pz-block {
+  font: inherit; font-family: var(--mono); color: var(--text); cursor: pointer; text-align: left;
+  border-radius: 8px; padding: 4px 10px; min-height: 36px; margin: 2px 0;
+}
+.pz-gap { border: 2px dashed var(--border); background: var(--surface-2); min-width: 8ch; white-space: pre; }
+.pz-gap.filled { border-style: solid; border-color: var(--accent); background: var(--surface); }
+.pz-gap.selected { border-color: var(--gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 35%, transparent); }
+.pz-tip { margin: 0; font-size: 0.9rem; }
+.pz-tray { display: flex; flex-wrap: wrap; gap: 8px; }
+.pz-tray p { margin: 0; }
+.pz-block {
+  border: 1px solid var(--accent); background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere;
+  box-shadow: 0 2px 0 var(--accent); max-width: 100%;
+}
+.pz-block:active { transform: translateY(2px); box-shadow: none; }
+
 .symbols { display: none; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
 .symbols button {
   flex: none; min-width: 44px; min-height: 40px; padding: 0 10px;
@@ -212,6 +235,8 @@ dialog input { width: 100%; font-size: 1.3rem; padding: 10px; margin-bottom: 12p
   .lesson-body { padding: 2px 16px 16px; }
   .to-code { display: flex; }
   .editor .cm-editor { height: 46vh; }
+  .pz-code { font-size: 13px; padding: 8px; }
+  .pz-gap, .pz-block { padding: 4px 8px; }
   .symbols { display: flex; }
 }
 
